@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { getUsuario, logoutUsuario, ESTADO_AUTH_EVENTO } from '../service/auth.js';
@@ -5,6 +6,7 @@ import { getUsuario, logoutUsuario, ESTADO_AUTH_EVENTO } from '../service/auth.j
 const links = [
   { nome: 'Início', to: '/' },
   { nome: 'Planejamento', to: '/planejamento' },
+  { nome: 'Simulados', to: '/simulados' },
   { nome: 'Progresso', to: '/progresso' },
   { nome: 'Cronograma', to: '/cronograma' },
   { nome: 'Meus Planos', to: '/meus-planos' },
@@ -18,7 +20,6 @@ function Header() {
   const [usuario, setUsuario] = useState(() => getUsuario());
   const [menuAberto, setMenuAberto] = useState(false);
 
-  // Relê o usuário a cada troca de página e quando o login/logout acontece
   useEffect(() => {
     setUsuario(getUsuario());
     setMenuAberto(false);
@@ -26,8 +27,10 @@ function Header() {
 
   useEffect(() => {
     const atualizar = () => setUsuario(getUsuario());
+
     window.addEventListener(ESTADO_AUTH_EVENTO, atualizar);
     window.addEventListener('storage', atualizar);
+
     return () => {
       window.removeEventListener(ESTADO_AUTH_EVENTO, atualizar);
       window.removeEventListener('storage', atualizar);
@@ -55,6 +58,7 @@ function Header() {
           <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center">
             <span className="text-lg">🎓</span>
           </div>
+
           <div>
             <h1 className="font-bold text-sm leading-none">Caraguá Futuro</h1>
             <p className="text-[8px] text-emerald-400 tracking-wide mt-1">
@@ -65,7 +69,12 @@ function Header() {
 
         <div className="hidden lg:flex items-center gap-6 text-sm text-gray-300">
           {links.map((link) => (
-            <NavLink key={link.to} to={link.to} end={link.to === '/'} className={classeLink}>
+            <NavLink
+              key={link.to}
+              to={link.to}
+              end={link.to === '/'}
+              className={classeLink}
+            >
               {link.nome}
             </NavLink>
           ))}
@@ -77,10 +86,12 @@ function Header() {
               <div className="w-9 h-9 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold shrink-0">
                 {inicial}
               </div>
+
               <div className="hidden sm:block leading-tight">
                 <p className="text-white font-semibold text-sm max-w-[140px] truncate">
                   {usuario.nome}
                 </p>
+
                 <button
                   type="button"
                   onClick={sair}
@@ -120,7 +131,9 @@ function Header() {
               end={link.to === '/'}
               className={({ isActive }) =>
                 `block py-3 border-t border-[#174c3b] transition ${
-                  isActive ? 'text-emerald-400' : 'text-white hover:text-emerald-400'
+                  isActive
+                    ? 'text-emerald-400'
+                    : 'text-white hover:text-emerald-400'
                 }`
               }
             >
@@ -130,8 +143,15 @@ function Header() {
 
           {usuario ? (
             <div className="sm:hidden border-t border-[#174c3b] pt-3 flex items-center justify-between">
-              <span className="text-sm font-semibold truncate">{usuario.nome}</span>
-              <button type="button" onClick={sair} className="text-emerald-300 text-sm">
+              <span className="text-sm font-semibold truncate">
+                {usuario.nome}
+              </span>
+
+              <button
+                type="button"
+                onClick={sair}
+                className="text-emerald-300 text-sm"
+              >
                 Sair
               </button>
             </div>
