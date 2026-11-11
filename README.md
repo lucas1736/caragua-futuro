@@ -55,3 +55,94 @@ Campos: título, matéria, descrição, prioridade (Baixa/Média/Alta), prazo e 
 | Read | `GET /api/metas` e `GET /api/metas/:id` | Metas (lista, barra de progresso e filtros) |
 | Update | `PUT /api/metas/:id` | Metas → "Editar" ou o checkbox de concluir |
 | Delete | `DELETE /api/metas/:id` | Metas → "Excluir" |
+
+## Como trabalhar neste projeto (passo a passo)
+
+### 1. O que instalar antes
+
+- [Git](https://git-scm.com/downloads)
+- [Node.js](https://nodejs.org/) (versão LTS)
+- [VS Code](https://code.visualstudio.com/)
+- [MySQL](https://dev.mysql.com/downloads/mysql/) (precisa estar instalado e rodando)
+
+### 2. Baixar o projeto
+
+Abra o terminal do VS Code (Terminal → New Terminal), vá até a pasta onde quer guardar o projeto e rode:
+
+```
+git clone https://github.com/lucas1736/caragua-futuro.git
+cd caragua-futuro
+code .
+npm install
+```
+
+### 3. Configurar o ambiente (.env)
+
+1. Na raiz do projeto, crie um arquivo chamado `.env`.
+2. Cole o modelo abaixo e preencha com os seus dados:
+
+```
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=sua_senha_do_mysql
+DB_NAME=caragua_futuro
+
+PORT=3001
+JWT_SECRET=coloque-uma-frase-longa-e-aleatoria-aqui
+```
+
+3. **Nunca envie o `.env` para o GitHub.** Ele já está no `.gitignore`.
+
+### 4. Banco de dados
+
+Basta ter o MySQL rodando. O servidor cria o banco `caragua_futuro` e as tabelas automaticamente na primeira execução. Só garanta que o usuário e a senha no `.env` estão corretos.
+
+### 5. Rodar o projeto
+
+Um único comando sobe o servidor (API) e o site juntos:
+
+```
+npm run dev
+```
+
+Se precisar rodar separado: `npm run server` (API) e `npm run web` (site).
+
+### 6. Fluxo de trabalho (sempre em branch)
+
+**Nunca trabalhe direto na `main`.**
+
+```
+git checkout main
+git pull
+git checkout -b nome-da-tarefa
+```
+
+Faça suas alterações e depois:
+
+```
+git add .
+git commit -m "Descreva o que você fez"
+git push -u origin nome-da-tarefa
+```
+
+### 7. Abrir um Pull Request
+
+1. No GitHub, abra o repositório e clique em **Compare & pull request**.
+2. Descreva rapidamente o que foi feito.
+3. Aguarde a revisão. O responsável clica em **Merge** quando estiver tudo certo.
+
+Depois do merge, volte para a `main` e atualize:
+
+```
+git checkout main
+git pull
+```
+
+### 8. Regras do grupo
+
+- Combine quem faz cada página/arquivo para evitar conflitos.
+- Rode `git pull` antes de começar a mexer.
+- Faça commits pequenos, com mensagens claras.
+- Nunca envie senhas, tokens ou arquivos `.env`.
+- Em caso de conflito, avise o grupo antes de resolver.
