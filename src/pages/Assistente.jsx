@@ -35,7 +35,7 @@ function Assistente() {
               </div>
             </div>
 
-            <div className="flex-1 px-5 py-6 space-y-5 min-h-[380px]">
+            <div className="flex-1 px-5 py-6 space-y-5 min-h-[95]">
               <div className="flex items-start gap-3 max-w-[85%]">
                 <div className="w-7 h-7 shrink-0 bg-emerald-100 rounded-full flex items-center justify-center text-xs">
                   🤖

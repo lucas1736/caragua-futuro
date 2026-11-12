@@ -113,7 +113,7 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <main className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-10 py-8">
+      <main className="max-w-375 mx-auto px-4 sm:px-6 lg:px-10 py-8">
 
         <section className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-5 mb-8">
           <div>
@@ -154,7 +154,7 @@ useEffect(() => {
 
           <section className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
-              <div className="min-w-[760px]">
+              <div className="min-w-190">
 
                 <div className="grid grid-cols-[90px_repeat(7,minmax(0,1fr))] bg-[#063b29] text-white">
                   <div className="p-4 text-sm font-semibold">Horário</div>
@@ -229,7 +229,7 @@ useEffect(() => {
                                   key={materia}
                                   className="rounded-lg border border-emerald-200 bg-emerald-50 p-3"
                                 >
-                                  <p className="text-sm font-bold text-emerald-900 break-words">
+                                  <p className="text-sm font-bold text-emerald-900  wrap-break-word">
                                     {materia}
                                   </p>
                                   <p className="mt-2 text-xs text-emerald-700">
@@ -363,7 +363,7 @@ useEffect(() => {
       </main>
 
       <footer className="bg-[#063b29] text-white mt-12">
-        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-10 py-10 flex flex-col md:flex-row justify-between gap-8">
+        <div className="max-w-375 mx-auto px-4 sm:px-6 lg:px-10 py-10 flex flex-col md:flex-row justify-between gap-8">
           <div>
             <h3 className="font-bold text-lg">Caraguá Futuro</h3>
             <p className="text-sm text-gray-300 mt-2 max-w-md leading-relaxed">
@@ -388,7 +388,7 @@ useEffect(() => {
           </div>
         </div>
 
-        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-10 py-4 border-t border-white/10 text-xs text-gray-400">
+        <div className="max-w-375 mx-auto px-4 sm:px-6 lg:px-10 py-4 border-t border-white/10 text-xs text-gray-400">
           © 2026 Caraguá Futuro. Todos os direitos reservados.
         </div>
       </footer>
