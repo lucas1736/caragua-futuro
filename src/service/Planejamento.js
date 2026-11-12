@@ -1,570 +1,530 @@
+
 import { getToken } from "./auth.js";
 import { criarPlano } from "./planos.js";
 
-// Roda toda vez que a página é montada (navegação sem recarregar).
 export default function iniciarPlanejamento() {
+  const objetivo = document.getElementById("objetivo");
+  const modalidade = document.getElementById("modalidade");
 
-// ==========================================
-// PLANEJAMENTO - CARAGUÁ FUTURO
-// ==========================================
+  const botoesMaterias = document.querySelectorAll(".materia");
+  const botoesDias = document.querySelectorAll(".dia");
 
+  const tempo = document.getElementById("tempo");
+  const tempoSelecionado = document.getElementById("tempoSelecionado");
+  const dataExame = document.getElementById("dataExame");
 
-// ==========================================
-// MATÉRIAS
-// ==========================================
+  const botaoGerar = document.getElementById("gerarPlano");
+  const modal = document.getElementById("modalPlano");
+  const resultado = document.getElementById("resultadoPlano");
+  const botaoSalvar = document.getElementById("confirmarPlano");
 
-const botoesMaterias = document.querySelectorAll(".materia");
+  if (!objetivo || !modalidade || !botaoGerar || !botaoSalvar) {
+    console.error("Elementos do planejamento não encontrados.");
+    return;
+  }
 
-let materiasSelecionadas = [
-    "Matemática",
-    "Português",
-    "Biologia",
-    "História",
-    "Redação"
-];
+  let materiasSelecionadas = [];
+  let diasSelecionados = ["Seg", "Ter", "Qua", "Qui", "Sex"];
+  let vestibularesSelecionados = [];
 
+  // Opções disponíveis para cada objetivo.
+  const opcoesPorObjetivo = {
+    IFSP: [
+      {
+        id: "integrado",
+        nome: "IFSP Integrado ao Ensino Médio"
+      },
+      {
+        id: "concomitante",
+        nome: "IFSP Concomitante e Subsequente"
+      }
+    ],
 
-botoesMaterias.forEach(botao => {
+    ETEC: [
+      {
+        id: "etec",
+        nome: "Vestibulinho ETEC"
+      }
+    ],
 
-    botao.addEventListener("click", () => {
+    FATEC: [
+      {
+        id: "fatec",
+        nome: "Vestibular FATEC"
+      }
+    ],
 
-        const materia = botao.dataset.materia;
+    "Concurso público": [
+      {
+        id: "concurso",
+        nome: "Concurso público"
+      }
+    ],
 
-        if (materiasSelecionadas.includes(materia)) {
+    Vestibular: [
+      {
+        id: "enem",
+        nome: "ENEM"
+      },
+      {
+        id: "outros",
+        nome: "Outros vestibulares"
+      }
+    ]
+  };
 
-            materiasSelecionadas =
-                materiasSelecionadas.filter(
-                    item => item !== materia
-                );
+  // Matérias sugeridas para cada modalidade.
+  const materiasPorModalidade = {
+    integrado: [
+      "Português",
+      "Matemática"
+    ],
 
-            // aparência desativada
+    concomitante: [
+      "Português",
+      "Matemática"
+    ],
 
-            botao.classList.remove(
-                "bg-emerald-500",
-                "text-[#063b29]",
-                "font-semibold"
-            );
+    etec: [
+      "Português",
+      "Matemática",
+      "História",
+      "Geografia",
+      "Biologia",
+      "Física",
+      "Química"
+    ],
 
-            botao.classList.add(
-                "bg-slate-50",
-                "border",
-                "border-slate-200",
-                "text-slate-600"
-            );
+    fatec: [
+      "Português",
+      "Matemática",
+      "Física",
+      "Química",
+      "Biologia",
+      "História",
+      "Geografia",
+      "Redação"
+    ],
 
-        } else {
+    concurso: [
+      "Português",
+      "Matemática",
+      "História",
+      "Geografia"
+    ],
 
-            materiasSelecionadas.push(materia);
+    enem: [
+      "Português",
+      "Matemática",
+      "Física",
+      "Química",
+      "Biologia",
+      "História",
+      "Geografia",
+      "Redação"
+    ],
 
-            // aparência ativada
+    outros: [
+      "Português",
+      "Matemática",
+      "Física",
+      "Química",
+      "Biologia",
+      "História",
+      "Geografia",
+      "Redação"
+    ]
+  };
 
-            botao.classList.remove(
-                "bg-slate-50",
-                "border",
-                "border-slate-200",
-                "text-slate-600"
-            );
+  const nomesModalidades = {
+    integrado: "IFSP Integrado ao Ensino Médio",
+    concomitante: "IFSP Concomitante e Subsequente",
+    etec: "Vestibulinho ETEC",
+    fatec: "Vestibular FATEC",
+    concurso: "Concurso público",
+    enem: "ENEM",
+    outros: "Outros vestibulares"
+  };
 
-            botao.classList.add(
-                "bg-emerald-500",
-                "text-[#063b29]",
-                "font-semibold"
-            );
+  // Atualiza a aparência de uma matéria.
+  function atualizarVisualMateria(botao, selecionada) {
+    botao.setAttribute("aria-pressed", String(selecionada));
 
-        }
+    botao.classList.toggle("bg-emerald-500", selecionada);
+    botao.classList.toggle("text-[#063b29]", selecionada);
+    botao.classList.toggle("font-semibold", selecionada);
 
+    botao.classList.toggle("bg-slate-50", !selecionada);
+    botao.classList.toggle("border", !selecionada);
+    botao.classList.toggle("border-slate-200", !selecionada);
+    botao.classList.toggle("text-slate-600", !selecionada);
+  }
 
-        atualizarIA();
+  // Atualiza todas as matérias conforme a modalidade.
+  function atualizarMateriasAutomaticamente() {
+    const materias = materiasPorModalidade[
+      vestibularesSelecionados[0]
+    ] || [];
 
+    materiasSelecionadas = [...materias];
+
+    botoesMaterias.forEach(botao => {
+      atualizarVisualMateria(
+        botao,
+        materiasSelecionadas.includes(botao.dataset.materia)
+      );
     });
 
-});
+    atualizarIA();
+  }
 
+  // CAMPO 1: OBJETIVO.
+  // CAMPO 2: OPÇÕES DEPENDENTES DO OBJETIVO.
+  objetivo.addEventListener("change", () => {
+    const objetivoEscolhido = objetivo.value;
+    const opcoes = opcoesPorObjetivo[objetivoEscolhido] || [];
 
+    modalidade.innerHTML = "";
 
-// ==========================================
-// TEMPO DE ESTUDO
-// ==========================================
+    const opcaoInicial = document.createElement("option");
+    opcaoInicial.value = "";
+    opcaoInicial.textContent = "Selecione uma modalidade";
+    opcaoInicial.disabled = true;
+    opcaoInicial.selected = true;
 
-const tempo = document.getElementById("tempo");
+    modalidade.appendChild(opcaoInicial);
+    modalidade.disabled = opcoes.length === 0;
 
-const tempoSelecionado =
-    document.getElementById("tempoSelecionado");
+    opcoes.forEach(opcao => {
+      const elemento = document.createElement("option");
+      elemento.value = opcao.id;
+      elemento.textContent = opcao.nome;
+      modalidade.appendChild(elemento);
+    });
 
+    vestibularesSelecionados = [];
+    materiasSelecionadas = [];
 
-tempo.addEventListener("input", () => {
+    botoesMaterias.forEach(botao => {
+      atualizarVisualMateria(botao, false);
+    });
 
-    const horas = tempo.value;
+    atualizarIA();
+  });
+
+  // QUANDO ESCOLHER A MODALIDADE.
+  modalidade.addEventListener("change", () => {
+    vestibularesSelecionados = modalidade.value
+      ? [modalidade.value]
+      : [];
+
+    atualizarMateriasAutomaticamente();
+  });
+
+  // PERMITE AJUSTAR AS MATÉRIAS MANUALMENTE.
+  botoesMaterias.forEach(botao => {
+    botao.addEventListener("click", () => {
+      if (vestibularesSelecionados.length === 0) {
+        alert("Primeiro escolha seu objetivo e sua modalidade.");
+        return;
+      }
+
+      const materia = botao.dataset.materia;
+
+      if (materiasSelecionadas.includes(materia)) {
+        materiasSelecionadas = materiasSelecionadas.filter(
+          item => item !== materia
+        );
+      } else {
+        materiasSelecionadas.push(materia);
+      }
+
+      atualizarVisualMateria(
+        botao,
+        materiasSelecionadas.includes(materia)
+      );
+
+      atualizarIA();
+    });
+  });
+
+  // TEMPO DISPONÍVEL.
+  tempo.addEventListener("input", () => {
+    const horas = Number(tempo.value);
 
     tempoSelecionado.textContent =
-        `${horas} ${horas == 1 ? "hora" : "horas"} / dia selecionada${horas == 1 ? "" : "s"}`;
+      `${horas} ${horas === 1 ? "hora" : "horas"} / dia selecionada${horas === 1 ? "" : "s"}`;
 
     atualizarIA();
+  });
 
-});
-
-
-
-// ==========================================
-// DIAS DA SEMANA
-// ==========================================
-
-const botoesDias =
-    document.querySelectorAll(".dia");
-
-
-let diasSelecionados = [
-    "Seg",
-    "Ter",
-    "Qua",
-    "Qui",
-    "Sex"
-];
-
-
-botoesDias.forEach(botao => {
-
+  // DIAS DA SEMANA.
+  botoesDias.forEach(botao => {
     botao.addEventListener("click", () => {
+      const dia = botao.dataset.dia;
 
-        const dia = botao.dataset.dia;
-
-
-        if (diasSelecionados.includes(dia)) {
-
-            // não deixa ficar sem nenhum dia
-
-            if (diasSelecionados.length === 1) {
-
-                alert("Você precisa selecionar pelo menos um dia.");
-
-                return;
-
-            }
-
-
-            diasSelecionados =
-                diasSelecionados.filter(
-                    item => item !== dia
-                );
-
-
-            botao.classList.remove(
-                "bg-[#063b29]",
-                "text-white"
-            );
-
-            botao.classList.add(
-                "bg-slate-50",
-                "border",
-                "border-slate-200",
-                "text-slate-600"
-            );
-
-
-        } else {
-
-            diasSelecionados.push(dia);
-
-
-            botao.classList.remove(
-                "bg-slate-50",
-                "border",
-                "border-slate-200",
-                "text-slate-600"
-            );
-
-            botao.classList.add(
-                "bg-[#063b29]",
-                "text-white"
-            );
-
+      if (diasSelecionados.includes(dia)) {
+        if (diasSelecionados.length === 1) {
+          alert("Você precisa selecionar pelo menos um dia.");
+          return;
         }
 
+        diasSelecionados = diasSelecionados.filter(
+          item => item !== dia
+        );
 
-        atualizarIA();
+        botao.classList.remove("bg-[#063b29]", "text-white");
 
+        botao.classList.add(
+          "bg-slate-50",
+          "border",
+          "border-slate-200",
+          "text-slate-600"
+        );
+      } else {
+        diasSelecionados.push(dia);
+
+        botao.classList.remove(
+          "bg-slate-50",
+          "border",
+          "border-slate-200",
+          "text-slate-600"
+        );
+
+        botao.classList.add("bg-[#063b29]", "text-white");
+      }
+
+      botao.setAttribute(
+        "aria-pressed",
+        String(diasSelecionados.includes(dia))
+      );
+
+      atualizarIA();
     });
+  });
 
-});
-
-
-
-// ==========================================
-// OBJETIVO
-// ==========================================
-
-const objetivo =
-    document.getElementById("objetivo");
-
-
-objetivo.addEventListener("change", () => {
-
-    atualizarIA();
-
-});
-
-
-
-// ==========================================
-// DATA
-// ==========================================
-
-const dataExame =
-    document.getElementById("dataExame");
-
-
-dataExame.addEventListener("change", () => {
-
-    atualizarIA();
-
-});
-
-
-
-// ==========================================
-// IA
-// ==========================================
-
-function atualizarIA() {
-
+  // ATUALIZAÇÃO DA ANÁLISE DA IA.
+  function atualizarIA() {
     const horas = Number(tempo.value);
 
     const prioridadeMateria =
-        document.getElementById("prioridadeMateria");
+      document.getElementById("prioridadeMateria");
 
     const distribuicao =
-        document.getElementById("distribuicao");
+      document.getElementById("distribuicao");
 
     const nivelDificuldade =
-        document.getElementById("nivelDificuldade");
+      document.getElementById("nivelDificuldade");
 
     const dicaIA =
-        document.getElementById("dicaIA");
-
-
-    // ----------------------------
-    // MATÉRIAS
-    // ----------------------------
+      document.getElementById("dicaIA");
 
     if (materiasSelecionadas.length === 0) {
-
-        prioridadeMateria.textContent =
-            "Nenhuma matéria selecionada";
-
-    } else if (materiasSelecionadas.length === 1) {
-
-        prioridadeMateria.textContent =
-            materiasSelecionadas[0];
-
+      prioridadeMateria.textContent =
+        "Selecione uma modalidade";
     } else {
-
-        prioridadeMateria.textContent =
-            materiasSelecionadas.slice(0, 2).join(" & ");
-
+      prioridadeMateria.textContent =
+        materiasSelecionadas.slice(0, 2).join(" & ") +
+        (materiasSelecionadas.length > 2
+          ? ` e mais ${materiasSelecionadas.length - 2}`
+          : "");
     }
 
-
-    // ----------------------------
-    // DISTRIBUIÇÃO
-    // ----------------------------
-
     if (horas <= 2) {
+      distribuicao.textContent =
+        "Priorizar teoria e exercícios essenciais.";
 
-        distribuicao.textContent =
-            "Priorizar teoria e exercícios essenciais.";
-
+      nivelDificuldade.textContent =
+        "Carga reduzida - focar nos conteúdos mais importantes.";
     } else if (horas <= 4) {
+      distribuicao.textContent =
+        "3 blocos de teoria e 2 de prática semanais.";
 
-        distribuicao.textContent =
-            "3 blocos de teoria e 2 de prática semanais.";
-
+      nivelDificuldade.textContent =
+        "Intermediário - equilibrar teoria e exercícios.";
     } else {
+      distribuicao.textContent =
+        "4 blocos de teoria e 3 de prática semanais.";
 
-        distribuicao.textContent =
-            "4 blocos de teoria e 3 de prática semanais.";
-
+      nivelDificuldade.textContent =
+        "Avançado - incluir revisões e simulados.";
     }
 
+    if (
+      !diasSelecionados.includes("Sáb") &&
+      !diasSelecionados.includes("Dom")
+    ) {
+      dicaIA.textContent =
+        "Dica da IA: mantenha o fim de semana livre para descansar e recuperar o conteúdo.";
+    } else {
+      dicaIA.textContent =
+        "Dica da IA: faça revisões leves no fim de semana para reforçar o conteúdo.";
+    }
+  }
 
-    // ----------------------------
-    // DIFICULDADE
-    // ----------------------------
-
+  // ESTRATÉGIA DO PLANO.
+  function gerarEstrategia(horas) {
     if (horas <= 2) {
-
-        nivelDificuldade.textContent =
-            "Carga reduzida - focar nos conteúdos mais importantes.";
-
-    } else if (horas <= 4) {
-
-        nivelDificuldade.textContent =
-            "Intermediário - equilibrar teoria e exercícios.";
-
-    } else {
-
-        nivelDificuldade.textContent =
-            "Avançado - incluir revisões e simulados.";
-
+      return `
+        Como seu tempo é limitado, o plano vai priorizar
+        os assuntos mais importantes das matérias selecionadas,
+        evitando sobrecarregar seus estudos.
+      `;
     }
-
-
-    // ----------------------------
-    // DICA
-    // ----------------------------
-
-    if (!diasSelecionados.includes("Sáb") &&
-        !diasSelecionados.includes("Dom")) {
-
-        dicaIA.textContent =
-            "Dica da IA: mantenha o fim de semana livre para descansar e recuperar o conteúdo.";
-
-    } else {
-
-        dicaIA.textContent =
-            "Dica da IA: faça revisões leves no fim de semana para reforçar o conteúdo.";
-
-    }
-
-}
-
-
-
-// ==========================================
-// GERAR PLANO
-// ==========================================
-
-const botaoGerar =
-    document.getElementById("gerarPlano");
-
-const modal =
-    document.getElementById("modalPlano");
-
-const resultado =
-    document.getElementById("resultadoPlano");
-
-
-botaoGerar.addEventListener("click", () => {
-
-
-    // validação
-
-    if (materiasSelecionadas.length === 0) {
-
-        alert("Selecione pelo menos uma matéria.");
-
-        return;
-
-    }
-
-
-    if (!dataExame.value) {
-
-        alert("Escolha a data estimada do exame.");
-
-        return;
-
-    }
-
-
-    const horas = Number(tempo.value);
-
-    const objetivoSelecionado =
-        objetivo.value;
-
-
-    // limpa resultado
-
-    resultado.innerHTML = "";
-
-
-    // informações principais
-
-    resultado.innerHTML += `
-
-        <div class="bg-slate-50 rounded-lg p-4">
-
-            <p class="text-[9px] text-slate-400 uppercase font-bold">
-                Objetivo
-            </p>
-
-            <p class="text-sm font-bold mt-1">
-                ${objetivoSelecionado}
-            </p>
-
-        </div>
-
-
-        <div class="bg-slate-50 rounded-lg p-4">
-
-            <p class="text-[9px] text-slate-400 uppercase font-bold">
-                Tempo diário
-            </p>
-
-            <p class="text-sm font-bold mt-1">
-                ${horas} ${horas === 1 ? "hora" : "horas"} por dia
-            </p>
-
-        </div>
-
-
-        <div class="bg-slate-50 rounded-lg p-4">
-
-            <p class="text-[9px] text-slate-400 uppercase font-bold">
-                Dias selecionados
-            </p>
-
-            <p class="text-sm font-bold mt-1">
-                ${diasSelecionados.join(", ")}
-            </p>
-
-        </div>
-
-
-        <div class="bg-slate-50 rounded-lg p-4">
-
-            <p class="text-[9px] text-slate-400 uppercase font-bold">
-                Matérias
-            </p>
-
-            <p class="text-sm font-bold mt-1">
-                ${materiasSelecionadas.join(", ")}
-            </p>
-
-        </div>
-
-
-        <div class="bg-emerald-50 rounded-lg p-4">
-
-            <p class="text-[9px] text-emerald-600 uppercase font-bold">
-                Estratégia da IA
-            </p>
-
-            <p class="text-xs text-slate-700 mt-2 leading-relaxed">
-
-                ${gerarEstrategia(horas)}
-
-            </p>
-
-        </div>
-
-    `;
-
-
-    // reseta estado de "plano salvo" de uma geração anterior
-
-    const msgAnterior = document.getElementById("mensagemPlanoSalvo");
-    if (msgAnterior) msgAnterior.classList.add("hidden");
-
-    const btnSalvar = document.getElementById("confirmarPlano");
-    if (btnSalvar) {
-        btnSalvar.disabled = false;
-        btnSalvar.textContent = "Salvar meu plano";
-        btnSalvar.classList.remove("opacity-60");
-    }
-
-    const linkCron = document.getElementById("linkCronograma");
-    if (linkCron) linkCron.classList.add("hidden");
-
-
-    // mostra modal
-
-    modal.classList.remove("hidden");
-
-    modal.classList.add("flex");
-
-});
-
-
-
-// ==========================================
-// ESTRATÉGIA
-// ==========================================
-
-function gerarEstrategia(horas) {
-
-    if (horas <= 2) {
-
-        return `
-            Como seu tempo é limitado, o plano vai priorizar
-            os assuntos mais importantes das matérias selecionadas,
-            evitando sobrecarregar seus estudos.
-        `;
-
-    }
-
 
     if (horas <= 4) {
-
-        return `
-            Seu tempo permite equilibrar teoria, exercícios
-            e revisões. A IA vai distribuir as matérias
-            durante a semana para manter uma rotina sustentável.
-        `;
-
+      return `
+        Seu tempo permite equilibrar teoria, exercícios
+        e revisões. A IA vai distribuir as matérias
+        durante a semana para manter uma rotina sustentável.
+      `;
     }
-
 
     return `
-        Como você possui bastante tempo disponível,
-        o plano poderá incluir teoria, exercícios,
-        revisões espaçadas e simulados.
+      Como você possui bastante tempo disponível,
+      o plano poderá incluir teoria, exercícios,
+      revisões espaçadas e simulados.
     `;
+  }
 
-}
-
-
-
-// ==========================================
-// FECHAR MODAL
-// ==========================================
-
-document
-    .getElementById("fecharModal")
-    .addEventListener("click", () => {
-
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
-
-    });
-
-
-
-// ==========================================
-// CLICAR FORA DO MODAL
-// ==========================================
-
-modal.addEventListener("click", (event) => {
-
-    if (event.target === modal) {
-
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
-
+  // GERAR PLANO.
+  botaoGerar.addEventListener("click", () => {
+    if (!objetivo.value) {
+      alert("Selecione seu objetivo principal.");
+      return;
     }
 
-});
+    if (vestibularesSelecionados.length === 0) {
+      alert("Selecione uma modalidade.");
+      return;
+    }
 
+    if (materiasSelecionadas.length === 0) {
+      alert("Selecione pelo menos uma matéria.");
+      return;
+    }
 
+    if (!dataExame.value) {
+      alert("Escolha a data estimada do exame.");
+      return;
+    }
 
-// ==========================================
-// SALVAR PLANO
-// ==========================================
+    const horas = Number(tempo.value);
+    const modalidadeId = vestibularesSelecionados[0];
 
-document
-  .getElementById("confirmarPlano")
-  .addEventListener("click", async (evento) => {
-    const botaoSalvar = evento.currentTarget;
-    if (botaoSalvar.disabled) return;
+    const modalidadeNome =
+      nomesModalidades[modalidadeId];
 
-    botaoSalvar.disabled = true;
-    botaoSalvar.textContent = "Salvando...";
+    resultado.innerHTML = `
+      <div class="bg-slate-50 rounded-lg p-4">
+        <p class="text-[9px] text-slate-400 uppercase font-bold">
+          Objetivo
+        </p>
+        <p class="text-sm font-bold mt-1">
+          ${objetivo.value}
+        </p>
+      </div>
+
+      <div class="bg-slate-50 rounded-lg p-4">
+        <p class="text-[9px] text-slate-400 uppercase font-bold">
+          Modalidade escolhida
+        </p>
+        <p class="text-sm font-bold mt-1">
+          ${modalidadeNome}
+        </p>
+      </div>
+
+      <div class="bg-slate-50 rounded-lg p-4">
+        <p class="text-[9px] text-slate-400 uppercase font-bold">
+          Tempo diário
+        </p>
+        <p class="text-sm font-bold mt-1">
+          ${horas} ${horas === 1 ? "hora" : "horas"} por dia
+        </p>
+      </div>
+
+      <div class="bg-slate-50 rounded-lg p-4">
+        <p class="text-[9px] text-slate-400 uppercase font-bold">
+          Dias selecionados
+        </p>
+        <p class="text-sm font-bold mt-1">
+          ${diasSelecionados.join(", ")}
+        </p>
+      </div>
+
+      <div class="bg-slate-50 rounded-lg p-4">
+        <p class="text-[9px] text-slate-400 uppercase font-bold">
+          Matérias
+        </p>
+        <p class="text-sm font-bold mt-1">
+          ${materiasSelecionadas.join(", ")}
+        </p>
+      </div>
+
+      <div class="bg-emerald-50 rounded-lg p-4">
+        <p class="text-[9px] text-emerald-600 uppercase font-bold">
+          Estratégia da IA
+        </p>
+        <p class="text-xs text-slate-700 mt-2 leading-relaxed">
+          ${gerarEstrategia(horas)}
+        </p>
+      </div>
+    `;
+
+    const mensagem =
+      document.getElementById("mensagemPlanoSalvo");
+
+    if (mensagem) mensagem.classList.add("hidden");
+
+    botaoSalvar.disabled = false;
+    botaoSalvar.textContent = "Salvar meu plano";
+    botaoSalvar.classList.remove("opacity-60");
+
+    const linkCronograma =
+      document.getElementById("linkCronograma");
+
+    if (linkCronograma) {
+      linkCronograma.classList.add("hidden");
+    }
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  });
+
+  // FECHAR MODAL.
+  function fecharModal() {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+
+  document
+    .getElementById("fecharModal")
+    .addEventListener("click", fecharModal);
+
+  modal.addEventListener("click", event => {
+    if (event.target === modal) {
+      fecharModal();
+    }
+  });
+
+  // SALVAR PLANO.
+  botaoSalvar.addEventListener("click", async evento => {
+    const botao = evento.currentTarget;
+
+    if (botao.disabled) return;
+
+    botao.disabled = true;
+    botao.textContent = "Salvando...";
 
     const plano = {
       objetivo: objetivo.value,
+      vestibulares: [...vestibularesSelecionados],
+      modalidade: vestibularesSelecionados[0],
       materias: [...materiasSelecionadas],
       horas: Number(tempo.value),
       dias: [...diasSelecionados],
-      data: dataExame.value
+      data: dataExame.value,
+      planoConfigurado: true
     };
 
     localStorage.setItem(
@@ -574,16 +534,21 @@ document
 
     window.dispatchEvent(new Event("planoAtualizado"));
 
-    const mensagem = document.getElementById("mensagemPlanoSalvo");
+    const mensagem =
+      document.getElementById("mensagemPlanoSalvo");
 
-    let texto = "Plano salvo neste navegador. Faça login para salvá-lo na sua conta.";
+    let texto =
+      "Plano salvo neste navegador. Faça login para salvá-lo na sua conta.";
 
     if (getToken()) {
       try {
         await criarPlano(plano);
-        texto = "Plano salvo na sua conta! Veja em Meus Planos ou consulte o cronograma.";
+
+        texto =
+          "Plano salvo na sua conta! Consulte também seu cronograma.";
       } catch (erro) {
-        texto = `Plano salvo neste navegador, mas não foi possível salvar na conta: ${erro.message}`;
+        texto =
+          `Plano salvo neste navegador, mas não foi possível salvar na conta: ${erro.message}`;
       }
     }
 
@@ -592,16 +557,16 @@ document
       mensagem.classList.remove("hidden");
     }
 
-    botaoSalvar.textContent = "Plano salvo ✓";
-    botaoSalvar.classList.add("opacity-60");
+    botao.textContent = "Plano salvo ✓";
+    botao.classList.add("opacity-60");
 
-    const linkCronograma = document.getElementById("linkCronograma");
-    if (linkCronograma) linkCronograma.classList.remove("hidden");
+    const linkCronograma =
+      document.getElementById("linkCronograma");
+
+    if (linkCronograma) {
+      linkCronograma.classList.remove("hidden");
+    }
   });
 
-// ==========================================
-// INICIAR IA
-// ==========================================
-
-atualizarIA();
+  atualizarIA();
 }

@@ -2,142 +2,189 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer.jsx';
-import { obterResumoMateria } from '../service/simulados.js';
+import { obterResumoModalidade } from '../service/simulados.js';
 
-const CHAVE_PLANO = 'planoCaraguaFuturo';
-
-function lerPlano() {
-  try {
-    return JSON.parse(localStorage.getItem(CHAVE_PLANO)) || null;
-  } catch {
-    return null;
-  }
-}
+const MODALIDADES = [
+  {
+    id: 'integrado',
+    titulo: 'IFSP Integrado ao Ensino Médio',
+    descricao: 'Para quem deseja cursar o Ensino Médio junto com o curso técnico.',
+    icone: '🎓',
+    questoes: 30,
+    areas: 'Português e Matemática',
+    instituicao: 'IFSP',
+  },
+  {
+    id: 'concomitante',
+    titulo: 'IFSP Concomitante e Subsequente',
+    descricao: 'Para quem cursa o Ensino Médio em outra escola ou já concluiu essa etapa.',
+    icone: '📚',
+    questoes: 30,
+    areas: 'Português e Matemática',
+    instituicao: 'IFSP',
+  },
+  {
+    id: 'etec',
+    titulo: 'ETEC — Vestibulinho',
+    descricao: 'Prepare-se para o processo seletivo das Escolas Técnicas Estaduais.',
+    icone: '🏫',
+    questoes: 50,
+    areas: 'Português, Matemática, Ciências Humanas e Ciências da Natureza',
+    instituicao: 'ETEC',
+  },
+];
 
 function Simulados() {
-  const [plano, setPlano] = useState(lerPlano);
+  const [resultados, setResultados] = useState({});
 
-  function atualizarPlano() {
-    setPlano(lerPlano());
+  function atualizarResultados() {
+    setResultados({
+      integrado: obterResumoModalidade('integrado'),
+      concomitante: obterResumoModalidade('concomitante'),
+      etec: obterResumoModalidade('etec'),
+    });
   }
 
   useEffect(() => {
-    window.addEventListener('planoAtualizado', atualizarPlano);
-    window.addEventListener('focus', atualizarPlano);
+    atualizarResultados();
+
+    window.addEventListener('simuladosAtualizados', atualizarResultados);
+    window.addEventListener('focus', atualizarResultados);
 
     return () => {
-      window.removeEventListener('planoAtualizado', atualizarPlano);
-      window.removeEventListener('focus', atualizarPlano);
+      window.removeEventListener('simuladosAtualizados', atualizarResultados);
+      window.removeEventListener('focus', atualizarResultados);
     };
   }, []);
-
-  const materias = Array.isArray(plano?.materias) ? plano.materias : [];
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-7 py-8">
+
         <div className="mb-8">
           <span className="text-emerald-600 font-bold text-xs uppercase tracking-wider">
-            Pratique seus conhecimentos
+            Prepare-se para sua aprovação
           </span>
 
           <h1 className="text-3xl font-extrabold text-slate-800 mt-2">
             Simulados
           </h1>
 
-          <p className="text-sm text-slate-500 mt-2">
-            Escolha uma matéria e teste o que você aprendeu. Seus resultados
-            serão enviados automaticamente para a página de progresso.
+          <p className="text-sm text-slate-500 mt-2 max-w-2xl">
+            Escolha o processo seletivo que deseja realizar e pratique com
+            questões de treinamento. Seus resultados serão enviados
+            automaticamente para a página de progresso.
           </p>
         </div>
 
-        {materias.length === 0 ? (
-          <div className="bg-white border border-slate-200 rounded-xl p-8 text-center">
-            <h2 className="font-bold text-lg text-slate-800">
-              Você ainda não escolheu suas matérias
-            </h2>
+        <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-5 mb-7">
+          <h2 className="font-bold text-emerald-900">
+            Conheça os simulados
+          </h2>
 
-            <p className="text-sm text-slate-500 mt-2 mb-5">
-              Primeiro, crie seu planejamento para encontrar simulados
-              relacionados aos seus estudos.
-            </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+            <div>
+              <p className="text-2xl font-extrabold text-emerald-800">30</p>
+              <p className="text-xs text-emerald-800">Questões no IFSP</p>
+            </div>
 
-            <Link
-              to="/planejamento"
-              className="inline-block bg-emerald-500 hover:bg-emerald-400 text-[#063b29] font-bold text-sm px-6 py-3 rounded-lg"
-            >
-              Criar planejamento
-            </Link>
+            <div>
+              <p className="text-2xl font-extrabold text-emerald-800">50</p>
+              <p className="text-xs text-emerald-800">Questões na ETEC</p>
+            </div>
+
+            <div>
+              <p className="text-2xl font-extrabold text-emerald-800">5</p>
+              <p className="text-xs text-emerald-800">Alternativas por questão</p>
+            </div>
           </div>
-        ) : (
-          <>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-slate-800">
-                Suas matérias
-              </h2>
+        </div>
 
-              <span className="text-xs text-slate-500">
-                {materias.length} matéria(s)
-              </span>
-            </div>
+        <h2 className="font-bold text-slate-800 mb-4">
+          Escolha seu simulado
+        </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {materias.map((materia) => {
-                const resultado = obterResumoMateria(materia);
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {MODALIDADES.map((modalidade) => {
+            const resultado = resultados[modalidade.id] || {
+              porcentagem: 0,
+              simulados: 0,
+              acertos: 0,
+              total: 0,
+            };
 
-                return (
-                  <div
-                    key={materia}
-                    className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm"
-                  >
-                    <div className="w-11 h-11 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-xl mb-4">
-                      <span>📚</span>
-                    </div>
+            return (
+              <article
+                key={modalidade.id}
+                className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col"
+              >
+                <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-2xl mb-4">
+                  {modalidade.icone}
+                </div>
 
-                    <h3 className="font-bold text-lg text-slate-800">
-                      {materia}
-                    </h3>
+                <span className="text-xs font-bold text-emerald-700 uppercase tracking-wide">
+                  {modalidade.instituicao}
+                </span>
 
-                    <p className="text-xs text-slate-500 mt-1">
-                      Teste seus conhecimentos nesta matéria.
-                    </p>
+                <h3 className="text-xl font-bold text-slate-800 mt-1">
+                  {modalidade.titulo}
+                </h3>
 
-                    <div className="mt-5 mb-4">
-                      <div className="flex justify-between text-xs mb-2">
-                        <span className="text-slate-500">
-                          Seu aproveitamento
-                        </span>
-                        <strong className="text-emerald-700">
-                          {resultado.porcentagem}%
-                        </strong>
-                      </div>
+                <p className="text-sm text-slate-500 mt-2 min-h-10">
+                  {modalidade.descricao}
+                </p>
 
-                      <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-emerald-500 rounded-full"
-                          style={{ width: `${resultado.porcentagem}%` }}
-                        />
-                      </div>
-                    </div>
+                <div className="bg-slate-50 rounded-lg p-3 mt-4">
+                  <p className="text-sm font-semibold text-slate-700">
+                    {modalidade.questoes} questões
+                  </p>
 
-                    <div className="text-xs text-slate-500 mb-5">
-                      {resultado.simulados} simulado(s) realizado(s)
-                      <br />
-                      {resultado.acertos} acerto(s) de {resultado.total} questões
-                    </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {modalidade.areas}
+                  </p>
+                </div>
 
-                    <Link
-                      to={`/simulados/${encodeURIComponent(materia)}`}
-                      className="block text-center bg-[#063b29] hover:bg-emerald-800 text-white font-bold text-sm py-3 rounded-lg transition"
-                    >
-                      Iniciar simulado
-                    </Link>
+                <div className="mt-5 mb-3">
+                  <div className="flex justify-between text-xs mb-2">
+                    <span className="text-slate-500">
+                      Aproveitamento acumulado
+                    </span>
+
+                    <strong className="text-emerald-700">
+                      {resultado.porcentagem}%
+                    </strong>
                   </div>
-                );
-              })}
-            </div>
-          </>
-        )}
+
+                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-emerald-500 rounded-full transition-all"
+                      style={{ width: `${resultado.porcentagem}%` }}
+                    />
+                  </div>
+                </div>
+
+                <p className="text-xs text-slate-500 mb-5">
+                  {resultado.simulados} simulado(s) realizado(s)
+                  <br />
+                  {resultado.acertos} acertos de {resultado.total} questões
+                </p>
+
+                <Link
+                  to={`/simulados/${modalidade.id}`}
+                  className="block text-center bg-[#063b29] hover:bg-emerald-800 text-white font-bold text-sm py-3 rounded-lg transition mt-auto"
+                >
+                  Iniciar simulado
+                </Link>
+              </article>
+            );
+          })}
+        </div>
+
+        <p className="text-xs text-slate-400 mt-6">
+          Os simulados são compostos por questões de treinamento elaboradas
+          no estilo dos processos seletivos. Não são cadernos oficiais nem
+          substituem a consulta aos editais vigentes.
+        </p>
       </main>
 
       <Footer />
