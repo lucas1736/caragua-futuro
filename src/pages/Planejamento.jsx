@@ -7,28 +7,29 @@ function Planejamento() {
   const raiz = useRef(null);
 
   useEffect(() => {
-    // evita rodar duas vezes no mesmo DOM (StrictMode em desenvolvimento)
     if (!raiz.current || raiz.current.dataset.iniciado) return;
+
     raiz.current.dataset.iniciado = '1';
     iniciarPlanejamento();
   }, []);
 
   return (
     <div ref={raiz} className="min-h-screen bg-slate-50">
-
       <main className="max-w-7xl mx-auto px-5 md:px-7 py-9">
         <div className="mb-6">
           <h2 className="text-2xl font-extrabold text-slate-900">
             Monte seu plano de estudos
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            Configure suas preferências para a nossa inteligência artificial
+            Configure suas preferências para nossa inteligência artificial
             desenhar sua grade de estudos ideal.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-5">
+
+            {/* 1. OBJETIVO */}
             <div className="mb-5">
               <label
                 className="block font-bold text-xs mb-2"
@@ -40,44 +41,72 @@ function Planejamento() {
               <select
                 className="w-full border border-slate-200 rounded-md px-3 py-3 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-emerald-400"
                 id="objetivo"
-                defaultValue="Vestibular"
+                defaultValue=""
               >
-                <option value="Vestibular">
-                  Vestibular (FATEC, IFSP, ENEM...)
+                <option value="" disabled>
+                  Selecione uma opção
                 </option>
-                <option value="ENEM">ENEM</option>
-                <option value="FATEC">FATEC</option>
                 <option value="IFSP">IFSP</option>
-                <option value="Concurso">Concurso público</option>
+                <option value="ETEC">ETEC</option>
+                <option value="FATEC">FATEC</option>
+                <option value="Concurso público">Concurso público</option>
+                <option value="Vestibular">Vestibular</option>
               </select>
             </div>
 
+            {/* 2. MODALIDADE */}
             <div className="mb-5">
-              <h3 className="font-bold text-xs mb-3">
-                2. Selecione as matérias que você precisa focar:
+              <label
+                className="block font-bold text-xs mb-2"
+                htmlFor="modalidade"
+              >
+                2. Qual modalidade você pretende prestar?
+              </label>
+
+              <select
+                className="w-full border border-slate-200 rounded-md px-3 py-3 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-emerald-400 disabled:bg-slate-100 disabled:text-slate-400"
+                id="modalidade"
+                defaultValue=""
+                disabled
+              >
+                <option value="">
+                  Primeiro selecione seu objetivo
+                </option>
+              </select>
+
+              <p className="text-[10px] text-slate-500 mt-2">
+                As opções serão exibidas conforme o objetivo escolhido.
+              </p>
+            </div>
+
+            {/* 3. MATÉRIAS */}
+            <div className="mb-5">
+              <h3 className="font-bold text-xs mb-2">
+                3. Matérias para estudar:
               </h3>
+
+              <p className="text-[10px] text-slate-500 mb-3">
+                As matérias serão selecionadas automaticamente conforme
+                a modalidade escolhida. Você também poderá ajustá-las.
+              </p>
 
               <div className="flex flex-wrap gap-2" id="materias">
                 {[
-                  ['Matemática', true],
-                  ['Português', true],
-                  ['Física', false],
-                  ['Química', false],
-                  ['Biologia', true],
-                  ['História', true],
-                  ['Geografia', false],
-                  ['Redação', true],
-                ].map(([materia, selecionada]) => (
+                  'Matemática',
+                  'Português',
+                  'Física',
+                  'Química',
+                  'Biologia',
+                  'História',
+                  'Geografia',
+                  'Redação',
+                ].map(materia => (
                   <button
                     key={materia}
-                    className={`materia ${
-                      selecionada
-                        ? 'bg-emerald-500 text-[#063b29] font-semibold'
-                        : 'bg-slate-50 border border-slate-200 text-slate-600'
-                    } text-[10px] px-4 py-2 rounded-full transition`}
+                    className="materia bg-slate-50 border border-slate-200 text-slate-600 text-[10px] px-4 py-2 rounded-full transition"
                     data-materia={materia}
                     type="button"
-                    aria-pressed={selecionada}
+                    aria-pressed="false"
                   >
                     {materia}
                   </button>
@@ -85,9 +114,10 @@ function Planejamento() {
               </div>
             </div>
 
+            {/* 4. TEMPO */}
             <div className="mb-5">
               <h3 className="font-bold text-xs mb-2">
-                3. Tempo disponível por dia:
+                4. Tempo disponível por dia:
               </h3>
 
               <div className="flex flex-wrap justify-between gap-2 text-[9px] text-slate-500 mb-2">
@@ -112,9 +142,10 @@ function Planejamento() {
               />
             </div>
 
+            {/* 5. DIAS */}
             <div className="mb-5">
               <h3 className="font-bold text-xs mb-3">
-                4. Dias da semana para estudar:
+                5. Dias da semana para estudar:
               </h3>
 
               <div className="grid grid-cols-7 gap-1">
@@ -144,16 +175,16 @@ function Planejamento() {
               </div>
             </div>
 
+            {/* 6. DATA */}
             <div className="mb-5">
               <h3 className="font-bold text-xs mb-3">
-                5. Data estimada do exame:
+                6. Data estimada do exame:
               </h3>
 
               <input
                 className="w-full border border-slate-200 rounded-md px-3 py-3 text-xs outline-none focus:ring-2 focus:ring-emerald-400"
                 id="dataExame"
                 type="date"
-                defaultValue="2026-10-25"
               />
             </div>
 
@@ -166,6 +197,7 @@ function Planejamento() {
             </button>
           </div>
 
+          {/* ASSISTENTE */}
           <aside
             className="bg-[#063b29] rounded-xl text-white p-5 h-fit"
             id="assistente"
@@ -174,6 +206,7 @@ function Planejamento() {
               <div className="w-8 h-8 bg-[#0d523b] rounded-md flex items-center justify-center">
                 <span className="text-emerald-400">✨</span>
               </div>
+
               <div>
                 <h3 className="font-bold text-xs">Análise da IA</h3>
                 <p className="text-[8px] text-emerald-400">
@@ -192,10 +225,10 @@ function Planejamento() {
                   className="text-[10px] text-emerald-400 font-semibold"
                   id="prioridadeMateria"
                 >
-                  Matemática &amp; Português
+                  Selecione uma modalidade
                 </p>
                 <p className="text-[8px] text-gray-300 mt-1">
-                  Maior peso nas provas escolhidas
+                  Matérias relacionadas à prova escolhida
                 </p>
               </div>
 
@@ -219,7 +252,7 @@ function Planejamento() {
                   className="text-[8px] text-gray-300 mt-1"
                   id="nivelDificuldade"
                 >
-                  Intermediário - focar em revisões
+                  Intermediário - equilibrar teoria e exercícios
                 </p>
               </div>
 
@@ -230,8 +263,7 @@ function Planejamento() {
                     className="text-[8px] text-gray-300 leading-relaxed"
                     id="dicaIA"
                   >
-                    Dica da IA: mantenha os sábados livres para retomar o
-                    conteúdo e evitar fadiga mental.
+                    Dica da IA: mantenha um tempo para revisões e descanso.
                   </p>
                 </div>
               </div>
@@ -242,6 +274,7 @@ function Planejamento() {
 
       <Footer />
 
+      {/* MODAL */}
       <div
         className="hidden fixed inset-0 bg-black/50 items-start sm:items-center justify-center p-3 sm:p-5 z-50 overflow-y-auto"
         id="modalPlano"
@@ -251,6 +284,7 @@ function Planejamento() {
             <h2 className="text-xl font-extrabold">
               Seu plano de estudos
             </h2>
+
             <button
               className="text-slate-400 hover:text-slate-800 text-xl"
               id="fecharModal"
@@ -284,7 +318,7 @@ function Planejamento() {
           <a
             id="linkCronograma"
             href="/cronograma"
-            className="hidden mt-3 w-full text-center border border-emerald-500 text-emerald-700 hover:bg-emerald-50 font-bold py-3 rounded-md text-xs block"
+            className="hidden mt-3 w-full text-center border border-emerald-500 text-emerald-700 hover:bg-emerald-50 font-bold py-3 rounded-md text-xs"
           >
             Ver meu cronograma
           </a>
