@@ -123,7 +123,7 @@ function Planejamento() {
               <div className="flex flex-wrap justify-between gap-2 text-[9px] text-slate-500 mb-2">
                 <span>Mínimo: 1 hora</span>
                 <span
-                  className="text-emerald-500 font-bold"
+                  className="text-emerald-700 font-bold"
                   id="tempoSelecionado"
                 >
                   3 horas / dia selecionadas
@@ -139,6 +139,7 @@ function Planejamento() {
                 step="1"
                 type="range"
                 defaultValue="3"
+                aria-label="Tempo disponível por dia, em horas"
               />
             </div>
 
@@ -185,6 +186,7 @@ function Planejamento() {
                 className="w-full border border-slate-200 rounded-md px-3 py-3 text-xs outline-none focus:ring-2 focus:ring-emerald-400"
                 id="dataExame"
                 type="date"
+                aria-label="Data estimada do exame"
               />
             </div>
 
@@ -311,7 +313,7 @@ function Planejamento() {
 
           <p
             id="mensagemPlanoSalvo"
-            className="hidden mt-3 text-center text-sm text-emerald-600 font-semibold break-words"
+            className="hidden mt-3 text-center text-sm text-emerald-700 font-semibold break-words"
             role="status"
           ></p>
 

@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import './env.js';
 import express from 'express';
 
 
@@ -10,6 +10,18 @@ import pool, { prepararBanco } from './db.js';
 const app = express();
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'troque-esta-chave-no-env';
+
+if (!process.env.JWT_SECRET) {
+  console.warn(
+    'Aviso: JWT_SECRET não definido no .env — usando a chave padrão de desenvolvimento.'
+  );
+}
+
+if (!process.env.DB_PASSWORD) {
+  console.warn(
+    'Aviso: DB_PASSWORD está vazio no .env. Se o seu MySQL tem senha, preencha-a lá.'
+  );
+}
 
 app.use(cors({ origin: /^http:\/\/localhost:\d+$/ }));
 app.use(express.json());
@@ -103,12 +115,17 @@ function autenticar(req, res, next) {
 }
 
 app.get('/api/me', autenticar, async (req, res) => {
-  const [linhas] = await pool.query(
-    'SELECT id, nome, email FROM usuarios WHERE id = ?',
-    [req.usuarioId]
-  );
-  if (!linhas[0]) return res.status(404).json({ erro: 'Usuário não encontrado.' });
-  res.json({ usuario: linhas[0] });
+  try {
+    const [linhas] = await pool.query(
+      'SELECT id, nome, email FROM usuarios WHERE id = ?',
+      [req.usuarioId]
+    );
+    if (!linhas[0]) return res.status(404).json({ erro: 'Usuário não encontrado.' });
+    res.json({ usuario: linhas[0] });
+  } catch (erro) {
+    console.error(erro);
+    res.status(500).json({ erro: 'Erro ao buscar usuário.' });
+  }
 });
 
 
@@ -446,13 +463,30 @@ prepararBanco()
     });
   })
   .catch((erro) => {
+    const dicas = {
+      ER_ACCESS_DENIED_ERROR:
+        'Usuário ou senha incorretos. Confira DB_USER e DB_PASSWORD no .env.',
+      ECONNREFUSED:
+        'O MySQL não está rodando (ou está em outra porta). Ligue o serviço do MySQL e confira DB_HOST/DB_PORT.',
+      ENOTFOUND: 'O endereço em DB_HOST não existe. Use 127.0.0.1 para MySQL local.',
+      ETIMEDOUT: 'Tempo esgotado. Confira DB_HOST/DB_PORT e se o MySQL está ligado.',
+      ER_BAD_DB_ERROR: 'O banco informado em DB_NAME não existe.',
+      ER_DBACCESS_DENIED_ERROR: 'Este usuário não tem permissão para criar/usar o banco.',
+    };
+    const config = `${process.env.DB_USER || 'root'}@${process.env.DB_HOST || '127.0.0.1'}:${process.env.DB_PORT || 3306}`;
+
     console.error('\n========================================');
     console.error('NÃO FOI POSSÍVEL CONECTAR AO MYSQL');
-    console.error('Motivo:', erro.message);
+    console.error('Motivo:', erro.message || erro.code || erro);
+    console.error('Código:', erro.code || '(sem código)');
+    console.error('Tentou conectar como:', config);
+    console.error(
+      'Senha no .env:',
+      process.env.DB_PASSWORD ? 'preenchida' : 'VAZIA'
+    );
     console.error('');
-    console.error('1) O MySQL está ligado?');
-    console.error('2) A senha em DB_PASSWORD (arquivo .env) está correta?');
-    console.error('Depois de ajustar o .env, rode "npm run dev" de novo.');
+    console.error(dicas[erro.code] || 'Verifique se o MySQL está ligado e se o .env está correto.');
+    console.error('Depois de ajustar o .env, rode \"npm run dev\" de novo.');
     console.error('========================================\n');
     process.exit(1);
   });

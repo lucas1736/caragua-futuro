@@ -117,7 +117,7 @@ useEffect(() => {
 
         <section className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-5 mb-8">
           <div>
-            <p className="text-sm font-bold text-emerald-600 uppercase tracking-wide">
+            <p className="text-sm font-bold text-emerald-700 uppercase tracking-wide">
               Organização dos estudos
             </p>
             <h2 className="text-3xl md:text-4xl font-extrabold text-slate-800 mt-2">
@@ -178,7 +178,7 @@ useEffect(() => {
                     </p>
                     <Link
                       to="/planejamento"
-                      className="inline-block mt-5 bg-emerald-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-emerald-700"
+                      className="inline-block mt-5 bg-emerald-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-emerald-800"
                     >
                       Criar meu plano
                     </Link>
@@ -219,7 +219,7 @@ useEffect(() => {
                           className="min-h-64 border-r border-b border-slate-200 p-2"
                         >
                           {!diaAtivo ? (
-                            <p className="text-sm text-slate-400 text-center mt-8">
+                            <p className="text-sm text-slate-600 text-center mt-8">
                               Dia livre
                             </p>
                           ) : (

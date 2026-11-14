@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 function Home() {
   return (
     <div className="min-h-screen">
+      <main>
 
       {/* Banner principal */}
       <section className="bg-[#063b29] text-white">
@@ -59,7 +60,7 @@ function Home() {
       <section className="bg-slate-50 py-16 lg:py-20">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12">
           <div className="text-center mb-12">
-            <p className="text-sm font-bold text-emerald-600 uppercase tracking-wide">
+            <p className="text-sm font-bold text-emerald-700 uppercase tracking-wide">
               Funcionalidades
             </p>
             <h2 className="text-3xl lg:text-4xl font-extrabold mt-3 text-slate-900">
@@ -109,7 +110,7 @@ function Home() {
         <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <div>
-              <p className="text-sm font-bold text-emerald-600 uppercase tracking-wide">
+              <p className="text-sm font-bold text-emerald-700 uppercase tracking-wide">
                 Visualização
               </p>
 
@@ -147,7 +148,7 @@ function Home() {
                     Visualização Semanal
                   </span>
                 </div>
-                <span className="text-sm text-slate-400">
+                <span className="text-sm text-slate-600">
                   Exemplo de planejamento
                 </span>
               </div>
@@ -192,7 +193,7 @@ function Home() {
 
               <Link
                 to="/cronograma"
-                className="block text-center mt-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-5 rounded-lg transition"
+                className="block text-center mt-6 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-5 rounded-lg transition"
               >
                 Acessar meu cronograma
               </Link>
@@ -239,7 +240,7 @@ function Home() {
       <section className="bg-slate-50 py-16 lg:py-20">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12">
           <div className="text-center mb-12">
-            <p className="text-sm font-bold text-emerald-600 uppercase tracking-wide">
+            <p className="text-sm font-bold text-emerald-700 uppercase tracking-wide">
               Metodologia
             </p>
             <h2 className="text-3xl lg:text-4xl font-extrabold mt-3">
@@ -249,7 +250,7 @@ function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-14">
             <div>
-              <h3 className="text-4xl font-extrabold text-emerald-500">01</h3>
+              <h3 className="text-4xl font-extrabold text-emerald-600">01</h3>
               <h4 className="font-bold text-xl mt-3">Defina seu objetivo</h4>
               <p className="text-base text-slate-600 leading-relaxed mt-3">
                 Complete as tarefas do seu plano e mantenha sua sequência de estudos.
@@ -257,7 +258,7 @@ function Home() {
             </div>
 
             <div>
-              <h3 className="text-4xl font-extrabold text-emerald-500">02</h3>
+              <h3 className="text-4xl font-extrabold text-emerald-600">02</h3>
               <h4 className="font-bold text-xl mt-3">Configure seu tempo</h4>
               <p className="text-base text-slate-600 leading-relaxed mt-3">
                 Diga quantas horas por dia e quais dias da semana você pode estudar.
@@ -265,7 +266,7 @@ function Home() {
             </div>
 
             <div>
-              <h3 className="text-4xl font-extrabold text-emerald-500">03</h3>
+              <h3 className="text-4xl font-extrabold text-emerald-600">03</h3>
               <h4 className="font-bold text-xl mt-3">Receba seu plano</h4>
               <p className="text-base text-slate-600 leading-relaxed mt-3">
                 Receba sua grade de estudos organizada de acordo com sua rotina.
@@ -279,7 +280,7 @@ function Home() {
       <section className="bg-slate-100 py-16 lg:py-20">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12">
           <div className="text-center mb-12">
-            <p className="text-sm font-bold text-emerald-600 uppercase tracking-wide">
+            <p className="text-sm font-bold text-emerald-700 uppercase tracking-wide">
               Depoimentos
             </p>
             <h2 className="text-3xl lg:text-4xl font-extrabold mt-3">
@@ -295,8 +296,8 @@ function Home() {
                 perfeitamente."
               </p>
               <div className="mt-6">
-                <h4 className="text-base font-bold">Mariana Silva</h4>
-                <p className="text-sm text-emerald-600 font-semibold mt-1">
+                <h3 className="text-base font-bold">Mariana Silva</h3>
+                <p className="text-sm text-emerald-700 font-semibold mt-1">
                   Aprovada em Análise de Sistemas
                 </p>
               </div>
@@ -308,8 +309,8 @@ function Home() {
                 Redação na semana da prova do ENEM. Melhor investimento que fiz."
               </p>
               <div className="mt-6">
-                <h4 className="text-base font-bold">Pedro Santos</h4>
-                <p className="text-sm text-emerald-600 font-semibold mt-1">
+                <h3 className="text-base font-bold">Pedro Santos</h3>
+                <p className="text-sm text-emerald-700 font-semibold mt-1">
                   Aprovado no ENEM
                 </p>
               </div>
@@ -317,6 +318,8 @@ function Home() {
           </div>
         </div>
       </section>
+
+      </main>
 
       {/* Rodapé */}
       <footer className="bg-[#063b29] text-white">

@@ -170,7 +170,7 @@ function Metas() {
             <button
               type="button"
               onClick={abrirCriar}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition"
+              className="bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition"
             >
               + Nova meta
             </button>
@@ -184,7 +184,7 @@ function Metas() {
             </p>
             <Link
               to="/login"
-              className="inline-block bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-6 py-2.5 rounded-lg"
+              className="inline-block bg-emerald-700 hover:bg-emerald-800 text-white font-semibold px-6 py-2.5 rounded-lg"
             >
               Ir para o login
             </Link>
@@ -333,8 +333,11 @@ function Metas() {
             </h3>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Título</label>
+              <label className="block text-sm font-medium mb-2" htmlFor="meta-titulo">
+                Título
+              </label>
               <input
+                id="meta-titulo"
                 type="text"
                 maxLength={120}
                 value={form.titulo}
@@ -346,8 +349,11 @@ function Metas() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Matéria</label>
+                <label className="block text-sm font-medium mb-2" htmlFor="meta-materia">
+                  Matéria
+                </label>
                 <select
+                  id="meta-materia"
                   value={form.materia}
                   onChange={(e) => setForm({ ...form, materia: e.target.value })}
                   className={inputClasse}
@@ -361,8 +367,11 @@ function Metas() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Prioridade</label>
+                <label className="block text-sm font-medium mb-2" htmlFor="meta-prioridade">
+                  Prioridade
+                </label>
                 <select
+                  id="meta-prioridade"
                   value={form.prioridade}
                   onChange={(e) => setForm({ ...form, prioridade: e.target.value })}
                   className={inputClasse}
@@ -377,8 +386,11 @@ function Metas() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Prazo</label>
+              <label className="block text-sm font-medium mb-2" htmlFor="meta-prazo">
+                Prazo
+              </label>
               <input
+                id="meta-prazo"
                 type="date"
                 value={form.prazo}
                 onChange={(e) => setForm({ ...form, prazo: e.target.value })}
@@ -387,10 +399,11 @@ function Metas() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2" htmlFor="meta-descricao">
                 Descrição (opcional)
               </label>
               <textarea
+                id="meta-descricao"
                 rows={3}
                 maxLength={500}
                 value={form.descricao}
@@ -426,7 +439,7 @@ function Metas() {
               <button
                 type="submit"
                 disabled={salvando}
-                className="px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 text-white text-sm font-semibold"
+                className="px-5 py-2.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white text-sm font-semibold"
               >
                 {salvando ? 'Salvando...' : 'Salvar'}
               </button>

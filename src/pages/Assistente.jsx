@@ -28,7 +28,7 @@ function Assistente() {
               </div>
               <div>
                 <p className="font-bold text-sm leading-none">Assistente Caraguá Futuro</p>
-                <p className="text-[10px] text-emerald-500 mt-1 flex items-center gap-1">
+                <p className="text-[10px] text-emerald-700 mt-1 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
                   Online
                 </p>
@@ -47,7 +47,7 @@ function Assistente() {
               </div>
 
               <div className="flex justify-end">
-                <div className="bg-emerald-500 text-white rounded-2xl rounded-tr-sm px-4 py-3 text-xs leading-relaxed max-w-[85%]">
+                <div className="bg-emerald-700 text-white rounded-2xl rounded-tr-sm px-4 py-3 text-xs leading-relaxed max-w-[85%]">
                   Trabalho o dia todo e só tenho 2 horas por noite. Como estudo para o ENEM?
                 </div>
               </div>
@@ -74,6 +74,7 @@ function Assistente() {
             >
               <input
                 type="text"
+                aria-label="Digite sua pergunta"
                 placeholder="Digite sua pergunta..."
                 className="flex-1 border border-slate-200 rounded-lg px-4 py-3 text-xs outline-none focus:ring-2 focus:ring-emerald-500"
               />

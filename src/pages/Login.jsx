@@ -58,8 +58,11 @@ function Login() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {modoCadastro && (
               <div>
-                <label className="block text-sm font-medium mb-2">Nome</label>
+                <label className="block text-sm font-medium mb-2" htmlFor="login-nome">
+                  Nome
+                </label>
                 <input
+                  id="login-nome"
                   name="nome"
                   type="text"
                   required
@@ -70,8 +73,11 @@ function Login() {
             )}
 
             <div>
-              <label className="block text-sm font-medium mb-2">E-mail</label>
+              <label className="block text-sm font-medium mb-2" htmlFor="login-email">
+                E-mail
+              </label>
               <input
+                id="login-email"
                 name="email"
                 type="email"
                 required
@@ -81,8 +87,11 @@ function Login() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Senha</label>
+              <label className="block text-sm font-medium mb-2" htmlFor="login-senha">
+                Senha
+              </label>
               <input
+                id="login-senha"
                 name="senha"
                 type="password"
                 required
@@ -101,7 +110,7 @@ function Login() {
             <button
               type="submit"
               disabled={carregando}
-              className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 text-white font-semibold py-3 rounded-lg transition"
+              className="w-full bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white font-semibold py-3 rounded-lg transition"
             >
               {carregando ? 'Aguarde...' : modoCadastro ? 'Criar conta' : 'Entrar'}
             </button>
@@ -112,7 +121,7 @@ function Login() {
             <button
               type="button"
               onClick={alternarModo}
-              className="text-emerald-600 font-semibold"
+              className="text-emerald-700 font-semibold"
             >
               {modoCadastro ? 'Entrar' : 'Criar conta'}
             </button>

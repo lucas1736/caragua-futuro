@@ -156,7 +156,7 @@ function MeusPlanos() {
             <button
               type="button"
               onClick={abrirCriar}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition"
+              className="bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition"
             >
               + Novo plano
             </button>
@@ -170,7 +170,7 @@ function MeusPlanos() {
             </p>
             <Link
               to="/login"
-              className="inline-block bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-6 py-2.5 rounded-lg"
+              className="inline-block bg-emerald-700 hover:bg-emerald-800 text-white font-semibold px-6 py-2.5 rounded-lg"
             >
               Ir para o login
             </Link>
@@ -267,8 +267,11 @@ function MeusPlanos() {
             </h3>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Objetivo</label>
+              <label className="block text-sm font-medium mb-2" htmlFor="plano-objetivo">
+                Objetivo
+              </label>
               <select
+                id="plano-objetivo"
                 value={form.objetivo}
                 onChange={(e) => setForm({ ...form, objetivo: e.target.value })}
                 className="w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-emerald-500"
@@ -298,10 +301,11 @@ function MeusPlanos() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2" htmlFor="plano-horas">
                 Horas por dia: {form.horas}
               </label>
               <input
+                id="plano-horas"
                 type="range"
                 min="1"
                 max="8"
@@ -328,8 +332,11 @@ function MeusPlanos() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Data da prova</label>
+              <label className="block text-sm font-medium mb-2" htmlFor="plano-data">
+                Data da prova
+              </label>
               <input
+                id="plano-data"
                 type="date"
                 value={form.data}
                 onChange={(e) => setForm({ ...form, data: e.target.value })}
@@ -354,7 +361,7 @@ function MeusPlanos() {
               <button
                 type="submit"
                 disabled={salvando}
-                className="px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 text-white text-sm font-semibold"
+                className="px-5 py-2.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white text-sm font-semibold"
               >
                 {salvando ? 'Salvando...' : 'Salvar'}
               </button>

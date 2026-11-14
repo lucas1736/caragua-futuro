@@ -12,19 +12,32 @@ Projeto convertido para React + Vite + Tailwind CSS, mantendo as páginas e func
 
 ## Organização
 
-- `src/pages/`: páginas Início, Planejamento, Progresso e Cronograma.
+- `src/pages/`: telas do site — Início, Planejamento, Progresso, Cronograma, Simulados, Assistente, Meus Planos, Metas e Login.
+- `src/components/`: cabeçalho e rodapé compartilhados.
 - `src/layouts/`: layout principal do React Router.
-- `src/legacy/`: scripts JavaScript originais que controlam os formulários, cronograma, timer e progresso.
-- `src/assets/` e `public/assets/`: imagens do projeto.
+- `src/service/`: acesso à API (autenticação, planos, metas) e dados locais (cronograma, simulados).
+- `public/assets/`: imagens servidas em `/assets/...`.
 - `src/App.jsx`: rotas e importações das páginas.
 - `src/main.jsx`: ponto de entrada do React.
+- `server/`: API Express, conexão com o MySQL e criação automática das tabelas.
 
-Os scripts legados são carregados depois que cada página é montada para que os elementos HTML já existam. `node_modules` não está incluído; ele será criado ao executar `npm install`.
+`node_modules` não está incluído; ele será criado ao executar `npm install`.
+
+## Scripts
+
+| Comando | O que faz |
+| --- | --- |
+| `npm run dev` | Liga a API (porta 3001) e o site (porta 5173) juntos |
+| `npm run web` | Liga apenas o site (Vite) |
+| `npm run server` | Liga apenas a API |
+| `npm run build` | Gera a versão de produção em `dist/` |
+| `npm run preview` | Serve localmente a versão de produção |
+
 
 ## Como rodar (rápido)
 
 1. Ligue o MySQL.
-2. Abra o arquivo `.env` e coloque a senha do seu MySQL em `DB_PASSWORD=`.
+2. Abra o arquivo `.env` e preencha `DB_PASSWORD=` com a senha do seu MySQL.
 3. `npm install` (só na primeira vez).
 4. `npm run dev` — liga a API (porta 3001) e o site (porta 5173) juntos.
 5. Abra http://localhost:5173/login e use **Criar conta**.

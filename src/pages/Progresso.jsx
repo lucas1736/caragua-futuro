@@ -505,7 +505,7 @@ function Progresso() {
               ))}
             </div>
 
-            <p className="text-[9px] text-slate-400 mt-3">
+            <p className="text-[9px] text-slate-600 mt-3">
               Horas por semana nas últimas 8 semanas (S-1 = semana passada).
             </p>
           </div>
@@ -515,7 +515,7 @@ function Progresso() {
               Progresso por Vestibular
             </h3>
 
-            <p className="text-[9px] text-slate-400 mb-4">
+            <p className="text-[9px] text-slate-600 mb-4">
               Desempenho calculado automaticamente pelos simulados realizados.
             </p>
 
@@ -541,7 +541,7 @@ function Progresso() {
                     />
                   </div>
 
-                  <p className="text-[9px] text-slate-400 mt-1">
+                  <p className="text-[9px] text-slate-600 mt-1">
                     {dados
                       ? `${dados.acertos} acertos de ${dados.total} questões · ${dados.simulados} simulado(s)`
                       : 'Nenhum simulado realizado ainda'}

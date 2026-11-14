@@ -1,9 +1,11 @@
+import './env.js';
 import mysql from 'mysql2/promise';
 
 const NOME_BANCO = process.env.DB_NAME || 'caragua_futuro';
 
 const conexaoConfig = {
-  host: process.env.DB_HOST || 'localhost',
+  // 127.0.0.1 evita o problema de "localhost" virar IPv6 (::1) no Node 17+
+  host: process.env.DB_HOST || '127.0.0.1',
   port: Number(process.env.DB_PORT) || 3306,
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',

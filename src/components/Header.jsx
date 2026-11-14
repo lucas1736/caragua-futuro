@@ -83,7 +83,7 @@ function Header() {
         <div className="flex items-center gap-3">
           {usuario ? (
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold shrink-0">
+              <div className="w-9 h-9 rounded-full bg-emerald-700 text-white flex items-center justify-center font-bold shrink-0">
                 {inicial}
               </div>
 
