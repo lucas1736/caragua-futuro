@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { getUsuario, logoutUsuario, ESTADO_AUTH_EVENTO } from '../service/auth.js';
+import { ESTADO_PERFIL_ATUALIZADO } from '../pages/Perfil.jsx';
 
 const links = [
   { nome: 'Início', to: '/' },
@@ -29,10 +30,12 @@ function Header() {
     const atualizar = () => setUsuario(getUsuario());
 
     window.addEventListener(ESTADO_AUTH_EVENTO, atualizar);
+    window.addEventListener(ESTADO_PERFIL_ATUALIZADO, atualizar);
     window.addEventListener('storage', atualizar);
 
     return () => {
       window.removeEventListener(ESTADO_AUTH_EVENTO, atualizar);
+      window.removeEventListener(ESTADO_PERFIL_ATUALIZADO, atualizar);
       window.removeEventListener('storage', atualizar);
     };
   }, []);
@@ -50,6 +53,18 @@ function Header() {
       : 'hover:text-emerald-400 transition';
 
   const inicial = usuario?.nome?.charAt(0).toUpperCase() || '?';
+
+  function avatar(usuario) {
+    return usuario?.foto ? (
+      <img
+        src={usuario.foto}
+        alt="Foto de perfil"
+        className="w-full h-full object-cover"
+      />
+    ) : (
+      <span className="font-bold">{inicial}</span>
+    );
+  }
 
   return (
     <header className="bg-[#063b29] text-white">
@@ -83,9 +98,13 @@ function Header() {
         <div className="flex items-center gap-3">
           {usuario ? (
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-emerald-700 text-white flex items-center justify-center font-bold shrink-0">
-                {inicial}
-              </div>
+              <Link
+                to="/perfil"
+                title="Meu perfil"
+                className="w-9 h-9 rounded-full bg-emerald-700 text-white overflow-hidden flex items-center justify-center shrink-0 hover:ring-2 hover:ring-emerald-400 transition"
+              >
+                {avatar(usuario)}
+              </Link>
 
               <div className="hidden sm:block leading-tight">
                 <p className="text-white font-semibold text-sm max-w-[140px] truncate">
@@ -143,9 +162,12 @@ function Header() {
 
           {usuario ? (
             <div className="sm:hidden border-t border-[#174c3b] pt-3 flex items-center justify-between">
-              <span className="text-sm font-semibold truncate">
+              <Link to="/perfil" className="flex items-center gap-3 text-sm font-semibold truncate">
+                <span className="w-8 h-8 rounded-full bg-emerald-700 text-white overflow-hidden flex items-center justify-center shrink-0">
+                  {avatar(usuario)}
+                </span>
                 {usuario.nome}
-              </span>
+              </Link>
 
               <button
                 type="button"

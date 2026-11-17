@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer.jsx';
 import { obterResumoModalidade } from '../service/simulados.js';
+import { BANCOS_CONCURSO } from '../service/questoesConcurso.js';
+import { BANCOS_VESTIBULAR } from '../service/questoesVestibular.js';
 
 const MODALIDADES = [
   {
@@ -32,6 +34,24 @@ const MODALIDADES = [
     areas: 'Português, Matemática, Ciências Humanas e Ciências da Natureza',
     instituicao: 'ETEC',
   },
+  {
+    id: 'concurso',
+    titulo: 'Concurso Público',
+    descricao: 'Treine para concursos municipais, estaduais e federais com questões de nível médio.',
+    icone: '🏛️',
+    questoes: BANCOS_CONCURSO.concurso.questoes.length,
+    areas: BANCOS_CONCURSO.concurso.areas,
+    instituicao: 'Concurso',
+  },
+  {
+    id: 'vestibular',
+    titulo: 'Vestibular',
+    descricao: 'Pratique com questões no estilo ENEM e dos vestibulares para o Ensino Superior.',
+    icone: '🧠',
+    questoes: BANCOS_VESTIBULAR.vestibular.questoes.length,
+    areas: BANCOS_VESTIBULAR.vestibular.areas,
+    instituicao: 'Vestibular',
+  },
 ];
 
 function Simulados() {
@@ -42,6 +62,8 @@ function Simulados() {
       integrado: obterResumoModalidade('integrado'),
       concomitante: obterResumoModalidade('concomitante'),
       etec: obterResumoModalidade('etec'),
+      concurso: obterResumoModalidade('concurso'),
+      vestibular: obterResumoModalidade('vestibular'),
     });
   }
 
@@ -82,7 +104,7 @@ function Simulados() {
             Conheça os simulados
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
             <div>
               <p className="text-2xl font-extrabold text-emerald-800">30</p>
               <p className="text-xs text-emerald-800">Questões no IFSP</p>
@@ -91,6 +113,11 @@ function Simulados() {
             <div>
               <p className="text-2xl font-extrabold text-emerald-800">50</p>
               <p className="text-xs text-emerald-800">Questões na ETEC</p>
+            </div>
+
+            <div>
+              <p className="text-2xl font-extrabold text-emerald-800">20</p>
+              <p className="text-xs text-emerald-800">Questões em Concurso e Vestibular</p>
             </div>
 
             <div>

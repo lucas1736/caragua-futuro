@@ -4,7 +4,10 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import Footer from '../components/Footer.jsx';
 import { BANCOS_IFSP } from '../service/questoesIFSP.js';
 import { BANCO_ETEC } from '../service/questoesETEC.js';
+import { BANCOS_CONCURSO } from '../service/questoesConcurso.js';
+import { BANCOS_VESTIBULAR } from '../service/questoesVestibular.js';
 import { registrarResultadoModalidade } from '../service/simulados.js';
+import Pomodoro from '../components/Pomodoro.jsx';
 
 function RealizarSimulado() {
   const { materia } = useParams();
@@ -15,15 +18,18 @@ function RealizarSimulado() {
   const banco =
     modalidade === 'etec'
       ? BANCO_ETEC
-      : BANCOS_IFSP[modalidade];
+      : BANCOS_CONCURSO[modalidade] ||
+        BANCOS_VESTIBULAR[modalidade] ||
+        BANCOS_IFSP[modalidade];
 
   const questoes = banco?.questoes || [];
 
   const [respostas, setRespostas] = useState({});
   const [resultado, setResultado] = useState(null);
-  const [tempoRestante, setTempoRestante] = useState(25 * 60);
+  const [tempoRestante, setTempoRestante] = useState((banco?.tempoMinutos || 25) * 60);
 
-  const isETEC = modalidade === 'etec';
+  const tempoTotalMinutos = banco?.tempoMinutos || 25;
+  const nomeInstituicao = banco?.instituicao || (modalidade === 'etec' ? 'ETEC' : 'IFSP');
 
   function selecionarResposta(indiceQuestao, alternativa) {
     setRespostas((atual) => ({
@@ -131,7 +137,7 @@ function RealizarSimulado() {
 
         <div className="mt-5 mb-7">
           <span className="text-xs text-emerald-700 font-bold uppercase">
-            Simulado {isETEC ? 'ETEC' : 'IFSP'}
+            Simulado {nomeInstituicao}
           </span>
 
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 mt-2">
@@ -148,9 +154,10 @@ function RealizarSimulado() {
             </span>
 
             <span className="bg-emerald-50 text-emerald-800 text-xs font-semibold px-3 py-2 rounded-lg">
-              {isETEC
-                ? 'Português, Matemática, Ciências Humanas e Ciências da Natureza'
-                : 'Português e Matemática'}
+              {banco.areas ||
+                (modalidade === 'etec'
+                  ? 'Português, Matemática, Ciências Humanas e Ciências da Natureza'
+                  : 'Português e Matemática')}
             </span>
 
             <span className="bg-emerald-50 text-emerald-800 text-xs font-semibold px-3 py-2 rounded-lg">
@@ -158,7 +165,7 @@ function RealizarSimulado() {
             </span>
 
             <span className="bg-amber-50 text-amber-800 text-xs font-semibold px-3 py-2 rounded-lg">
-              ⏱️ 25 minutos
+              ⏱️ {tempoTotalMinutos} minutos
             </span>
           </div>
         </div>
@@ -200,6 +207,10 @@ function RealizarSimulado() {
                     {minutos}:{segundos}
                   </p>
                 </div>
+              </div>
+
+              <div className="mt-3 flex justify-end">
+                <Pomodoro compacto />
               </div>
 
               {tempoAcabando && (

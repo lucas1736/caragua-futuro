@@ -39,9 +39,31 @@ export async function prepararBanco() {
       nome       VARCHAR(100) NOT NULL,
       email      VARCHAR(150) NOT NULL UNIQUE,
       senha_hash VARCHAR(255) NOT NULL,
+      telefone   VARCHAR(20) NULL,
+      foto       MEDIUMTEXT NULL,
       criado_em  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  // Migração: cria telefone/foto em bancos criados antes dessa atualização
+  const [colunas] = await conexao.query(
+    `SELECT COLUMN_NAME FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'usuarios'`,
+    [NOME_BANCO]
+  );
+  const nomesColunas = colunas.map((c) => c.COLUMN_NAME);
+
+  if (!nomesColunas.includes('telefone')) {
+    await conexao.query(
+      'ALTER TABLE usuarios ADD COLUMN telefone VARCHAR(20) NULL AFTER senha_hash'
+    );
+  }
+
+  if (!nomesColunas.includes('foto')) {
+    await conexao.query(
+      'ALTER TABLE usuarios ADD COLUMN foto MEDIUMTEXT NULL AFTER telefone'
+    );
+  }
 
   await conexao.query(`
     CREATE TABLE IF NOT EXISTS planos (

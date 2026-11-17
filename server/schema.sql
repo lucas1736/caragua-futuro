@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
   nome       VARCHAR(100) NOT NULL,
   email      VARCHAR(150) NOT NULL UNIQUE,
   senha_hash VARCHAR(255) NOT NULL,
+  telefone   VARCHAR(20) NULL,
+  foto       MEDIUMTEXT NULL,
   criado_em  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

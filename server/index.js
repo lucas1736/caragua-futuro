@@ -66,7 +66,7 @@ app.post('/api/cadastro', async (req, res) => {
       [nome.trim(), emailLimpo, senhaHash]
     );
 
-    const usuario = { id: resultado.insertId, nome: nome.trim(), email: emailLimpo };
+    const usuario = { id: resultado.insertId, nome: nome.trim(), email: emailLimpo, telefone: null, foto: null };
     res.status(201).json({ usuario, token: gerarToken(usuario) });
   } catch (erro) {
     console.error(erro);
@@ -84,7 +84,7 @@ app.post('/api/login', async (req, res) => {
     }
 
     const [linhas] = await pool.query(
-      'SELECT id, nome, email, senha_hash FROM usuarios WHERE email = ?',
+      'SELECT id, nome, email, telefone, foto, senha_hash FROM usuarios WHERE email = ?',
       [email.trim().toLowerCase()]
     );
 
@@ -95,7 +95,13 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ erro: 'E-mail ou senha incorretos.' });
     }
 
-    const usuario = { id: registro.id, nome: registro.nome, email: registro.email };
+    const usuario = {
+      id: registro.id,
+      nome: registro.nome,
+      email: registro.email,
+      telefone: registro.telefone || null,
+      foto: registro.foto || null,
+    };
     res.json({ usuario, token: gerarToken(usuario) });
   } catch (erro) {
     console.error(erro);
@@ -117,7 +123,7 @@ function autenticar(req, res, next) {
 app.get('/api/me', autenticar, async (req, res) => {
   try {
     const [linhas] = await pool.query(
-      'SELECT id, nome, email FROM usuarios WHERE id = ?',
+      'SELECT id, nome, email, telefone, foto FROM usuarios WHERE id = ?',
       [req.usuarioId]
     );
     if (!linhas[0]) return res.status(404).json({ erro: 'Usuário não encontrado.' });
@@ -125,6 +131,86 @@ app.get('/api/me', autenticar, async (req, res) => {
   } catch (erro) {
     console.error(erro);
     res.status(500).json({ erro: 'Erro ao buscar usuário.' });
+  }
+});
+
+// ---------- PERFIL (atualizar dados pessoais) ----------
+app.put('/api/perfil', autenticar, async (req, res) => {
+  try {
+    const { nome, email, telefone, foto, senhaAtual, novaSenha } = req.body;
+
+    if (!nome || !nome.trim() || nome.trim().length > 100) {
+      return res.status(400).json({ erro: 'Informe um nome válido (até 100 caracteres).' });
+    }
+    if (!emailValido(email)) {
+      return res.status(400).json({ erro: 'E-mail inválido.' });
+    }
+
+    const telefoneLimpo = typeof telefone === 'string' ? telefone.trim() : '';
+    if (telefoneLimpo && !/^[\d()+\-\s]{8,20}$/.test(telefoneLimpo)) {
+      return res.status(400).json({ erro: 'Telefone inválido. Ex.: (12) 99123-4567.' });
+    }
+
+    if (foto !== undefined && foto !== null && foto !== '') {
+      if (typeof foto !== 'string' || !foto.startsWith('data:image/')) {
+        return res.status(400).json({ erro: 'Formato de foto inválido.' });
+      }
+      if (foto.length > 1_500_000) {
+        return res.status(400).json({ erro: 'A foto é muito grande. Escolha uma imagem menor.' });
+      }
+    }
+
+    const emailLimpo = email.trim().toLowerCase();
+
+    // E-mail não pode estar em uso por outro usuário
+    const [outro] = await pool.query(
+      'SELECT id FROM usuarios WHERE email = ? AND id != ?',
+      [emailLimpo, req.usuarioId]
+    );
+    if (outro.length > 0) {
+      return res.status(409).json({ erro: 'Este e-mail já está cadastrado por outra conta.' });
+    }
+
+    const [linhas] = await pool.query(
+      'SELECT id, senha_hash FROM usuarios WHERE id = ?',
+      [req.usuarioId]
+    );
+    if (!linhas[0]) {
+      return res.status(404).json({ erro: 'Usuário não encontrado.' });
+    }
+
+    // Troca de senha (opcional): exige a senha atual
+    let novaHash = null;
+    if (novaSenha) {
+      if (typeof novaSenha !== 'string' || novaSenha.length < 6) {
+        return res.status(400).json({ erro: 'A nova senha precisa ter pelo menos 6 caracteres.' });
+      }
+      const senhaAtualOk = senhaAtual && (await bcrypt.compare(senhaAtual, linhas[0].senha_hash));
+      if (!senhaAtualOk) {
+        return res.status(401).json({ erro: 'A senha atual está incorreta.' });
+      }
+      novaHash = await bcrypt.hash(novaSenha, 10);
+    }
+
+    await pool.query(
+      `UPDATE usuarios
+          SET nome = ?, email = ?, telefone = ?, foto = ?${novaHash ? ', senha_hash = ?' : ''}
+        WHERE id = ?`,
+      novaHash
+        ? [nome.trim(), emailLimpo, telefoneLimpo || null, foto || null, novaHash, req.usuarioId]
+        : [nome.trim(), emailLimpo, telefoneLimpo || null, foto || null, req.usuarioId]
+    );
+
+    const [atualizado] = await pool.query(
+      'SELECT id, nome, email, telefone, foto FROM usuarios WHERE id = ?',
+      [req.usuarioId]
+    );
+
+    const usuario = atualizado[0];
+    res.json({ usuario, token: gerarToken(usuario) });
+  } catch (erro) {
+    console.error(erro);
+    res.status(500).json({ erro: 'Erro ao salvar o perfil. Tente novamente.' });
   }
 });
 

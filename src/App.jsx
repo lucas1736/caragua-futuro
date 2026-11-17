@@ -6,6 +6,7 @@ import Planejamento from './pages/Planejamento.jsx';
 import Progresso from './pages/Progresso.jsx';
 import Cronograma from './pages/Cronograma.jsx';
 import Login from './pages/Login.jsx';
+import Perfil from './pages/Perfil.jsx';
 import Assistente from './pages/Assistente.jsx';
 import MeusPlanos from './pages/MeusPlanos.jsx';
 import Metas from './pages/Metas.jsx';
@@ -27,6 +28,7 @@ function App() {
           <Route path="/meus-planos" element={<MeusPlanos />} />
           <Route path="/metas" element={<Metas />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/perfil" element={<Perfil />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

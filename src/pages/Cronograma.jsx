@@ -4,10 +4,6 @@ import { Link } from 'react-router-dom';
 
 function Cronograma() {
   const [planoSalvo, setPlanoSalvo] = useState(null);
-  const [modo, setModo] = useState('foco');
-  const [segundos, setSegundos] = useState(25 * 60);
-  const [executando, setExecutando] = useState(false);
-  const [aviso, setAviso] = useState('');
 
   const diasSemana = [
     { nome: 'Segunda', abreviacao: 'Seg' },
@@ -49,54 +45,6 @@ function Cronograma() {
       window.removeEventListener('planoAtualizado', carregarPlano);
     };
   }, []);
-
-  // Cronômetro do Pomodoro
-  
-useEffect(() => {
-  if (!executando) return;
-
-  if (segundos === 0) {
-    setExecutando(false);
-
-    if (modo === 'foco') {
-      setModo('pausa');
-      setSegundos(5 * 60);
-      setAviso('Parabéns! Você concluiu 25 minutos de estudo. Hora de descansar!');
-    } else {
-      setModo('foco');
-      setSegundos(25 * 60);
-      setAviso('Pausa concluída! Você já pode começar outra sessão de estudos.');
-    }
-
-    return;
-  }
-
-  const intervalo = setTimeout(() => {
-    setSegundos((atual) => atual - 1);
-  }, 1000);
-
-  return () => clearTimeout(intervalo);
-}, [executando, segundos, modo]);
-
-
-  function iniciarPausar() {
-    setAviso('');
-    setExecutando((atual) => !atual);
-  }
-
-  function reiniciarPomodoro() {
-    setExecutando(false);
-    setModo('foco');
-    setSegundos(25 * 60);
-    setAviso('');
-  }
-
-  function formatarTempo() {
-    const minutos = Math.floor(segundos / 60);
-    const restante = segundos % 60;
-
-    return `${String(minutos).padStart(2, '0')}:${String(restante).padStart(2, '0')}`;
-  }
 
   function materiasDoDia(abreviacao) {
     const indiceDia = diasAtivos.findIndex(
@@ -306,54 +254,6 @@ useEffect(() => {
               ) : (
                 <p className="text-sm text-slate-500">
                   Nenhuma matéria salva ainda.
-                </p>
-              )}
-            </div>
-
-            <div className="bg-[#063b29] text-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-emerald-300 text-sm font-bold uppercase tracking-wide">
-                    Temporizador
-                  </p>
-                  <h3 className="font-bold text-xl mt-1">Pomodoro</h3>
-                </div>
-                <span className="text-3xl">⏱️</span>
-              </div>
-
-              <div className="text-center py-6">
-                <p className="text-sm text-emerald-200 mb-2">
-                  {modo === 'foco' ? 'Tempo de concentração' : 'Hora de descansar'}
-                </p>
-                <p className="text-6xl font-extrabold tabular-nums tracking-wider">
-                  {formatarTempo()}
-                </p>
-                <p className="text-sm text-gray-300 mt-3">
-                  {modo === 'foco' ? '25 minutos de foco' : '5 minutos de pausa'}
-                </p>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={iniciarPausar}
-                  className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-[#063b29] font-bold py-3 rounded-lg transition"
-                >
-                  {executando ? 'Pausar' : 'Iniciar'}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={reiniciarPomodoro}
-                  className="bg-white/10 hover:bg-white/20 px-5 py-3 rounded-lg font-semibold transition"
-                >
-                  Reiniciar
-                </button>
-              </div>
-
-              {aviso && (
-                <p className="text-sm text-emerald-200 text-center mt-4 leading-relaxed">
-                  {aviso}
                 </p>
               )}
             </div>

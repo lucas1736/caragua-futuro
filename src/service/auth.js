@@ -27,12 +27,20 @@ function salvarSessao({ usuario, token }) {
 }
 
 async function post(url, corpo) {
+  return pedir(url, { method: 'POST', corpo });
+}
+
+async function pedir(url, { method = 'GET', corpo } = {}) {
   let resposta;
   try {
+    const token = getToken();
     resposta = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(corpo),
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: corpo ? JSON.stringify(corpo) : undefined,
     });
   } catch {
     throw new Error('Não foi possível conectar ao servidor.');
@@ -54,6 +62,11 @@ export async function loginUsuario(email, senha) {
 
 export async function cadastrarUsuario(nome, email, senha) {
   return salvarSessao(await post('/api/cadastro', { nome, email, senha }));
+}
+
+// Atualiza os dados do perfil no banco e renova a sessão local
+export async function atualizarPerfil(dados) {
+  return salvarSessao(await pedir('/api/perfil', { method: 'PUT', corpo: dados }));
 }
 
 export function logoutUsuario() {

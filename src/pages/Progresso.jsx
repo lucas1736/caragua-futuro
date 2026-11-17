@@ -22,6 +22,14 @@ const modalidadesVestibulares = [
     id: 'etec',
     nome: 'Vestibulinho ETEC',
   },
+  {
+    id: 'concurso',
+    nome: 'Concurso Público',
+  },
+  {
+    id: 'vestibular',
+    nome: 'Vestibular',
+  },
 ];
 
 function paraISO(data) {
