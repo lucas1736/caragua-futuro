@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS planos (
   id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   usuario_id INT UNSIGNED NOT NULL,
   objetivo   VARCHAR(50) NOT NULL,
+  modalidade VARCHAR(60) NULL,
   materias   JSON NOT NULL,
   horas      TINYINT UNSIGNED NOT NULL,
   dias       JSON NOT NULL,

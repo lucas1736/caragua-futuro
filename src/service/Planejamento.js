@@ -1,6 +1,11 @@
 
 import { getToken } from "./auth.js";
 import { criarPlano } from "./planos.js";
+import { criarMeta, listarMetas } from "./metas.js";
+import {
+  sugestoesDaModalidade,
+  nomeModalidade,
+} from "./metasSugeridas.js";
 
 export default function iniciarPlanejamento() {
   const objetivo = document.getElementById("objetivo");
@@ -219,7 +224,110 @@ export default function iniciarPlanejamento() {
       : [];
 
     atualizarMateriasAutomaticamente();
+    renderizarMetasSugeridas();
   });
+
+  // METAS SUGERIDAS PARA A MODALIDADE ESCOLHIDA.
+  function renderizarMetasSugeridas() {
+    const secao = document.getElementById("secaoMetasSugeridas");
+    const lista = document.getElementById("listaMetasSugeridas");
+    const botaoMetas = document.getElementById("adicionarMetas");
+    const mensagem = document.getElementById("mensagemMetas");
+
+    if (!secao || !lista) return;
+
+    const idModalidade = vestibularesSelecionados[0];
+    const sugestoes = sugestoesDaModalidade(idModalidade);
+
+    if (!idModalidade || sugestoes.length === 0) {
+      secao.classList.add("hidden");
+      return;
+    }
+
+    lista.innerHTML = sugestoes
+      .map(
+        sugestao => `
+      <div class="border border-slate-200 bg-slate-50 rounded-lg p-3">
+        <p class="text-[11px] font-bold text-slate-700">${sugestao.titulo}</p>
+        <div class="flex flex-wrap gap-2 mt-2">
+          <span class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">${sugestao.materia}</span>
+          <span class="text-[9px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100">Prioridade ${sugestao.prioridade.toLowerCase()}</span>
+        </div>
+      </div>`
+      )
+      .join("");
+
+    if (botaoMetas) {
+      botaoMetas.textContent = `Adicionar ${sugestoes.length} metas de ${nomeModalidade(idModalidade)} à minha conta`;
+      botaoMetas.disabled = false;
+      botaoMetas.classList.remove("hidden");
+    }
+    if (mensagem) mensagem.classList.add("hidden");
+
+    secao.classList.remove("hidden");
+  }
+
+  // ADICIONA AS METAS SUGERIDAS À CONTA DO USUÁRIO.
+  const botaoMetas = document.getElementById("adicionarMetas");
+  if (botaoMetas) {
+    botaoMetas.addEventListener("click", async () => {
+      if (!getToken()) {
+        alert("Faça login para salvar as metas na sua conta.");
+        return;
+      }
+
+      const idModalidade = vestibularesSelecionados[0];
+      const sugestoes = sugestoesDaModalidade(idModalidade);
+      if (sugestoes.length === 0) return;
+
+      const mensagem = document.getElementById("mensagemMetas");
+      botaoMetas.disabled = true;
+      botaoMetas.textContent = "Adicionando metas...";
+
+      try {
+        // Evita duplicar metas que o usuário já criou com o mesmo título.
+        const existentes = await listarMetas();
+        const titulos = new Set(existentes.map(meta => meta.titulo));
+        const novas = sugestoes.filter(
+          sugestao => !titulos.has(sugestao.titulo)
+        );
+
+        const prazo = dataExame.value || "";
+        for (const sugestao of novas) {
+          await criarMeta({
+            titulo: sugestao.titulo,
+            materia: sugestao.materia,
+            descricao: sugestao.descricao,
+            prioridade: sugestao.prioridade,
+            prazo,
+            concluida: false,
+          });
+        }
+
+        if (mensagem) {
+          mensagem.textContent =
+            novas.length === 0
+              ? "Essas metas já estão na sua conta."
+              : `${novas.length} meta(s) adicionada(s)! Acompanhe o progresso na página de Metas.`;
+          mensagem.classList.remove("hidden");
+          mensagem.classList.remove("text-red-600");
+          mensagem.classList.add("text-emerald-700");
+        }
+
+        botaoMetas.textContent = "Metas adicionadas ✓";
+      } catch (erro) {
+        if (mensagem) {
+          mensagem.textContent = `Não foi possível adicionar as metas: ${erro.message}`;
+          mensagem.classList.remove("hidden");
+          mensagem.classList.remove("text-emerald-700");
+          mensagem.classList.add("text-red-600");
+        }
+        botaoMetas.textContent = "Tentar novamente";
+      } finally {
+        botaoMetas.disabled = false;
+      }
+    });
+  }
 
   // PERMITE AJUSTAR AS MATÉRIAS MANUALMENTE.
   botoesMaterias.forEach(botao => {

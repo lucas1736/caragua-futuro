@@ -27,6 +27,8 @@ function Planejamento() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
+          <div className="space-y-5">
+
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-5">
 
             {/* 1. OBJETIVO */}
@@ -197,6 +199,39 @@ function Planejamento() {
             >
               ✨ Gerar meu plano
             </button>
+          </div>
+
+          {/* 7. METAS SUGERIDAS PARA A MODALIDADE */}
+          <div
+            className="hidden bg-white border border-slate-200 rounded-xl shadow-sm p-5"
+            id="secaoMetasSugeridas"
+          >
+            <h3 className="font-bold text-xs mb-1">
+              Metas sugeridas para esta modalidade
+            </h3>
+            <p className="text-[10px] text-slate-500 mb-4">
+              Criamos metas com os conteúdos que a sua prova cobra. Você pode
+              ajustar, marcar como concluída e acompanhar o progresso na
+              página de Metas.
+            </p>
+
+            <div className="space-y-2" id="listaMetasSugeridas"></div>
+
+            <button
+              className="hidden mt-4 w-full bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white font-bold text-xs py-3 rounded-md transition"
+              id="adicionarMetas"
+              type="button"
+            >
+              Adicionar metas à minha conta
+            </button>
+
+            <p
+              className="hidden mt-3 text-[11px] font-semibold text-emerald-700"
+              id="mensagemMetas"
+              role="status"
+            ></p>
+          </div>
+
           </div>
 
           {/* ASSISTENTE */}

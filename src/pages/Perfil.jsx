@@ -91,6 +91,11 @@ function Perfil() {
       return;
     }
 
+    if (novaSenha && !senhaAtual) {
+      setErro('Digite sua senha atual para poder alterá-la.');
+      return;
+    }
+
     setCarregando(true);
 
     try {

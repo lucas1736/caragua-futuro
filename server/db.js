@@ -70,6 +70,7 @@ export async function prepararBanco() {
       id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
       usuario_id INT UNSIGNED NOT NULL,
       objetivo   VARCHAR(50) NOT NULL,
+      modalidade VARCHAR(60) NULL,
       materias   JSON NOT NULL,
       horas      TINYINT UNSIGNED NOT NULL,
       dias       JSON NOT NULL,
@@ -78,6 +79,20 @@ export async function prepararBanco() {
       FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
     )
   `);
+
+  // Migração: cria modalidade em bancos criados antes dessa atualização
+  const [colunasPlanos] = await conexao.query(
+    `SELECT COLUMN_NAME FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'planos'`,
+    [NOME_BANCO]
+  );
+  const nomesPlanos = colunasPlanos.map((c) => c.COLUMN_NAME);
+
+  if (!nomesPlanos.includes('modalidade')) {
+    await conexao.query(
+      'ALTER TABLE planos ADD COLUMN modalidade VARCHAR(60) NULL AFTER objetivo'
+    );
+  }
 
   await conexao.query(`
     CREATE TABLE IF NOT EXISTS metas (

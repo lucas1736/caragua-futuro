@@ -171,13 +171,21 @@ app.put('/api/perfil', autenticar, async (req, res) => {
       return res.status(409).json({ erro: 'Este e-mail já está cadastrado por outra conta.' });
     }
 
+    // Busca o usuário atual ANTES de montar o UPDATE, para preservar
+    // telefone/foto quando o frontend não enviar esses campos.
     const [linhas] = await pool.query(
-      'SELECT id, senha_hash FROM usuarios WHERE id = ?',
+      'SELECT id, senha_hash, telefone, foto FROM usuarios WHERE id = ?',
       [req.usuarioId]
     );
     if (!linhas[0]) {
       return res.status(404).json({ erro: 'Usuário não encontrado.' });
     }
+    const atual = linhas[0];
+
+    // Campos ausentes no corpo preservam o valor já salvo no banco.
+    // Foto/telefone = null ou '' significa "remover" de propósito.
+    const telefoneFinal = telefone === undefined ? atual.telefone : telefoneLimpo || null;
+    const fotoFinal = foto === undefined ? atual.foto : foto || null;
 
     // Troca de senha (opcional): exige a senha atual
     let novaHash = null;
@@ -185,9 +193,21 @@ app.put('/api/perfil', autenticar, async (req, res) => {
       if (typeof novaSenha !== 'string' || novaSenha.length < 6) {
         return res.status(400).json({ erro: 'A nova senha precisa ter pelo menos 6 caracteres.' });
       }
-      const senhaAtualOk = senhaAtual && (await bcrypt.compare(senhaAtual, linhas[0].senha_hash));
+      if (senhaAtual === undefined || senhaAtual === null || senhaAtual === '') {
+        return res.status(400).json({ erro: 'Informe sua senha atual para alterá-la.' });
+      }
+
+      // Aceita a senha como digitada e também sem espaços nas pontas
+      // (evita erro por espaço acidental ao colar/autocompletar).
+      const tentativas = [...new Set([String(senhaAtual), String(senhaAtual).trim()])];
+      let senhaAtualOk = false;
+      for (const tentativa of tentativas) {
+        senhaAtualOk = await bcrypt.compare(tentativa, atual.senha_hash);
+        if (senhaAtualOk) break;
+      }
+
       if (!senhaAtualOk) {
-        return res.status(401).json({ erro: 'A senha atual está incorreta.' });
+        return res.status(401).json({ erro: 'A senha atual está incorreta. Confira e tente novamente.' });
       }
       novaHash = await bcrypt.hash(novaSenha, 10);
     }
@@ -197,8 +217,8 @@ app.put('/api/perfil', autenticar, async (req, res) => {
           SET nome = ?, email = ?, telefone = ?, foto = ?${novaHash ? ', senha_hash = ?' : ''}
         WHERE id = ?`,
       novaHash
-        ? [nome.trim(), emailLimpo, telefoneLimpo || null, foto || null, novaHash, req.usuarioId]
-        : [nome.trim(), emailLimpo, telefoneLimpo || null, foto || null, req.usuarioId]
+        ? [nome.trim(), emailLimpo, telefoneFinal, fotoFinal, novaHash, req.usuarioId]
+        : [nome.trim(), emailLimpo, telefoneFinal, fotoFinal, req.usuarioId]
     );
 
     const [atualizado] = await pool.query(
@@ -228,6 +248,7 @@ function formatarPlano(linha) {
   return {
     id: linha.id,
     objetivo: linha.objetivo,
+    modalidade: linha.modalidade || '',
     materias: lerJson(linha.materias),
     horas: linha.horas,
     dias: lerJson(linha.dias),
@@ -237,7 +258,7 @@ function formatarPlano(linha) {
 }
 
 function validarPlano(corpo) {
-  const { objetivo, materias, horas, dias, data } = corpo;
+  const { objetivo, materias, horas, dias, data, modalidade } = corpo;
 
   if (!objetivo || typeof objetivo !== 'string' || objetivo.length > 50) {
     return { erro: 'Objetivo inválido.' };
@@ -259,6 +280,9 @@ function validarPlano(corpo) {
   return {
     plano: {
       objetivo,
+      modalidade: typeof modalidade === 'string' && modalidade.trim()
+        ? modalidade.trim().slice(0, 60)
+        : '',
       materias: materias.map(String),
       horas: horasNum,
       dias: dias.map(String),
@@ -303,11 +327,12 @@ app.post('/api/planos', autenticar, async (req, res) => {
     if (erro) return res.status(400).json({ erro });
 
     const [resultado] = await pool.query(
-      `INSERT INTO planos (usuario_id, objetivo, materias, horas, dias, data_exame)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO planos (usuario_id, objetivo, modalidade, materias, horas, dias, data_exame)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         req.usuarioId,
         plano.objetivo,
+        plano.modalidade,
         JSON.stringify(plano.materias),
         plano.horas,
         JSON.stringify(plano.dias),
@@ -333,10 +358,11 @@ app.put('/api/planos/:id', autenticar, async (req, res) => {
 
     const [resultado] = await pool.query(
       `UPDATE planos
-          SET objetivo = ?, materias = ?, horas = ?, dias = ?, data_exame = ?
+          SET objetivo = ?, modalidade = ?, materias = ?, horas = ?, dias = ?, data_exame = ?
         WHERE id = ? AND usuario_id = ?`,
       [
         plano.objetivo,
+        plano.modalidade,
         JSON.stringify(plano.materias),
         plano.horas,
         JSON.stringify(plano.dias),

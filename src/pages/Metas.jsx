@@ -2,6 +2,11 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer.jsx';
 import { getUsuario } from '../service/auth.js';
+import { listarPlanos } from '../service/planos.js';
+import {
+  sugestoesDaModalidade,
+  nomeModalidade,
+} from '../service/metasSugeridas.js';
 import {
   listarMetas,
   criarMeta,
@@ -47,6 +52,8 @@ function Metas() {
   const usuario = getUsuario();
 
   const [metas, setMetas] = useState([]);
+  const [modalidade, setModalidade] = useState('');
+  const [adicionandoSugestoes, setAdicionandoSugestoes] = useState(false);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
   const [aviso, setAviso] = useState('');
@@ -68,6 +75,27 @@ function Metas() {
       .then(setMetas)
       .catch((e) => setErro(e.message))
       .finally(() => setCarregando(false));
+
+    // Modalidade vem do plano salvo na conta (banco de dados);
+    // se ainda não há plano salvo, usa o plano local do navegador.
+    listarPlanos()
+      .then((planos) => {
+        if (planos[0]?.modalidade) {
+          setModalidade(planos[0].modalidade);
+          return;
+        }
+        throw new Error('sem plano no banco');
+      })
+      .catch(() => {
+        try {
+          const planoLocal = JSON.parse(
+            localStorage.getItem('planoCaraguaFuturo') || 'null'
+          );
+          if (planoLocal?.modalidade) setModalidade(planoLocal.modalidade);
+        } catch {
+          /* sem plano local */
+        }
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -141,6 +169,49 @@ function Metas() {
     }
   }
 
+  async function adicionarSugestoes() {
+    if (adicionandoSugestoes) return;
+    setAdicionandoSugestoes(true);
+    setErro('');
+
+    try {
+      const sugestoes = sugestoesDaModalidade(modalidade);
+      const titulos = new Set(metas.map((m) => m.titulo));
+      const novas = sugestoes.filter((s) => !titulos.has(s.titulo));
+
+      const criadas = [];
+      for (const sugestao of novas) {
+        criadas.push(
+          await criarMeta({
+            titulo: sugestao.titulo,
+            materia: sugestao.materia,
+            descricao: sugestao.descricao,
+            prioridade: sugestao.prioridade,
+            prazo: '',
+            concluida: false,
+          })
+        );
+      }
+
+      setMetas((lista) => [...criadas.reverse(), ...lista]);
+      setAviso(
+        criadas.length === 0
+          ? 'As metas sugeridas já estão na sua lista.'
+          : `${criadas.length} meta(s) sugerida(s) adicionada(s)!`
+      );
+    } catch (e) {
+      setErro(e.message);
+    } finally {
+      setAdicionandoSugestoes(false);
+    }
+  }
+
+  const sugestoesModalidade = sugestoesDaModalidade(modalidade);
+  const titulosAtuais = new Set(metas.map((m) => m.titulo));
+  const sugestoesFaltantes = sugestoesModalidade.filter(
+    (s) => !titulosAtuais.has(s.titulo)
+  );
+
   const total = metas.length;
   const feitas = metas.filter((m) => m.concluida).length;
   const percentual = total === 0 ? 0 : Math.round((feitas / total) * 100);
@@ -188,6 +259,39 @@ function Metas() {
             >
               Ir para o login
             </Link>
+          </div>
+        )}
+
+        {usuario && modalidade && sugestoesModalidade.length > 0 && (
+          <div className="bg-[#063b29] text-white rounded-xl p-5 mb-5 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-[10px] text-emerald-300 font-bold uppercase tracking-wide">
+                  Sua preparação
+                </p>
+                <h3 className="font-bold text-sm mt-1">
+                  Metas sugeridas · {nomeModalidade(modalidade)}
+                </h3>
+                <p className="text-[11px] text-gray-300 mt-1">
+                  {sugestoesFaltantes.length === 0
+                    ? 'Todas as metas sugeridas dessa modalidade já estão na sua lista.'
+                    : `${sugestoesFaltantes.length} meta(s) com os conteúdos que essa prova cobra podem ser adicionadas automaticamente.`}
+                </p>
+              </div>
+
+              {sugestoesFaltantes.length > 0 && (
+                <button
+                  type="button"
+                  onClick={adicionarSugestoes}
+                  disabled={adicionandoSugestoes}
+                  className="bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 text-[#063b29] text-xs font-bold px-4 py-2.5 rounded-lg transition"
+                >
+                  {adicionandoSugestoes
+                    ? 'Adicionando...'
+                    : `+ Adicionar ${sugestoesFaltantes.length} meta(s)`}
+                </button>
+              )}
+            </div>
           </div>
         )}
 
