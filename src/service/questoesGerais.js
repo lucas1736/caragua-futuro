@@ -1,0 +1,142 @@
+const q = (materia, pergunta, alternativas, correta, explicacao) => ({
+  materia,
+  pergunta,
+  alternativas,
+  correta,
+  explicacao,
+});
+
+const questoesConcurso = [
+  // PORTUGUÊS — 6
+  q('Português', 'Qual frase está correta quanto ao uso da crase?',
+    ['Fui à pé até o centro.', 'Entreguei o documento à diretora.', 'Ele começou à estudar.', 'Não vou à ninguém.', 'Refiro-me à aquele aluno.'], 1,
+    'Há crase quando se une a preposição "a" ao artigo "a" de "a diretora".'),
+  q('Português', 'Assinale a frase correta quanto à concordância nominal:',
+    ['Seguem anexo as planilhas.', 'Seguem anexas as planilhas.', 'Os documentos estão em anexa.', 'Seguem anexo os planilhas.', 'Segue anexas as planilhas.'], 1,
+    '"Anexo" é adjetivo e concorda com o substantivo: planilhas → anexas.'),
+  q('Português', 'No trecho "O servidor atendeu o público com presteza", a palavra "presteza" significa:',
+    ['Lentidão', 'Rapidez e prontidão', 'Grosseria', 'Hesitação', 'Indiferença'], 1,
+    'Presteza é agilidade, disposição em atender.'),
+  q('Português', 'Qual é a forma correta?',
+    ['Aluga-se casas.', 'Alugam-se casas.', 'Alugam casas-se.', 'Se aluga casas.', 'Alugase casas.'], 1,
+    'Na voz passiva sintética, o verbo concorda com o sujeito: casas → alugam-se.'),
+  q('Português', 'Na frase "Choveu muito ontem", o sujeito é:',
+    ['Inexistente (oração sem sujeito)', 'Oculto', 'Simples', 'Composto', 'Indeterminado'], 0,
+    'Verbos que indicam fenômenos da natureza são impessoais e não têm sujeito.'),
+  q('Português', 'Qual alternativa apresenta linguagem adequada a um ofício?',
+    ['Cara Maria, blz?', 'Solicito a V. Sa. que providencie o documento.', 'Manda aí o papel, valeu.', 'Oi chefe, tudo certo?', 'Me vê isso rápido!'], 1,
+    'Correspondências oficiais exigem linguagem formal, impessoal e objetiva.'),
+
+  // MATEMÁTICA E RACIOCÍNIO LÓGICO — 6
+  q('Matemática', 'Quanto é 20% de 450?', ['70', '80', '90', '100', '110'], 2, '450 × 0,20 = 90.'),
+  q('Matemática', 'Três operários constroem um muro em 12 dias. No mesmo ritmo, 6 operários construirão em:',
+    ['4 dias', '6 dias', '8 dias', '9 dias', '24 dias'], 1,
+    'Grandezas inversamente proporcionais: o dobro de operários, metade do tempo.'),
+  q('Raciocínio Lógico', 'Se chove, então a rua molha. A rua não molhou. Conclui-se que:',
+    ['Choveu', 'Não choveu', 'Choveu pouco', 'Nada se pode concluir', 'A rua secou'], 1,
+    'Negando o consequente, nega-se o antecedente.'),
+  q('Raciocínio Lógico', 'Na sequência 2, 6, 18, 54, ..., o próximo termo é:',
+    ['108', '126', '162', '148', '216'], 2, 'Cada termo é multiplicado por 3: 54 × 3 = 162.'),
+  q('Matemática', 'Um produto de R$ 200,00 recebeu 15% de desconto. O novo preço é:',
+    ['R$ 150,00', 'R$ 160,00', 'R$ 170,00', 'R$ 175,00', 'R$ 185,00'], 2, 'Desconto de R$ 30,00; 200 − 30 = 170.'),
+  q('Raciocínio Lógico', 'Todos os servidores são pontuais. Carlos é servidor. Logo:',
+    ['Carlos é pontual', 'Carlos pode não ser pontual', 'Todo pontual é servidor', 'Carlos não é pontual', 'Nenhum pontual é servidor'], 0,
+    'Se todo servidor é pontual e Carlos é servidor, Carlos é pontual.'),
+
+  // INFORMÁTICA — 4
+  q('Informática', 'Qual é o atalho padrão para copiar no Windows?',
+    ['Ctrl + V', 'Ctrl + C', 'Ctrl + X', 'Ctrl + Z', 'Ctrl + P'], 1, 'Ctrl + C copia; Ctrl + V cola.'),
+  q('Informática', 'Qual é a extensão padrão de um arquivo do Word atual?',
+    ['.xlsx', '.pptx', '.docx', '.pdf', '.txt'], 2, 'O formato padrão do Word é .docx.'),
+  q('Informática', 'Qual é uma boa prática para criar senhas seguras?',
+    ['Usar a mesma senha em todos os sites', 'Usar a data de nascimento', 'Combinar letras, números e símbolos em uma senha longa', 'Compartilhar com colegas', 'Anotar em papel colado no monitor'], 2,
+    'Senhas longas e variadas são mais difíceis de descobrir.'),
+  q('Informática', 'O software malicioso que bloqueia dados e exige pagamento é chamado de:',
+    ['Spyware', 'Ransomware', 'Adware', 'Firewall', 'Antivírus'], 1, 'Ransomware sequestra arquivos e pede resgate.'),
+
+  // CONHECIMENTOS GERAIS E NOÇÕES DE DIREITO — 4
+  q('Noções de Direito', 'A Administração Pública obedece aos princípios de legalidade, impessoalidade, moralidade, publicidade e:',
+    ['Eficiência', 'Liberdade', 'Sigilo', 'Autonomia', 'Igualdade'], 0, 'Art. 37 da Constituição Federal (LIMPE).'),
+  q('Noções de Direito', 'Em regra, o ingresso em cargo público efetivo depende de:',
+    ['Indicação política', 'Concurso público de provas ou de provas e títulos', 'Sorteio', 'Análise apenas de currículo', 'Entrevista pessoal'], 1,
+    'A Constituição exige concurso público para cargos efetivos.'),
+  q('Conhecimentos Gerais', 'São Poderes da União, independentes e harmônicos entre si:',
+    ['Legislativo, Executivo e Judiciário', 'Executivo, Judiciário e Ministério Público', 'Legislativo, Militar e Executivo', 'Federal, Estadual e Municipal', 'Judiciário, Eleitoral e Fiscal'], 0,
+    'Art. 2º da Constituição Federal.'),
+  q('Noções de Direito', 'Na Lei de Acesso à Informação (Lei nº 12.527/2011), a regra é:',
+    ['O sigilo', 'A publicidade, sendo o sigilo exceção', 'Acesso só para jornalistas', 'Acesso só para servidores', 'Cobrança obrigatória pelas informações'], 1,
+    'A transparência é a regra; o sigilo é exceção.'),
+];
+
+const questoesVestibular = [
+  // LINGUAGENS — 5
+  q('Português e Literatura', 'O marco inicial do Modernismo brasileiro foi:',
+    ['A Semana de Arte Moderna de 1922', 'A Proclamação da República', 'A Abolição da escravatura', 'A Missão Artística Francesa', 'A Independência do Brasil'], 0,
+    'A Semana de Arte Moderna, em São Paulo, inaugurou o Modernismo.'),
+  q('Português e Literatura', 'Qual obra é de Machado de Assis?',
+    ['Dom Casmurro', 'O Cortiço', 'Iracema', 'Vidas Secas', 'O Guarani'], 0, 'Dom Casmurro (1899) é de Machado de Assis.'),
+  q('Português e Literatura', 'Em "Compre agora e economize!", predomina a função da linguagem:',
+    ['Emotiva', 'Conativa', 'Poética', 'Referencial', 'Metalinguística'], 1,
+    'A função conativa busca convencer o receptor, usando o imperativo.'),
+  q('Português e Literatura', '"Vidas Secas", de Graciliano Ramos, pertence:',
+    ['Ao Romantismo', 'Ao Parnasianismo', 'Ao Modernismo (Romance de 30)', 'Ao Barroco', 'Ao Arcadismo'], 2,
+    'Graciliano Ramos integra a segunda fase do Modernismo.'),
+  q('Português e Literatura', 'Em "Seus olhos são duas estrelas", ocorre:',
+    ['Metáfora', 'Metonímia', 'Hipérbole', 'Ironia', 'Paradoxo'], 0, 'Comparação implícita, sem conectivo.'),
+
+  // MATEMÁTICA — 5
+  q('Matemática', 'Se f(x) = 2x + 3, então f(5) é:', ['10', '11', '12', '13', '15'], 3, '2 × 5 + 3 = 13.'),
+  q('Matemática', 'A área de um círculo de raio 3 (π ≈ 3,14) é:',
+    ['18,84', '28,26', '9,42', '31,40', '56,52'], 1, 'A = πr² = 3,14 × 9 = 28,26.'),
+  q('Matemática', 'As raízes de x² − 5x + 6 = 0 são:',
+    ['1 e 6', '2 e 3', '−2 e −3', '1 e 5', '3 e 4'], 1, 'Soma 5 e produto 6: as raízes são 2 e 3.'),
+  q('Matemática', 'Ao lançar um dado comum, a probabilidade de sair face par é:',
+    ['1/6', '1/3', '1/2', '2/3', '5/6'], 2, 'Há 3 faces pares em 6: 3/6 = 1/2.'),
+  q('Matemática', 'O valor de log₁₀(1000) é:', ['1', '2', '3', '10', '100'], 2, '10³ = 1000.'),
+
+  // CIÊNCIAS HUMANAS — 5
+  q('História', 'O lema da Revolução Francesa foi:',
+    ['Liberdade, Igualdade e Fraternidade', 'Deus, Pátria e Família', 'Ordem e Progresso', 'Paz e Terra', 'Trabalho e Capital'], 0,
+    '"Liberté, Égalité, Fraternité" resume os ideais revolucionários.'),
+  q('História', 'A Lei Áurea, de 1888, determinou:',
+    ['O fim da escravidão no Brasil', 'A Independência do Brasil', 'A Proclamação da República', 'O voto feminino', 'A reforma agrária'], 0,
+    'Assinada pela Princesa Isabel, aboliu a escravidão.'),
+  q('História', 'Qual medida marcou a Era Vargas (1930–1945)?',
+    ['A criação da CLT, em 1943', 'A Guerra do Paraguai', 'A abolição da escravatura', 'A chegada da família real', 'O fim da República'], 0,
+    'A Consolidação das Leis do Trabalho foi criada em 1943.'),
+  q('Geografia', 'O crescimento da população das cidades em relação ao campo é chamado de:',
+    ['Urbanização', 'Desertificação', 'Glaciação', 'Erosão', 'Sedimentação'], 0, 'Urbanização é o aumento da população urbana.'),
+  q('História', 'O Tratado de Tordesilhas (1494) dividiu terras entre:',
+    ['Portugal e Espanha', 'Portugal e Inglaterra', 'Espanha e França', 'Holanda e Portugal', 'Inglaterra e Espanha'], 0,
+    'Dividiu as terras descobertas e por descobrir entre as duas coroas ibéricas.'),
+
+  // CIÊNCIAS DA NATUREZA — 5
+  q('Biologia', 'A organela responsável pela respiração celular é:',
+    ['Ribossomo', 'Mitocôndria', 'Lisossomo', 'Cloroplasto', 'Núcleo'], 1, 'A mitocôndria produz ATP.'),
+  q('Física', 'No Sistema Internacional, a unidade de força é:',
+    ['Joule', 'Watt', 'Newton', 'Pascal', 'Hertz'], 2, 'A unidade de força é o newton (N).'),
+  q('Química', 'O número atômico do carbono é:', ['4', '6', '8', '12', '14'], 1, 'O carbono tem 6 prótons.'),
+  q('Física', 'Pela Segunda Lei de Newton, a força resultante é:',
+    ['m / a', 'm · a', 'a / m', 'm + a', 'm · v²'], 1, 'F = m · a.'),
+  q('Biologia', 'Qual é o principal gás do efeito estufa emitido por atividades humanas?',
+    ['Dióxido de carbono', 'Oxigênio', 'Nitrogênio', 'Hélio', 'Argônio'], 0, 'A queima de combustíveis fósseis libera CO₂.'),
+];
+
+export const BANCOS_GERAIS = {
+  concurso: {
+    titulo: 'Concurso Público',
+    descricao: 'Simulado de treino com 20 questões de Português, Matemática, Raciocínio Lógico, Informática e Noções de Direito.',
+    instituicao: 'Concurso',
+    areas: 'Português, Matemática e Raciocínio Lógico, Informática e Noções de Direito',
+    tempoMinutos: 30,
+    questoes: questoesConcurso,
+  },
+  vestibular: {
+    titulo: 'Vestibular',
+    descricao: 'Simulado de treino com 20 questões de Linguagens, Matemática, Ciências Humanas e Ciências da Natureza.',
+    instituicao: 'Vestibular',
+    areas: 'Linguagens, Matemática, Ciências Humanas e Ciências da Natureza',
+    tempoMinutos: 40,
+    questoes: questoesVestibular,
+  },
+};
