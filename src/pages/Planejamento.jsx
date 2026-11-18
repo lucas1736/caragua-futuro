@@ -21,8 +21,8 @@ function Planejamento() {
             Monte seu plano de estudos
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            Configure suas preferências para nossa inteligência artificial
-            desenhar sua grade de estudos ideal.
+            Informe suas preferências para gerar uma sugestão automática de
+            grade de estudos, que você pode ajustar.
           </p>
         </div>
 
@@ -245,9 +245,9 @@ function Planejamento() {
               </div>
 
               <div>
-                <h3 className="font-bold text-xs">Análise da IA</h3>
+                <h3 className="font-bold text-xs">Sugestão personalizada</h3>
                 <p className="text-[8px] text-emerald-400">
-                  EM TEMPO REAL
+                  BASEADA NAS SUAS ESCOLHAS
                 </p>
               </div>
             </div>
@@ -300,7 +300,7 @@ function Planejamento() {
                     className="text-[8px] text-gray-300 leading-relaxed"
                     id="dicaIA"
                   >
-                    Dica da IA: mantenha um tempo para revisões e descanso.
+                    Dica de planejamento: reserve tempo para revisões e descanso.
                   </p>
                 </div>
               </div>

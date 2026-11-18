@@ -411,7 +411,7 @@ export default function iniciarPlanejamento() {
     });
   });
 
-  // ATUALIZAÇÃO DA ANÁLISE DA IA.
+  // ATUALIZAÇÃO DAS SUGESTÕES DE PLANEJAMENTO.
   function atualizarIA() {
     const horas = Number(tempo.value);
 
@@ -463,10 +463,10 @@ export default function iniciarPlanejamento() {
       !diasSelecionados.includes("Dom")
     ) {
       dicaIA.textContent =
-        "Dica da IA: mantenha o fim de semana livre para descansar e recuperar o conteúdo.";
+        "Dica de planejamento: mantenha o fim de semana livre para descansar e recuperar o conteúdo.";
     } else {
       dicaIA.textContent =
-        "Dica da IA: faça revisões leves no fim de semana para reforçar o conteúdo.";
+        "Dica de planejamento: faça revisões leves no fim de semana para reforçar o conteúdo.";
     }
   }
 
@@ -483,8 +483,8 @@ export default function iniciarPlanejamento() {
     if (horas <= 4) {
       return `
         Seu tempo permite equilibrar teoria, exercícios
-        e revisões. A IA vai distribuir as matérias
-        durante a semana para manter uma rotina sustentável.
+        e revisões. A sugestão distribui as matérias
+        durante a semana para apoiar uma rotina sustentável.
       `;
     }
 
@@ -571,7 +571,7 @@ export default function iniciarPlanejamento() {
 
       <div class="bg-emerald-50 rounded-lg p-4">
         <p class="text-[9px] text-emerald-600 uppercase font-bold">
-          Estratégia da IA
+          Estratégia sugerida
         </p>
         <p class="text-xs text-slate-700 mt-2 leading-relaxed">
           ${gerarEstrategia(horas)}

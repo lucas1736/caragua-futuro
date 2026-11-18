@@ -12,7 +12,7 @@ const links = [
   { nome: 'Cronograma', to: '/cronograma' },
   { nome: 'Meus Planos', to: '/meus-planos' },
   { nome: 'Metas', to: '/metas' },
-  { nome: 'Assistente IA', to: '/assistente' },
+  { nome: 'Assistente (em breve)', to: '/assistente' },
 ];
 
 function Header() {

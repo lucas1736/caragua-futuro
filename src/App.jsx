@@ -12,6 +12,9 @@ import MeusPlanos from './pages/MeusPlanos.jsx';
 import Metas from './pages/Metas.jsx';
 import Simulados from './pages/Simulados.jsx';
 import RealizarSimulado from './pages/RealizarSimulado.jsx';
+import Termos from './pages/Termos.jsx';
+import Privacidade from './pages/Privacidade.jsx';
+import Suporte from './pages/Suporte.jsx';
 
 function App() {
   return (
@@ -29,6 +32,9 @@ function App() {
           <Route path="/metas" element={<Metas />} />
           <Route path="/login" element={<Login />} />
           <Route path="/perfil" element={<Perfil />} />
+          <Route path="/termos" element={<Termos />} />
+          <Route path="/privacidade" element={<Privacidade />} />
+          <Route path="/suporte" element={<Suporte />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

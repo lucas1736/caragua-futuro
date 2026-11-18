@@ -23,16 +23,16 @@ function Footer() {
               <Link className={linkClasse} to="/planejamento">Planejamento</Link>
               <Link className={linkClasse} to="/progresso">Progresso</Link>
               <Link className={linkClasse} to="/cronograma">Cronograma</Link>
-              <Link className={linkClasse} to="/assistente">Assistente IA</Link>
+              <Link className={linkClasse} to="/assistente">Assistente (em breve)</Link>
             </div>
           </div>
 
           <div>
             <h3 className="text-sm font-bold">Contato</h3>
             <div className="flex flex-col items-start gap-2 mt-3">
-              <a className={linkClasse} href="#">Suporte</a>
-              <a className={linkClasse} href="#">Termos de Uso</a>
-              <a className={linkClasse} href="#">Privacidade</a>
+              <Link className={linkClasse} to="/suporte">Suporte</Link>
+              <Link className={linkClasse} to="/termos">Termos de Uso</Link>
+              <Link className={linkClasse} to="/privacidade">Privacidade</Link>
             </div>
           </div>
         </div>
