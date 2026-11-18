@@ -66,6 +66,7 @@ function Login() {
                   name="nome"
                   type="text"
                   required
+                  maxLength={100}
                   placeholder="Digite seu nome"
                   className={inputClasse}
                 />
@@ -95,8 +96,8 @@ function Login() {
                 name="senha"
                 type="password"
                 required
-                minLength={modoCadastro ? 6 : undefined}
-                placeholder={modoCadastro ? 'Mínimo de 6 caracteres' : 'Digite sua senha'}
+                minLength={modoCadastro ? 8 : undefined}
+                placeholder={modoCadastro ? 'Mínimo de 8 caracteres' : 'Digite sua senha'}
                 className={inputClasse}
               />
             </div>

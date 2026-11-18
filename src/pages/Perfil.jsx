@@ -274,7 +274,7 @@ function Perfil() {
                   id="perfil-nova-senha"
                   type="password"
                   autoComplete="new-password"
-                  minLength={novaSenha ? 6 : undefined}
+                  minLength={novaSenha ? 8 : undefined}
                   value={novaSenha}
                   onChange={(e) => setNovaSenha(e.target.value)}
                   className={inputClasse}
