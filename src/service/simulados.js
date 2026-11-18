@@ -1,150 +1,105 @@
-const CHAVE_SIMULADOS = 'resultadosSimuladosCaraguaFuturo';
+import { getToken } from './auth.js';
+import { requisicaoApi } from './api.js';
+import { chaveVisitante, lerVisitante, salvarVisitante } from './dadosVisitante.js';
 
 function dadosVazios() {
-  return {
-    materias: {},
-    modalidades: {},
-    historico: [],
-  };
+  return { materias: {}, modalidades: {}, historico: [] };
 }
 
-function lerResultados() {
-  try {
-    const dados = JSON.parse(localStorage.getItem(CHAVE_SIMULADOS));
-
-    if (!dados || typeof dados !== 'object') {
-      return dadosVazios();
-    }
-
-    return {
-      ...dadosVazios(),
-      ...dados,
-      materias: dados.materias || {},
-      modalidades: dados.modalidades || {},
-      historico: Array.isArray(dados.historico) ? dados.historico : [],
-    };
-  } catch {
-    return dadosVazios();
+function agregarResultados(resultados) {
+  const dados = dadosVazios();
+  for (const item of resultados) {
+    const modalidade = item.modalidade;
+    const anterior = dados.modalidades[modalidade] || { acertos: 0, total: 0, simulados: 0 };
+    anterior.acertos += Number(item.acertos);
+    anterior.total += Number(item.total);
+    anterior.simulados += 1;
+    dados.modalidades[modalidade] = anterior;
+    dados.historico.push({
+      modalidade,
+      acertos: Number(item.acertos),
+      total: Number(item.total),
+      data: item.criadoEm,
+    });
   }
-}
-
-function salvarResultados(dados) {
-  localStorage.setItem(CHAVE_SIMULADOS, JSON.stringify(dados));
-  window.dispatchEvent(new Event('simuladosAtualizados'));
+  return dados;
 }
 
 export function obterResultados() {
-  return lerResultados();
+  if (getToken()) return dadosVazios();
+  const dados = lerVisitante('simulados', dadosVazios());
+  return {
+    ...dadosVazios(),
+    ...dados,
+    materias: dados?.materias || {},
+    modalidades: dados?.modalidades || {},
+    historico: Array.isArray(dados?.historico) ? dados.historico : [],
+  };
+}
+
+export async function obterResultadosAtuais() {
+  if (!getToken()) return obterResultados();
+  return agregarResultados(await requisicaoApi('/api/progresso/resultados-simulado').then((d) => d.resultados));
 }
 
 export function obterResumoModalidade(modalidade) {
-  const dados = lerResultados();
-  const resultado = dados.modalidades?.[modalidade];
-
-  if (!resultado || !resultado.total) {
-    return {
-      acertos: 0,
-      erros: 0,
-      total: 0,
-      simulados: 0,
-      porcentagem: 0,
-    };
-  }
-
-  return {
-    ...resultado,
-    erros: resultado.total - resultado.acertos,
-    porcentagem: Math.round((resultado.acertos / resultado.total) * 100),
-  };
+  const resultado = obterResultados().modalidades?.[modalidade];
+  if (!resultado || !resultado.total) return { acertos: 0, erros: 0, total: 0, simulados: 0, porcentagem: 0 };
+  return { ...resultado, erros: resultado.total - resultado.acertos, porcentagem: Math.round((resultado.acertos / resultado.total) * 100) };
 }
 
-export function registrarResultadoModalidade(modalidade, acertos, total) {
-  if (
-    !modalidade ||
-    !Number.isInteger(acertos) ||
-    !Number.isInteger(total) ||
-    total <= 0 ||
-    acertos < 0 ||
-    acertos > total
-  ) {
+export async function obterResumoModalidadeAtual(modalidade) {
+  const dados = await obterResultadosAtuais();
+  const resultado = dados.modalidades?.[modalidade];
+  if (!resultado || !resultado.total) return { acertos: 0, erros: 0, total: 0, simulados: 0, porcentagem: 0 };
+  return { ...resultado, erros: resultado.total - resultado.acertos, porcentagem: Math.round((resultado.acertos / resultado.total) * 100) };
+}
+
+export async function registrarResultadoModalidade(modalidade, acertos, total, duracaoSegundos = 0) {
+  if (!modalidade || !Number.isInteger(acertos) || !Number.isInteger(total) || total <= 0 || acertos < 0 || acertos > total) {
     throw new Error('Resultado de simulado inválido.');
   }
+  if (getToken()) {
+    const resposta = await requisicaoApi('/api/progresso/resultados-simulado', {
+      method: 'POST',
+      body: JSON.stringify({ modalidade, acertos, total, duracaoSegundos }),
+    });
+    window.dispatchEvent(new Event('simuladosAtualizados'));
+    return resposta;
+  }
 
-  const dados = lerResultados();
-
-  const anterior = dados.modalidades[modalidade] || {
-    acertos: 0,
-    total: 0,
-    simulados: 0,
-  };
-
-  const novoResultado = {
-    acertos: anterior.acertos + acertos,
-    total: anterior.total + total,
-    simulados: anterior.simulados + 1,
-  };
-
+  const dados = obterResultados();
+  const anterior = dados.modalidades[modalidade] || { acertos: 0, total: 0, simulados: 0 };
+  const novoResultado = { acertos: anterior.acertos + acertos, total: anterior.total + total, simulados: anterior.simulados + 1 };
   dados.modalidades[modalidade] = novoResultado;
-
-  dados.historico.push({
-    modalidade,
-    acertos,
-    total,
-    data: new Date().toISOString(),
-  });
-
-  salvarResultados(dados);
-
+  dados.historico.push({ modalidade, acertos, total, data: new Date().toISOString() });
+  salvarVisitante('simulados', dados);
+  window.dispatchEvent(new Event('simuladosAtualizados'));
   return novoResultado;
 }
 
-// Mantidas para compatibilidade com a versão anterior.
 export function obterResumoMateria(nome) {
-  const dados = lerResultados();
-  const resultado = dados.materias?.[nome];
-
-  if (!resultado || !resultado.total) {
-    return { acertos: 0, total: 0, simulados: 0, porcentagem: 0 };
-  }
-
-  return {
-    ...resultado,
-    porcentagem: Math.round((resultado.acertos / resultado.total) * 100),
-  };
+  const resultado = obterResultados().materias?.[nome];
+  if (!resultado || !resultado.total) return { acertos: 0, total: 0, simulados: 0, porcentagem: 0 };
+  return { ...resultado, porcentagem: Math.round((resultado.acertos / resultado.total) * 100) };
 }
 
 export function registrarResultado(nome, acertos, total) {
-  if (!nome || total <= 0 || acertos < 0 || acertos > total) {
-    throw new Error('Resultado de simulado inválido.');
-  }
-
-  const dados = lerResultados();
-
-  const anterior = dados.materias[nome] || {
-    acertos: 0,
-    total: 0,
-    simulados: 0,
-  };
-
-  dados.materias[nome] = {
-    acertos: anterior.acertos + acertos,
-    total: anterior.total + total,
-    simulados: anterior.simulados + 1,
-  };
-
-  dados.historico.push({
-    materia: nome,
-    acertos,
-    total,
-    data: new Date().toISOString(),
-  });
-
-  salvarResultados(dados);
-
+  if (!nome || total <= 0 || acertos < 0 || acertos > total) throw new Error('Resultado de simulado inválido.');
+  const dados = obterResultados();
+  const anterior = dados.materias[nome] || { acertos: 0, total: 0, simulados: 0 };
+  dados.materias[nome] = { acertos: anterior.acertos + acertos, total: anterior.total + total, simulados: anterior.simulados + 1 };
+  dados.historico.push({ materia: nome, acertos, total, data: new Date().toISOString() });
+  salvarVisitante('simulados', dados);
+  window.dispatchEvent(new Event('simuladosAtualizados'));
   return dados.materias[nome];
 }
 
-export function limparResultados() {
-  localStorage.removeItem(CHAVE_SIMULADOS);
+export async function limparResultados() {
+  if (getToken()) {
+    await requisicaoApi('/api/progresso/resultados-simulado', { method: 'DELETE' });
+  } else {
+    localStorage.removeItem(chaveVisitante('simulados'));
+  }
   window.dispatchEvent(new Event('simuladosAtualizados'));
 }

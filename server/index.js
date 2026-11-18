@@ -7,6 +7,7 @@ import pool, { prepararBanco } from './db.js';
 import rotasAutenticacao from './routes/auth.js';
 import rotasPlanos from './routes/planos.js';
 import rotasMetas from './routes/metas.js';
+import rotasProgresso from './routes/progresso.js';
 import { rotaNaoEncontrada, tratarErro } from './middleware/erros.js';
 import { validarSegredoJwt } from './validators/segredoJwt.js';
 
@@ -57,6 +58,7 @@ app.use('/api/login', limiteLogin);
 app.use('/api', rotasAutenticacao);
 app.use('/api/planos', rotasPlanos);
 app.use('/api/metas', rotasMetas);
+app.use('/api/progresso', rotasProgresso);
 app.use(rotaNaoEncontrada);
 app.use(tratarErro);
 

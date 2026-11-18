@@ -1,5 +1,7 @@
 
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import RotaProtegida from './components/RotaProtegida.jsx';
+import ImportarDadosVisitante from './components/ImportarDadosVisitante.jsx';
 import MainLayout from './layouts/MainLayout.jsx';
 import Home from './pages/Home.jsx';
 import Planejamento from './pages/Planejamento.jsx';
@@ -19,17 +21,18 @@ import Suporte from './pages/Suporte.jsx';
 function App() {
   return (
     <BrowserRouter>
+      <ImportarDadosVisitante />
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/planejamento" element={<Planejamento />} />
-          <Route path="/progresso" element={<Progresso />} />
+          <Route path="/progresso" element={<RotaProtegida><Progresso /></RotaProtegida>} />
           <Route path="/cronograma" element={<Cronograma />} />
           <Route path="/simulados" element={<Simulados />} />
           <Route path="/simulados/:materia" element={<RealizarSimulado />} />
           <Route path="/assistente" element={<Assistente />} />
-          <Route path="/meus-planos" element={<MeusPlanos />} />
-          <Route path="/metas" element={<Metas />} />
+          <Route path="/meus-planos" element={<RotaProtegida><MeusPlanos /></RotaProtegida>} />
+          <Route path="/metas" element={<RotaProtegida><Metas /></RotaProtegida>} />
           <Route path="/login" element={<Login />} />
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/termos" element={<Termos />} />

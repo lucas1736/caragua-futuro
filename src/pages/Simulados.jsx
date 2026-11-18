@@ -2,7 +2,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer.jsx';
-import { obterResumoModalidade } from '../service/simulados.js';
+import { obterResumoModalidade, obterResumoModalidadeAtual } from '../service/simulados.js';
+import { getToken } from '../service/auth.js';
 import { BANCOS_CONCURSO } from '../service/questoesConcurso.js';
 import { BANCOS_VESTIBULAR } from '../service/questoesVestibular.js';
 
@@ -56,25 +57,29 @@ const MODALIDADES = [
 
 function Simulados() {
   const [resultados, setResultados] = useState({});
+  const [erroResultados, setErroResultados] = useState('');
 
-  function atualizarResultados() {
-    setResultados({
-      integrado: obterResumoModalidade('integrado'),
-      concomitante: obterResumoModalidade('concomitante'),
-      etec: obterResumoModalidade('etec'),
-      concurso: obterResumoModalidade('concurso'),
-      vestibular: obterResumoModalidade('vestibular'),
-    });
+  async function atualizarResultados() {
+    try {
+      const obterResumo = getToken() ? obterResumoModalidadeAtual : async (id) => obterResumoModalidade(id);
+      const entradas = await Promise.all(MODALIDADES.map(async ({ id }) => [id, await obterResumo(id)]));
+      setResultados(Object.fromEntries(entradas));
+      setErroResultados('');
+    } catch (erro) {
+      setErroResultados(erro.message);
+    }
   }
 
   useEffect(() => {
     atualizarResultados();
 
     window.addEventListener('simuladosAtualizados', atualizarResultados);
+    window.addEventListener('caragua-auth-mudou', atualizarResultados);
     window.addEventListener('focus', atualizarResultados);
 
     return () => {
       window.removeEventListener('simuladosAtualizados', atualizarResultados);
+      window.removeEventListener('caragua-auth-mudou', atualizarResultados);
       window.removeEventListener('focus', atualizarResultados);
     };
   }, []);
@@ -127,6 +132,7 @@ function Simulados() {
           </div>
         </div>
 
+        {erroResultados && <p className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">{erroResultados}</p>}
         <h2 className="font-bold text-slate-800 mb-4">
           Escolha seu simulado
         </h2>

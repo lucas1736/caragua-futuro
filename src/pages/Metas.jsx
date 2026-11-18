@@ -80,21 +80,11 @@ function Metas() {
     // se ainda não há plano salvo, usa o plano local do navegador.
     listarPlanos()
       .then((planos) => {
-        if (planos[0]?.modalidade) {
-          setModalidade(planos[0].modalidade);
-          return;
-        }
-        throw new Error('sem plano no banco');
+        const plano = planos.find((item) => item.ativo) || planos[0];
+        if (plano?.modalidade) setModalidade(plano.modalidade);
       })
       .catch(() => {
-        try {
-          const planoLocal = JSON.parse(
-            localStorage.getItem('planoCaraguaFuturo') || 'null'
-          );
-          if (planoLocal?.modalidade) setModalidade(planoLocal.modalidade);
-        } catch {
-          /* sem plano local */
-        }
+        // A modalidade continua opcional se a conta não tiver planos.
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

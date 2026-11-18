@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { loginUsuario, cadastrarUsuario } from '../service/auth.js';
 import Footer from '../components/Footer.jsx';
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [modoCadastro, setModoCadastro] = useState(false);
   const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(false);
@@ -25,7 +26,8 @@ function Login() {
       } else {
         await loginUsuario(email, senha);
       }
-      navigate('/', { replace: true });
+      const destino = location.state?.returnTo || '/';
+      navigate(destino, { replace: true });
     } catch (e) {
       setErro(e.message);
     } finally {

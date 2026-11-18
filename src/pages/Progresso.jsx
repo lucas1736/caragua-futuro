@@ -2,12 +2,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer.jsx';
-import { getUsuario } from '../service/auth.js';
+import { getUsuario, getToken } from '../service/auth.js';
 import { listarMetas } from '../service/metas.js';
-import { obterResultados, limparResultados } from '../service/simulados.js';
-
-const CHAVE_PROGRESSO = 'progressoCaraguaFuturo';
-const CHAVE_PLANO = 'planoCaraguaFuturo';
+import { obterResultados, obterResultadosAtuais, limparResultados } from '../service/simulados.js';
+import { lerVisitante, salvarVisitante } from '../service/dadosVisitante.js';
+import { listarRegistrosEstudo, registrarEstudo, limparRegistrosEstudo } from '../service/progresso.js';
+import { obterPlanoAtivo } from '../service/planos.js';
 
 const modalidadesVestibulares = [
   {
@@ -57,17 +57,8 @@ function formatarHoras(valor) {
     : valor.toFixed(1).replace('.', ',');
 }
 
-function lerJSON(chave, padrao) {
-  try {
-    const bruto = localStorage.getItem(chave);
-    return bruto ? JSON.parse(bruto) : padrao;
-  } catch {
-    return padrao;
-  }
-}
-
 function lerProgresso() {
-  const dados = lerJSON(CHAVE_PROGRESSO, {});
+  const dados = lerVisitante('progresso', {});
 
   return {
     materias: dados?.materias || {},
@@ -76,11 +67,11 @@ function lerProgresso() {
 }
 
 function Progresso() {
-  const [progresso, setProgresso] = useState(lerProgresso);
-  const [resultados, setResultados] = useState(obterResultados);
-  const [plano, setPlano] = useState(() =>
-    lerJSON(CHAVE_PLANO, null)
-  );
+  const [progresso, setProgresso] = useState(() => getToken() ? { materias: {}, registros: {} } : lerProgresso());
+  const [resultados, setResultados] = useState(() => getToken() ? { materias: {}, modalidades: {}, historico: [] } : obterResultados());
+  const [plano, setPlano] = useState(() => getToken() ? null : lerVisitante('plano'));
+  const [carregandoDados, setCarregandoDados] = useState(false);
+  const [erroDados, setErroDados] = useState('');
   const [usuario, setUsuario] = useState(() => getUsuario());
   const [metas, setMetas] = useState(null);
   const [erroMetas, setErroMetas] = useState('');
@@ -91,21 +82,31 @@ function Progresso() {
   const [erroForm, setErroForm] = useState('');
 
   useEffect(() => {
-    try {
-      localStorage.setItem(
-        CHAVE_PROGRESSO,
-        JSON.stringify(progresso)
-      );
-    } catch {
-      // Ignora problemas de armazenamento.
-    }
+    if (!getToken()) salvarVisitante('progresso', progresso);
   }, [progresso]);
 
   useEffect(() => {
     function atualizar() {
-      setPlano(lerJSON(CHAVE_PLANO, null));
-      setUsuario(getUsuario());
-      setResultados(obterResultados());
+      const usuarioAtual = getUsuario();
+      setUsuario(usuarioAtual);
+      if (getToken()) {
+        setPlano(null);
+        setProgresso({ materias: {}, registros: {} });
+        setResultados({ materias: {}, modalidades: {}, historico: [] });
+      }
+      if (!getToken()) {
+        setPlano(lerVisitante('plano'));
+        setProgresso(lerProgresso());
+        setResultados(obterResultados());
+        return;
+      }
+      Promise.all([listarRegistrosEstudo(), obterResultadosAtuais(), obterPlanoAtivo()])
+        .then(([registros, resultadosAtuais, planoAtivo]) => {
+          setProgresso({ materias: {}, registros: Object.fromEntries(registros.map((item) => [String(item.data).slice(0, 10), Number(item.horas)])) });
+          setResultados(resultadosAtuais);
+          setPlano(planoAtivo);
+        })
+        .catch((erro) => setErroDados(erro.message));
     }
 
     window.addEventListener('planoAtualizado', atualizar);
@@ -120,6 +121,23 @@ function Progresso() {
       window.removeEventListener('focus', atualizar);
     };
   }, []);
+
+  useEffect(() => {
+    let ativo = true;
+    if (!usuario || !getToken()) return undefined;
+    setCarregandoDados(true);
+    setErroDados('');
+    Promise.all([listarRegistrosEstudo(), obterResultadosAtuais(), obterPlanoAtivo()])
+      .then(([registros, resultadosAtuais, planoAtivo]) => {
+        if (!ativo) return;
+        setProgresso({ materias: {}, registros: Object.fromEntries(registros.map((item) => [String(item.data).slice(0, 10), Number(item.horas)])) });
+        setResultados(resultadosAtuais);
+        setPlano(planoAtivo);
+      })
+      .catch((erro) => { if (ativo) setErroDados(erro.message); })
+      .finally(() => { if (ativo) setCarregandoDados(false); });
+    return () => { ativo = false; };
+  }, [usuario]);
 
   useEffect(() => {
     let ativo = true;
@@ -257,37 +275,41 @@ function Progresso() {
       return;
     }
 
-    setProgresso((atual) => ({
-      ...atual,
-      registros: {
-        ...atual.registros,
-        [dataRegistro]:
-          (Number(atual.registros[dataRegistro]) || 0) + horas,
-      },
-    }));
-
+    if (getToken()) {
+      setCarregandoDados(true);
+      setErroForm('');
+      registrarEstudo(dataRegistro, horas)
+        .then(() => listarRegistrosEstudo())
+        .then((registros) => setProgresso({ materias: {}, registros: Object.fromEntries(registros.map((item) => [String(item.data).slice(0, 10), Number(item.horas)])) }))
+        .catch((erro) => setErroForm(erro.message))
+        .finally(() => setCarregandoDados(false));
+    } else {
+      setProgresso((atual) => ({
+        ...atual,
+        registros: {
+          ...atual.registros,
+          [dataRegistro]: Math.min(24, (Number(atual.registros[dataRegistro]) || 0) + horas),
+        },
+      }));
+    }
     setHorasRegistro('1');
   }
 
   function limparRegistros() {
-    if (
-      window.confirm(
-        'Apagar o histórico de horas e todos os resultados dos simulados?'
-      )
-    ) {
-      setProgresso({
-        materias: {},
-        registros: {},
-      });
-
-      limparResultados();
-
-      setResultados({
-        materias: {},
-        modalidades: {},
-        historico: [],
-      });
-    }
+    if (!window.confirm('Apagar o histórico de horas e todos os resultados dos simulados?')) return;
+    setCarregandoDados(true);
+    setErroDados('');
+    const apagar = getToken()
+      ? Promise.all([limparRegistrosEstudo(), limparResultados()])
+      : limparResultados();
+    apagar
+      .then(() => {
+        setProgresso({ materias: {}, registros: {} });
+        setResultados({ materias: {}, modalidades: {}, historico: [] });
+        setErroDados('');
+      })
+      .catch((erro) => setErroDados(erro.message))
+      .finally(() => setCarregandoDados(false));
   }
 
   const circ = 2 * Math.PI * 16;
@@ -318,6 +340,9 @@ function Progresso() {
             Zerar progresso
           </button>
         </section>
+
+        {erroDados && <p className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">{erroDados}</p>}
+        {carregandoDados && <p className="mb-4 text-sm text-slate-600" role="status">Sincronizando seus dados...</p>}
 
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
 

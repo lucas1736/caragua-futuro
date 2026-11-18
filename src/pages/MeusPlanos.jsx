@@ -7,6 +7,7 @@ import {
   criarPlano,
   atualizarPlano,
   excluirPlano,
+  ativarPlano,
 } from '../service/planos.js';
 
 const OBJETIVOS = ['Vestibular', 'ENEM', 'FATEC', 'IFSP', 'Concurso'];
@@ -18,6 +19,9 @@ const DIAS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 
 const formVazio = {
   objetivo: 'ENEM',
+  modalidade: '',
+  vestibulares: [],
+  ativo: true,
   materias: ['Matemática', 'Português'],
   horas: 3,
   dias: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'],
@@ -73,6 +77,9 @@ function MeusPlanos() {
     setEditandoId(plano.id);
     setForm({
       objetivo: plano.objetivo,
+      modalidade: plano.modalidade,
+      vestibulares: plano.vestibulares,
+      ativo: plano.ativo,
       materias: plano.materias,
       horas: plano.horas,
       dias: plano.dias,
@@ -93,11 +100,14 @@ function MeusPlanos() {
     try {
       if (editandoId) {
         const atualizado = await atualizarPlano(editandoId, form);
-        setPlanos((lista) => lista.map((p) => (p.id === editandoId ? atualizado : p)));
+        setPlanos((lista) => lista.map((plano) => {
+          if (plano.id === editandoId) return atualizado;
+          return atualizado.ativo ? { ...plano, ativo: false } : plano;
+        }));
         setAviso('Plano atualizado!');
       } else {
         const novo = await criarPlano(form);
-        setPlanos((lista) => [novo, ...lista]);
+        setPlanos((lista) => [novo, ...lista.map((plano) => ({ ...plano, ativo: false }))]);
         setAviso('Plano criado!');
       }
       setFormAberto(false);
@@ -119,18 +129,15 @@ function MeusPlanos() {
     }
   }
 
-  function usarNoCronograma(plano) {
-    localStorage.setItem(
-      'planoCaraguaFuturo',
-      JSON.stringify({
-        objetivo: plano.objetivo,
-        materias: plano.materias,
-        horas: plano.horas,
-        dias: plano.dias,
-        data: plano.data,
-      })
-    );
-    navigate('/cronograma');
+  async function usarNoCronograma(plano) {
+    try {
+      const ativo = await ativarPlano(plano.id);
+      setPlanos((lista) => lista.map((item) => ({ ...item, ativo: item.id === ativo.id })));
+      window.dispatchEvent(new Event('planoAtualizado'));
+      navigate('/cronograma');
+    } catch (e) {
+      setErro(e.message);
+    }
   }
 
   const chip = (ativo) =>
@@ -210,6 +217,7 @@ function MeusPlanos() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <h3 className="font-bold text-lg text-slate-900">{plano.objetivo}</h3>
+                  {plano.ativo && <span className="text-xs font-semibold text-emerald-700">Plano ativo no cronograma</span>}
                   <p className="text-xs text-slate-500 mt-1">
                     {plano.horas} {plano.horas === 1 ? 'hora' : 'horas'}/dia ·{' '}
                     {plano.dias.join(', ')} · Prova: {formatarData(plano.data)}

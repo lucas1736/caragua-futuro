@@ -1,6 +1,7 @@
 
 import { getToken } from "./auth.js";
 import { criarPlano } from "./planos.js";
+import { salvarVisitante } from "./dadosVisitante.js";
 import { criarMeta, listarMetas } from "./metas.js";
 import {
   sugestoesDaModalidade,
@@ -635,30 +636,24 @@ export default function iniciarPlanejamento() {
       planoConfigurado: true
     };
 
-    localStorage.setItem(
-      "planoCaraguaFuturo",
-      JSON.stringify(plano)
-    );
-
-    window.dispatchEvent(new Event("planoAtualizado"));
-
     const mensagem =
       document.getElementById("mensagemPlanoSalvo");
 
-    let texto =
-      "Plano salvo neste navegador. Faça login para salvá-lo na sua conta.";
+    let texto = '';
 
     if (getToken()) {
       try {
         await criarPlano(plano);
-
-        texto =
-          "Plano salvo na sua conta! Consulte também seu cronograma.";
+        texto = 'Plano salvo na sua conta! Consulte também seu cronograma.';
       } catch (erro) {
-        texto =
-          `Plano salvo neste navegador, mas não foi possível salvar na conta: ${erro.message}`;
+        texto = `Não foi possível salvar o plano na sua conta: ${erro.message}`;
       }
+    } else {
+      salvarVisitante('plano', plano);
+      texto = 'Plano salvo neste navegador. Faça login para salvá-lo na sua conta.';
     }
+
+    window.dispatchEvent(new Event("planoAtualizado"));
 
     if (mensagem) {
       mensagem.textContent = texto;

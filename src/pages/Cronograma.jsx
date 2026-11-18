@@ -1,6 +1,9 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { getToken } from '../service/auth.js';
+import { obterPlanoAtivo } from '../service/planos.js';
+import { lerVisitante } from '../service/dadosVisitante.js';
 
 function Cronograma() {
   const [planoSalvo, setPlanoSalvo] = useState(null);
@@ -24,14 +27,14 @@ function Cronograma() {
   );
 
   useEffect(() => {
+    let ativo = true;
     function carregarPlano() {
-      try {
-        const dados = JSON.parse(
-          localStorage.getItem('planoCaraguaFuturo') || 'null'
-        );
-        setPlanoSalvo(dados);
-      } catch {
-        setPlanoSalvo(null);
+      if (getToken()) {
+        obterPlanoAtivo()
+          .then((plano) => { if (ativo) setPlanoSalvo(plano); })
+          .catch(() => { if (ativo) setPlanoSalvo(null); });
+      } else {
+        setPlanoSalvo(lerVisitante('plano'));
       }
     }
 
@@ -39,10 +42,13 @@ function Cronograma() {
 
     window.addEventListener('focus', carregarPlano);
     window.addEventListener('planoAtualizado', carregarPlano);
+    window.addEventListener('caragua-auth-mudou', carregarPlano);
 
     return () => {
+      ativo = false;
       window.removeEventListener('focus', carregarPlano);
       window.removeEventListener('planoAtualizado', carregarPlano);
+      window.removeEventListener('caragua-auth-mudou', carregarPlano);
     };
   }, []);
 

@@ -26,6 +26,8 @@ function RealizarSimulado() {
 
   const [respostas, setRespostas] = useState({});
   const [resultado, setResultado] = useState(null);
+  const [salvandoResultado, setSalvandoResultado] = useState(false);
+  const [erroResultado, setErroResultado] = useState('');
   const [tempoRestante, setTempoRestante] = useState((banco?.tempoMinutos || 25) * 60);
 
   const tempoTotalMinutos = banco?.tempoMinutos || 25;
@@ -38,8 +40,8 @@ function RealizarSimulado() {
     }));
   }
 
-  const finalizarSimulado = useCallback((automatico = false) => {
-    if (resultado !== null) return;
+  const finalizarSimulado = useCallback(async (automatico = false) => {
+    if (resultado !== null || salvandoResultado) return;
 
     if (
       !automatico &&
@@ -55,17 +57,24 @@ function RealizarSimulado() {
     const total = questoes.length;
     const porcentagem = Math.round((acertos / total) * 100);
 
-    registrarResultadoModalidade(modalidade, acertos, total);
-
-    setResultado({
-      acertos,
-      total,
-      porcentagem,
-      automatico,
-    });
+    setSalvandoResultado(true);
+    setErroResultado('');
+    try {
+      await registrarResultadoModalidade(
+        modalidade,
+        acertos,
+        total,
+        tempoTotalMinutos * 60 - tempoRestante
+      );
+      setResultado({ acertos, total, porcentagem, automatico });
+    } catch (erro) {
+      setErroResultado(erro.message);
+    } finally {
+      setSalvandoResultado(false);
+    }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [respostas, questoes, modalidade, resultado]);
+  }, [respostas, questoes, modalidade, resultado, salvandoResultado, tempoRestante, tempoTotalMinutos]);
 
   // Inicia a contagem regressiva de 25 minutos.
   useEffect(() => {
@@ -273,13 +282,14 @@ function RealizarSimulado() {
               ))}
             </div>
 
+            {erroResultado && <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3" role="alert">{erroResultado} O resultado não foi salvo. Tente finalizar novamente.</p>}
             <button
               type="button"
               onClick={() => finalizarSimulado(false)}
-              disabled={respondidas !== questoes.length}
+              disabled={respondidas !== questoes.length || salvandoResultado}
               className="w-full mt-6 bg-[#063b29] hover:bg-emerald-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-lg transition"
             >
-              Finalizar e corrigir simulado
+              {salvandoResultado ? 'Salvando resultado...' : 'Finalizar e corrigir simulado'}
             </button>
 
             {respondidas !== questoes.length && (
