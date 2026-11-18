@@ -99,7 +99,8 @@ function Perfil() {
     setCarregando(true);
 
     try {
-      const { usuario: atualizado } = await atualizarPerfil({
+      // atualizarPerfil já retorna o objeto do usuário atualizado
+      const atualizado = await atualizarPerfil({
         nome,
         email,
         telefone,
