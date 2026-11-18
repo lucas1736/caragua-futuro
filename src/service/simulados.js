@@ -1,6 +1,7 @@
 import { getToken } from './auth.js';
 import { requisicaoApi } from './api.js';
 import { chaveVisitante, lerVisitante, salvarVisitante } from './dadosVisitante.js';
+import { agregarDesempenhoMaterias } from '../utils/simulados.js';
 
 function dadosVazios() {
   return { materias: {}, modalidades: {}, historico: [] };
@@ -20,8 +21,17 @@ function agregarResultados(resultados) {
       acertos: Number(item.acertos),
       total: Number(item.total),
       data: item.criadoEm,
+      desempenhoMaterias: (() => {
+        if (Array.isArray(item.desempenhoMaterias)) return item.desempenhoMaterias;
+        if (item.desempenhoMaterias && typeof item.desempenhoMaterias === 'object') return item.desempenhoMaterias;
+        if (typeof item.desempenhoMaterias === 'string') {
+          try { return JSON.parse(item.desempenhoMaterias || '[]'); } catch { return []; }
+        }
+        return [];
+      })(),
     });
   }
+  dados.materias = agregarDesempenhoMaterias(dados.historico);
   return dados;
 }
 
@@ -31,7 +41,10 @@ export function obterResultados() {
   return {
     ...dadosVazios(),
     ...dados,
-    materias: dados?.materias || {},
+    materias: {
+      ...(dados?.materias || {}),
+      ...agregarDesempenhoMaterias(Array.isArray(dados?.historico) ? dados.historico : []),
+    },
     modalidades: dados?.modalidades || {},
     historico: Array.isArray(dados?.historico) ? dados.historico : [],
   };
@@ -55,14 +68,14 @@ export async function obterResumoModalidadeAtual(modalidade) {
   return { ...resultado, erros: resultado.total - resultado.acertos, porcentagem: Math.round((resultado.acertos / resultado.total) * 100) };
 }
 
-export async function registrarResultadoModalidade(modalidade, acertos, total, duracaoSegundos = 0) {
+export async function registrarResultadoModalidade(modalidade, acertos, total, duracaoSegundos = 0, desempenhoMaterias = []) {
   if (!modalidade || !Number.isInteger(acertos) || !Number.isInteger(total) || total <= 0 || acertos < 0 || acertos > total) {
     throw new Error('Resultado de simulado inválido.');
   }
   if (getToken()) {
     const resposta = await requisicaoApi('/api/progresso/resultados-simulado', {
       method: 'POST',
-      body: JSON.stringify({ modalidade, acertos, total, duracaoSegundos }),
+      body: JSON.stringify({ modalidade, acertos, total, duracaoSegundos, desempenhoMaterias }),
     });
     window.dispatchEvent(new Event('simuladosAtualizados'));
     return resposta;
@@ -72,7 +85,7 @@ export async function registrarResultadoModalidade(modalidade, acertos, total, d
   const anterior = dados.modalidades[modalidade] || { acertos: 0, total: 0, simulados: 0 };
   const novoResultado = { acertos: anterior.acertos + acertos, total: anterior.total + total, simulados: anterior.simulados + 1 };
   dados.modalidades[modalidade] = novoResultado;
-  dados.historico.push({ modalidade, acertos, total, data: new Date().toISOString() });
+  dados.historico.push({ modalidade, acertos, total, data: new Date().toISOString(), desempenhoMaterias });
   salvarVisitante('simulados', dados);
   window.dispatchEvent(new Event('simuladosAtualizados'));
   return novoResultado;

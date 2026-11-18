@@ -71,7 +71,7 @@ const questoesConcurso = [
 export const BANCOS_CONCURSO = {
   concurso: {
     titulo: 'Concurso Público',
-    descricao: 'Simulado de treino com 20 questões de Português, Matemática, Raciocínio Lógico, Informática e Noções de Direito.',
+    descricao: 'Simulado com 20 questões autorais de treino de Português, Matemática, Raciocínio Lógico, Informática e Noções de Direito; não são questões oficiais.',
     instituicao: 'Concurso',
     areas: 'Português, Matemática e Raciocínio Lógico, Informática e Noções de Direito',
     tempoMinutos: 30,

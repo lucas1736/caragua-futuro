@@ -505,12 +505,12 @@ const questoesConcomitante = [
 export const BANCOS_IFSP = {
   integrado: {
     titulo: 'IFSP Integrado ao Ensino Médio',
-    descricao: 'Questões de treino no nível do Ensino Fundamental, inspiradas no formato do processo seletivo.',
+    descricao: 'Questões autorais de treino no nível do Ensino Fundamental, inspiradas no formato do processo seletivo; não são questões oficiais.',
     questoes: questoesIntegrado,
   },
   concomitante: {
     titulo: 'IFSP Concomitante e Subsequente',
-    descricao: 'Questões de treino no estilo do processo seletivo para cursos concomitantes e subsequentes.',
+    descricao: 'Questões autorais de treino no estilo do processo seletivo para cursos concomitantes e subsequentes; não são questões oficiais.',
     questoes: questoesConcomitante,
   },
 };

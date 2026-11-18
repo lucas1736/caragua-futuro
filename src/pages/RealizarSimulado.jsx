@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Footer from '../components/Footer.jsx';
 import { BANCOS_IFSP } from '../service/questoesIFSP.js';
@@ -7,6 +7,7 @@ import { BANCO_ETEC } from '../service/questoesETEC.js';
 import { BANCOS_CONCURSO } from '../service/questoesConcurso.js';
 import { BANCOS_VESTIBULAR } from '../service/questoesVestibular.js';
 import { registrarResultadoModalidade } from '../service/simulados.js';
+import { embaralharQuestoes, calcularResultado } from '../utils/simulados.js';
 import Pomodoro from '../components/Pomodoro.jsx';
 
 function RealizarSimulado() {
@@ -22,16 +23,38 @@ function RealizarSimulado() {
         BANCOS_VESTIBULAR[modalidade] ||
         BANCOS_IFSP[modalidade];
 
-  const questoes = banco?.questoes || [];
-
+  const questoesOriginais = banco?.questoes || [];
+  const [questoes, setQuestoes] = useState(() => embaralharQuestoes(questoesOriginais));
   const [respostas, setRespostas] = useState({});
   const [resultado, setResultado] = useState(null);
   const [salvandoResultado, setSalvandoResultado] = useState(false);
   const [erroResultado, setErroResultado] = useState('');
+  const finalizacaoIniciada = useRef(false);
   const [tempoRestante, setTempoRestante] = useState((banco?.tempoMinutos || 25) * 60);
 
   const tempoTotalMinutos = banco?.tempoMinutos || 25;
   const nomeInstituicao = banco?.instituicao || (modalidade === 'etec' ? 'ETEC' : 'IFSP');
+
+  useEffect(() => {
+    finalizacaoIniciada.current = false;
+    setQuestoes(embaralharQuestoes(questoesOriginais));
+    setRespostas({});
+    setResultado(null);
+    setErroResultado('');
+    setSalvandoResultado(false);
+    setTempoRestante(tempoTotalMinutos * 60);
+  }, [modalidade]);
+
+  function refazerSimulado() {
+    finalizacaoIniciada.current = false;
+    setQuestoes(embaralharQuestoes(questoesOriginais));
+    setRespostas({});
+    setResultado(null);
+    setErroResultado('');
+    setSalvandoResultado(false);
+    setTempoRestante(tempoTotalMinutos * 60);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   function selecionarResposta(indiceQuestao, alternativa) {
     setRespostas((atual) => ({
@@ -41,7 +64,7 @@ function RealizarSimulado() {
   }
 
   const finalizarSimulado = useCallback(async (automatico = false) => {
-    if (resultado !== null || salvandoResultado) return;
+    if (resultado !== null || salvandoResultado || finalizacaoIniciada.current) return;
 
     if (
       !automatico &&
@@ -50,12 +73,10 @@ function RealizarSimulado() {
       return;
     }
 
-    const acertos = questoes.reduce((total, questao, indice) => {
-      return total + (respostas[indice] === questao.correta ? 1 : 0);
-    }, 0);
-
-    const total = questoes.length;
-    const porcentagem = Math.round((acertos / total) * 100);
+    finalizacaoIniciada.current = true;
+    const calculado = calcularResultado(questoes, respostas);
+    const { acertos, total, desempenhoMaterias } = calculado;
+    const porcentagem = total ? Math.round((acertos / total) * 100) : 0;
 
     setSalvandoResultado(true);
     setErroResultado('');
@@ -64,10 +85,12 @@ function RealizarSimulado() {
         modalidade,
         acertos,
         total,
-        tempoTotalMinutos * 60 - tempoRestante
+        tempoTotalMinutos * 60 - tempoRestante,
+        desempenhoMaterias
       );
-      setResultado({ acertos, total, porcentagem, automatico });
+      setResultado({ acertos, total, porcentagem, automatico, desempenhoMaterias });
     } catch (erro) {
+      finalizacaoIniciada.current = false;
       setErroResultado(erro.message);
     } finally {
       setSalvandoResultado(false);
@@ -395,15 +418,13 @@ function RealizarSimulado() {
                       </strong>
                     </p>
 
-                    {!acertou && (
-                      <p className="text-sm text-emerald-700 mt-2">
-                        Resposta correta:{' '}
-                        <strong>
-                          {String.fromCharCode(65 + questao.correta)}.{' '}
-                          {questao.alternativas[questao.correta]}
-                        </strong>
-                      </p>
-                    )}
+                    <p className="text-sm text-emerald-700 mt-2">
+                      Resposta correta:{' '}
+                      <strong>
+                        {String.fromCharCode(65 + questao.correta)}.{' '}
+                        {questao.alternativas[questao.correta]}
+                      </strong>
+                    </p>
 
                     <div className="bg-slate-50 rounded-lg p-3 mt-3">
                       <p className="text-xs font-bold text-slate-700 mb-1">
@@ -428,6 +449,13 @@ function RealizarSimulado() {
                 Voltar aos simulados
               </button>
 
+              <button
+                type="button"
+                onClick={refazerSimulado}
+                className="flex-1 border border-emerald-600 text-emerald-700 font-bold text-sm py-3 rounded-lg"
+              >
+                Refazer com novas questões
+              </button>
               <Link
                 to="/progresso"
                 className="flex-1 text-center border border-emerald-600 text-emerald-700 font-bold text-sm py-3 rounded-lg"

@@ -592,6 +592,40 @@ function Progresso() {
           </div>
         </section>
 
+        {resultados.historico?.length > 0 && (
+          <section className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-sm mb-5">
+            <h3 className="font-bold text-sm mb-1">Histórico de simulados</h3>
+            <p className="text-xs text-slate-600 mb-4">Tentativas registradas nesta conta ou neste navegador.</p>
+            <ol className="space-y-3">
+              {[...resultados.historico].reverse().slice(0, 10).map((item, indice) => (
+                <li key={`${item.data || indice}-${indice}`} className="flex flex-wrap justify-between gap-2 border-b border-slate-100 pb-3 last:border-0">
+                  <div><p className="text-sm font-semibold text-slate-800">{item.modalidade || item.materia || 'Simulado'}</p><p className="text-xs text-slate-600">{item.acertos} acertos de {item.total} questões{item.data ? ` · ${new Date(item.data).toLocaleString('pt-BR')}` : ''}</p></div>
+                  <span className="text-sm font-bold text-emerald-700">{item.total ? Math.round((item.acertos / item.total) * 100) : 0}%</span>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
+
+        {Object.keys(resultados.materias || {}).length > 0 && (
+          <section className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-sm mb-5">
+            <h3 className="font-bold text-sm mb-1">Desempenho por matéria</h3>
+            <p className="text-xs text-slate-600 mb-4">Resultados agregados das questões dos simulados realizados.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {Object.entries(resultados.materias).sort(([a], [b]) => a.localeCompare(b, 'pt-BR')).map(([materia, dados]) => {
+                const porcentagem = dados.total ? Math.round((dados.acertos / dados.total) * 100) : 0;
+                return (
+                  <div key={materia} className="rounded-lg border border-slate-200 p-3">
+                    <div className="flex justify-between gap-2 text-sm font-semibold"><span>{materia}</span><span>{porcentagem}%</span></div>
+                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-emerald-500" style={{ width: `${porcentagem}%` }} /></div>
+                    <p className="mt-2 text-xs text-slate-600">{dados.acertos} acertos de {dados.total} questões · {dados.simulados} tentativa(s)</p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         <section className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-sm">
           <h3 className="font-bold text-sm mb-4">
             Registrar horas estudadas

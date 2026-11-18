@@ -4,21 +4,15 @@ export const opcoesPorObjetivo = {
     { id: 'concomitante', nome: 'IFSP Concomitante e Subsequente' },
   ],
   ETEC: [{ id: 'etec', nome: 'Vestibulinho ETEC' }],
-  FATEC: [{ id: 'fatec', nome: 'Vestibular FATEC' }],
   'Concurso público': [{ id: 'concurso', nome: 'Concurso público' }],
-  Vestibular: [
-    { id: 'enem', nome: 'ENEM' },
-    { id: 'outros', nome: 'Outros vestibulares' },
-  ],
+  Vestibular: [{ id: 'outros', nome: 'Outros vestibulares' }],
 };
 
 export const materiasPorModalidade = {
   integrado: ['Português', 'Matemática'],
   concomitante: ['Português', 'Matemática'],
   etec: ['Português', 'Matemática', 'História', 'Geografia', 'Biologia', 'Física', 'Química'],
-  fatec: ['Português', 'Matemática', 'Física', 'Química', 'Biologia', 'História', 'Geografia', 'Redação'],
   concurso: ['Português', 'Matemática', 'História', 'Geografia'],
-  enem: ['Português', 'Matemática', 'Física', 'Química', 'Biologia', 'História', 'Geografia', 'Redação'],
   outros: ['Português', 'Matemática', 'Física', 'Química', 'Biologia', 'História', 'Geografia', 'Redação'],
 };
 

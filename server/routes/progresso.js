@@ -51,11 +51,14 @@ router.post('/importar', async (req, res, next) => {
     }
     for (const resultado of (Array.isArray(simulados?.historico) ? simulados.historico.slice(0, 1000) : [])) {
       if (!resultado?.modalidade || !Number.isInteger(resultado.acertos) || !Number.isInteger(resultado.total) || resultado.total <= 0 || resultado.acertos < 0 || resultado.acertos > resultado.total) continue;
+      const desempenhoMaterias = Array.isArray(resultado.desempenhoMaterias)
+        ? resultado.desempenhoMaterias.filter((item) => item && typeof item.materia === 'string' && item.materia.length <= 80 && Number.isInteger(item.acertos) && Number.isInteger(item.total) && item.total > 0 && item.acertos >= 0 && item.acertos <= item.total).slice(0, 30)
+        : [];
       await conexao.query(
-        `INSERT INTO resultados_simulado (usuario_id, modalidade, acertos, total, duracao_segundos, criado_em)
-         VALUES (?, ?, ?, ?, 0, ?)`,
+        `INSERT INTO resultados_simulado (usuario_id, modalidade, acertos, total, duracao_segundos, desempenho_materias, criado_em)
+         VALUES (?, ?, ?, ?, 0, ?, ?)`,
         [req.usuarioId, String(resultado.modalidade).slice(0, 60), resultado.acertos, resultado.total,
-          resultado.data && !Number.isNaN(Date.parse(resultado.data)) ? new Date(resultado.data) : new Date()]
+          JSON.stringify(desempenhoMaterias), resultado.data && !Number.isNaN(Date.parse(resultado.data)) ? new Date(resultado.data) : new Date()]
       );
     }
     await conexao.commit();
@@ -133,7 +136,8 @@ router.delete('/registros-estudo', async (req, res, next) => {
 router.get('/resultados-simulado', async (req, res, next) => {
   try {
     const [linhas] = await pool.query(
-      `SELECT id, modalidade, acertos, total, duracao_segundos AS duracaoSegundos, criado_em AS criadoEm
+      `SELECT id, modalidade, acertos, total, duracao_segundos AS duracaoSegundos,
+              desempenho_materias AS desempenhoMaterias, criado_em AS criadoEm
        FROM resultados_simulado WHERE usuario_id = ? ORDER BY criado_em DESC`,
       [req.usuarioId]
     );
@@ -143,18 +147,23 @@ router.get('/resultados-simulado', async (req, res, next) => {
 
 router.post('/resultados-simulado', async (req, res, next) => {
   try {
-    const { modalidade, acertos, total, duracaoSegundos = 0 } = req.body || {};
+    const { modalidade, acertos, total, duracaoSegundos = 0, desempenhoMaterias = [] } = req.body || {};
     if (
       typeof modalidade !== 'string' || !modalidade.trim() || modalidade.length > 60 ||
       !Number.isInteger(acertos) || !Number.isInteger(total) || total < 1 ||
-      acertos < 0 || acertos > total || !Number.isInteger(duracaoSegundos) || duracaoSegundos < 0
+      acertos < 0 || acertos > total || !Number.isInteger(duracaoSegundos) || duracaoSegundos < 0 ||
+      !Array.isArray(desempenhoMaterias) || desempenhoMaterias.length > 30 || desempenhoMaterias.some((item) =>
+        !item || typeof item.materia !== 'string' || !item.materia.trim() || item.materia.length > 80 ||
+        !Number.isInteger(item.acertos) || !Number.isInteger(item.total) || item.total < 1 ||
+        item.acertos < 0 || item.acertos > item.total
+      )
     ) {
       return res.status(400).json({ erro: 'Resultado de simulado inválido.' });
     }
     const [resultado] = await pool.query(
-      `INSERT INTO resultados_simulado (usuario_id, modalidade, acertos, total, duracao_segundos)
-       VALUES (?, ?, ?, ?, ?)`,
-      [req.usuarioId, modalidade.trim(), acertos, total, duracaoSegundos]
+      `INSERT INTO resultados_simulado (usuario_id, modalidade, acertos, total, duracao_segundos, desempenho_materias)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [req.usuarioId, modalidade.trim(), acertos, total, duracaoSegundos, JSON.stringify(desempenhoMaterias)]
     );
     res.status(201).json({ id: resultado.insertId });
   } catch (erro) { next(erro); }

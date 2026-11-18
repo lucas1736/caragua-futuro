@@ -147,7 +147,7 @@ function PlanejamentoReact() {
                 <label className="block font-bold text-xs mb-2" htmlFor="objetivo">1. Qual é o seu objetivo principal?</label>
                 <select className="w-full border border-slate-200 rounded-md px-3 py-3 text-xs text-slate-700 outline-none focus:ring-2 focus:ring-emerald-400" id="objetivo" value={objetivo} onChange={(evento) => alterarObjetivo(evento.target.value)}>
                   <option value="">Selecione uma opção</option>
-                  <option value="IFSP">IFSP</option><option value="ETEC">ETEC</option><option value="FATEC">FATEC</option><option value="Concurso público">Concurso público</option><option value="Vestibular">Vestibular</option>
+                  <option value="IFSP">IFSP</option><option value="ETEC">ETEC</option><option value="Concurso público">Concurso público</option><option value="Vestibular">Vestibular</option>
                 </select>
               </div>
               <div className="mb-5">
