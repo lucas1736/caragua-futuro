@@ -54,7 +54,7 @@ function Pomodoro({ compacto = false }) {
       <div className="bg-[#063b29] text-white rounded-lg px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="leading-tight">
-            <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-300">
+            <p className="text-xs font-bold uppercase tracking-wide text-emerald-300">
               Pomodoro · {modo === 'foco' ? 'Foco' : 'Pausa'}
             </p>
             <p className="text-xl font-extrabold tabular-nums">
@@ -82,7 +82,7 @@ function Pomodoro({ compacto = false }) {
         </div>
 
         {aviso && (
-          <p className="text-[11px] text-emerald-200 mt-2 leading-snug">
+          <p className="text-xs text-emerald-200 mt-2 leading-snug">
             {aviso}
           </p>
         )}

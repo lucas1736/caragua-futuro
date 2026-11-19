@@ -156,26 +156,26 @@ function PlanejamentoReact() {
                   <option value="">{objetivo ? 'Selecione uma modalidade' : 'Primeiro selecione seu objetivo'}</option>
                   {opcoes.map((opcao) => <option key={opcao.id} value={opcao.id}>{opcao.nome}</option>)}
                 </select>
-                <p className="text-[10px] text-slate-500 mt-2">As opções serão exibidas conforme o objetivo escolhido.</p>
+                <p className="text-xs text-slate-500 mt-2">As opções serão exibidas conforme o objetivo escolhido.</p>
               </div>
               <div className="mb-5">
                 <h3 className="font-bold text-xs mb-2">3. Matérias para estudar:</h3>
-                <p className="text-[10px] text-slate-500 mb-3">As matérias serão selecionadas automaticamente conforme a modalidade escolhida. Você também poderá ajustá-las.</p>
+                <p className="text-xs text-slate-500 mb-3">As matérias serão selecionadas automaticamente conforme a modalidade escolhida. Você também poderá ajustá-las.</p>
                 <div className="flex flex-wrap gap-2">
                   {MATERIAS.map((materia) => {
                     const selecionada = materias.includes(materia);
-                    return <button key={materia} type="button" aria-pressed={selecionada} onClick={() => alternarMateria(materia)} className={`text-[10px] px-4 py-2 rounded-full transition ${selecionada ? 'bg-emerald-500 text-[#063b29] font-semibold' : 'bg-slate-50 border border-slate-200 text-slate-600'}`}>{materia}</button>;
+                    return <button key={materia} type="button" aria-pressed={selecionada} onClick={() => alternarMateria(materia)} className={`text-xs px-4 py-2 rounded-full transition ${selecionada ? 'bg-emerald-500 text-[#063b29] font-semibold' : 'bg-slate-50 border border-slate-200 text-slate-600'}`}>{materia}</button>;
                   })}
                 </div>
               </div>
               <div className="mb-5">
                 <h3 className="font-bold text-xs mb-2">4. Tempo disponível por dia:</h3>
-                <div className="flex flex-wrap justify-between gap-2 text-[9px] text-slate-500 mb-2"><span>Mínimo: 1 hora</span><span className="text-emerald-700 font-bold">{horas} {horas === 1 ? 'hora' : 'horas'} / dia selecionada{horas === 1 ? '' : 's'}</span><span>Máximo: 8 horas</span></div>
+                <div className="flex flex-wrap justify-between gap-2 text-xs text-slate-500 mb-2"><span>Mínimo: 1 hora</span><span className="text-emerald-700 font-bold">{horas} {horas === 1 ? 'hora' : 'horas'} / dia selecionada{horas === 1 ? '' : 's'}</span><span>Máximo: 8 horas</span></div>
                 <input className="w-full accent-emerald-500 cursor-pointer" id="tempo" max="8" min="1" step="1" type="range" value={horas} onChange={(evento) => setHoras(Number(evento.target.value))} aria-label="Tempo disponível por dia, em horas" />
               </div>
               <div className="mb-5">
                 <h3 className="font-bold text-xs mb-3">5. Dias da semana para estudar:</h3>
-                <div className="grid grid-cols-7 gap-1">{DIAS.map((dia) => { const selecionado = dias.includes(dia); return <button key={dia} className={`${selecionado ? 'bg-[#063b29] text-white font-bold' : 'bg-slate-50 border border-slate-200 text-slate-600'} text-[9px] py-3 rounded-md`} type="button" aria-pressed={selecionado} onClick={() => alternarDia(dia)}>{dia}</button>; })}</div>
+                <div className="grid grid-cols-7 gap-1">{DIAS.map((dia) => { const selecionado = dias.includes(dia); return <button key={dia} className={`${selecionado ? 'bg-[#063b29] text-white font-bold' : 'bg-slate-50 border border-slate-200 text-slate-600'} text-xs py-3 rounded-md`} type="button" aria-pressed={selecionado} onClick={() => alternarDia(dia)}>{dia}</button>; })}</div>
               </div>
               <div className="mb-5">
                 <label className="block font-bold text-xs mb-3" htmlFor="dataExame">6. Data estimada do exame:</label>
@@ -186,16 +186,16 @@ function PlanejamentoReact() {
 
             {sugestoes.length > 0 && <section className="bg-white border border-slate-200 rounded-xl shadow-sm p-5">
               <h3 className="font-bold text-xs mb-1">Metas sugeridas para esta modalidade</h3>
-              <p className="text-[10px] text-slate-500 mb-4">Você pode ajustar, marcar como concluída e acompanhar o progresso na página de Metas.</p>
-              <div className="space-y-2">{sugestoes.map((item) => <div key={item.titulo} className="border border-slate-200 bg-slate-50 rounded-lg p-3"><p className="text-[11px] font-bold text-slate-700">{item.titulo}</p><div className="flex flex-wrap gap-2 mt-2"><span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">{item.materia}</span><span className="text-[9px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100">Prioridade {item.prioridade.toLowerCase()}</span></div></div>)}</div>
+              <p className="text-xs text-slate-500 mb-4">Você pode ajustar, marcar como concluída e acompanhar o progresso na página de Metas.</p>
+              <div className="space-y-2">{sugestoes.map((item) => <div key={item.titulo} className="border border-slate-200 bg-slate-50 rounded-lg p-3"><p className="text-xs font-bold text-slate-700">{item.titulo}</p><div className="flex flex-wrap gap-2 mt-2"><span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">{item.materia}</span><span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100">Prioridade {item.prioridade.toLowerCase()}</span></div></div>)}</div>
               <button className="mt-4 w-full bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white font-bold text-xs py-3 rounded-md transition" type="button" disabled={metasCarregando} onClick={adicionarMetas}>{metasCarregando ? 'Adicionando metas...' : `Adicionar ${sugestoes.length} metas de ${nomeModalidade(modalidade)} à minha conta`}</button>
-              {mensagemMetas && <p className={`mt-3 text-[11px] font-semibold ${erroMetas ? 'text-red-600' : 'text-emerald-700'}`} role={erroMetas ? 'alert' : 'status'}>{mensagemMetas}</p>}
+              {mensagemMetas && <p className={`mt-3 text-xs font-semibold ${erroMetas ? 'text-red-600' : 'text-emerald-700'}`} role={erroMetas ? 'alert' : 'status'}>{mensagemMetas}</p>}
             </section>}
           </div>
 
           <aside className="bg-[#063b29] rounded-xl text-white p-5 h-fit">
-            <div className="flex items-center gap-3 pb-4 border-b border-[#174c3b]"><div className="w-8 h-8 bg-[#0d523b] rounded-md flex items-center justify-center"><span className="text-emerald-400">✨</span></div><div><h3 className="font-bold text-xs">Sugestão personalizada</h3><p className="text-[8px] text-emerald-400">BASEADA NAS SUAS ESCOLHAS</p></div></div>
-            <div className="mt-5"><h4 className="font-bold text-[10px] mb-3">Prioridades Detectadas:</h4><div className="bg-[#174c3b] rounded-md p-3 mb-2"><p className="text-[10px] text-emerald-400 font-semibold">{prioridade}</p><p className="text-[8px] text-gray-300 mt-1">Matérias relacionadas à prova escolhida</p></div><div className="bg-[#174c3b] rounded-md p-3 mb-2"><p className="text-[10px] text-emerald-400 font-semibold">Sugestão de Distribuição</p><p className="text-[8px] text-gray-300 mt-1">{sugestao.distribuicao}</p></div><div className="bg-[#174c3b] rounded-md p-3"><p className="text-[10px] text-emerald-400 font-semibold">Nível de Dificuldade</p><p className="text-[8px] text-gray-300 mt-1">{sugestao.dificuldade}</p></div><div className="bg-[#0b4a35] rounded-md p-3 mt-4"><div className="flex gap-2"><span className="text-emerald-400">💡</span><p className="text-[8px] text-gray-300 leading-relaxed">{obterDicaDescanso(dias)}</p></div></div></div>
+            <div className="flex items-center gap-3 pb-4 border-b border-[#174c3b]"><div className="w-8 h-8 bg-[#0d523b] rounded-md flex items-center justify-center"><span className="text-emerald-400">✨</span></div><div><h3 className="font-bold text-xs">Sugestão personalizada</h3><p className="text-xs text-emerald-400">BASEADA NAS SUAS ESCOLHAS</p></div></div>
+            <div className="mt-5"><h4 className="font-bold text-xs mb-3">Prioridades Detectadas:</h4><div className="bg-[#174c3b] rounded-md p-3 mb-2"><p className="text-xs text-emerald-400 font-semibold">{prioridade}</p><p className="text-xs text-gray-300 mt-1">Matérias relacionadas à prova escolhida</p></div><div className="bg-[#174c3b] rounded-md p-3 mb-2"><p className="text-xs text-emerald-400 font-semibold">Sugestão de Distribuição</p><p className="text-xs text-gray-300 mt-1">{sugestao.distribuicao}</p></div><div className="bg-[#174c3b] rounded-md p-3"><p className="text-xs text-emerald-400 font-semibold">Nível de Dificuldade</p><p className="text-xs text-gray-300 mt-1">{sugestao.dificuldade}</p></div><div className="bg-[#0b4a35] rounded-md p-3 mt-4"><div className="flex gap-2"><span className="text-emerald-400">💡</span><p className="text-xs text-gray-300 leading-relaxed">{obterDicaDescanso(dias)}</p></div></div></div>
           </aside>
         </div>
       </main>
@@ -207,7 +207,7 @@ function PlanejamentoReact() {
           <p className="text-xs text-slate-500 mt-2">Plano criado com base nas suas preferências.</p>
           <div className="mt-5 space-y-3">{[
             ['Objetivo', planoPreview.objetivo], ['Modalidade escolhida', nomeModalidade(planoPreview.modalidade)], ['Tempo diário', `${planoPreview.horas} ${planoPreview.horas === 1 ? 'hora' : 'horas'} por dia`], ['Dias selecionados', planoPreview.dias.join(', ')], ['Matérias', planoPreview.materias.join(', ')], ['Estratégia sugerida', obterEstrategia(planoPreview.horas)],
-          ].map(([rotulo, valor]) => <div key={rotulo} className={`${rotulo === 'Estratégia sugerida' ? 'bg-emerald-50' : 'bg-slate-50'} rounded-lg p-4`}><p className="text-[9px] text-slate-400 uppercase font-bold">{rotulo}</p><p className="text-sm font-bold mt-1 break-words">{valor}</p></div>)}</div>
+          ].map(([rotulo, valor]) => <div key={rotulo} className={`${rotulo === 'Estratégia sugerida' ? 'bg-emerald-50' : 'bg-slate-50'} rounded-lg p-4`}><p className="text-xs text-slate-400 uppercase font-bold">{rotulo}</p><p className="text-sm font-bold mt-1 break-words">{valor}</p></div>)}</div>
           <button className="w-full mt-5 bg-emerald-500 hover:bg-emerald-400 disabled:cursor-not-allowed text-[#063b29] font-bold py-3.5 rounded-md text-sm" type="button" disabled={salvando || planoSalvo} onClick={salvarPlano}>{salvando ? 'Salvando...' : planoSalvo ? 'Plano salvo ✓' : 'Salvar meu plano'}</button>
           {planoSalvo && aviso.mensagem && <p className="mt-3 text-center text-sm text-emerald-700 font-semibold" role="status">{aviso.mensagem}</p>}
           {planoSalvo && <Link to="/cronograma" onClick={() => setModalAberto(false)} className="block mt-3 w-full text-center border border-emerald-500 text-emerald-700 hover:bg-emerald-50 font-bold py-3 rounded-md text-xs">Ver meu cronograma</Link>}

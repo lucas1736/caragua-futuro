@@ -335,7 +335,7 @@ function Progresso() {
           <button
             type="button"
             onClick={limparRegistros}
-            className="text-[11px] text-slate-500 hover:text-red-600 border border-slate-200 bg-white px-3 py-2 rounded-md"
+            className="text-xs text-slate-500 hover:text-red-600 border border-slate-200 bg-white px-3 py-2 rounded-md"
           >
             Zerar progresso
           </button>
@@ -349,7 +349,7 @@ function Progresso() {
           <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-[10px] text-slate-600">
+                <p className="text-xs text-slate-600">
                   Conclusão Geral
                 </p>
 
@@ -357,7 +357,7 @@ function Progresso() {
                   {conclusao}%
                 </h3>
 
-                <p className="text-[8px] text-slate-500">
+                <p className="text-xs text-slate-500">
                   Média dos resultados dos simulados realizados
                 </p>
               </div>
@@ -393,7 +393,7 @@ function Progresso() {
           </div>
 
           <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-            <p className="text-[10px] text-slate-600">
+            <p className="text-xs text-slate-600">
               Horas Estudadas (semana)
             </p>
 
@@ -401,7 +401,7 @@ function Progresso() {
               {formatarHoras(horasSemana)}h
             </h3>
 
-            <p className="text-[8px] text-slate-500">
+            <p className="text-xs text-slate-500">
               {metaHoras > 0
                 ? `Meta: ${metaHoras} horas semanais`
                 : 'Crie um plano para definir sua meta'}
@@ -423,7 +423,7 @@ function Progresso() {
           </div>
 
           <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-            <p className="text-[10px] text-slate-600">
+            <p className="text-xs text-slate-600">
               Metas Cumpridas
             </p>
 
@@ -435,7 +435,7 @@ function Progresso() {
                     : '—'}
                 </h3>
 
-                <p className="text-[8px] text-slate-500">
+                <p className="text-xs text-slate-500">
                   {erroMetas ||
                     (metas
                       ? 'Suas metas de estudo'
@@ -455,7 +455,7 @@ function Progresso() {
                   —
                 </h3>
 
-                <p className="text-[9px] text-slate-500 mt-1">
+                <p className="text-xs text-slate-500 mt-1">
                   <Link
                     to="/login"
                     className="text-emerald-600 font-semibold"
@@ -471,7 +471,7 @@ function Progresso() {
           <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
             <div className="flex justify-between">
               <div>
-                <p className="text-[10px] text-slate-600">
+                <p className="text-xs text-slate-600">
                   Sequência de Estudos
                 </p>
 
@@ -479,7 +479,7 @@ function Progresso() {
                   {sequencia} {sequencia === 1 ? 'Dia' : 'Dias'}
                 </h3>
 
-                <p className="text-[8px] text-slate-500">
+                <p className="text-xs text-slate-500">
                   {sequencia > 0
                     ? 'Continue assim!'
                     : 'Registre horas hoje para começar'}
@@ -506,7 +506,7 @@ function Progresso() {
                   key={i}
                   className="flex-1 h-full flex flex-col justify-end items-center gap-2 min-w-0"
                 >
-                  <span className="text-[8px] text-slate-500">
+                  <span className="text-xs text-slate-500">
                     {horas > 0
                       ? formatarHoras(
                           Math.round(horas * 10) / 10
@@ -531,14 +531,14 @@ function Progresso() {
                     )} horas estudadas`}
                   />
 
-                  <span className="text-[7px] sm:text-[8px] text-slate-500 whitespace-nowrap">
+                  <span className="text-xs sm:text-xs text-slate-500 whitespace-nowrap">
                     {i === 7 ? 'Atual' : `S-${7 - i}`}
                   </span>
                 </div>
               ))}
             </div>
 
-            <p className="text-[9px] text-slate-600 mt-3">
+            <p className="text-xs text-slate-600 mt-3">
               Horas por semana nas últimas 8 semanas (S-1 = semana passada).
             </p>
           </div>
@@ -548,7 +548,7 @@ function Progresso() {
               Progresso por Vestibular
             </h3>
 
-            <p className="text-[9px] text-slate-600 mb-4">
+            <p className="text-xs text-slate-600 mb-4">
               Desempenho calculado automaticamente pelos simulados realizados.
             </p>
 
@@ -562,7 +562,7 @@ function Progresso() {
                   key={modalidade.id}
                   className="mb-5 last:mb-0"
                 >
-                  <div className="flex justify-between text-[10px] font-semibold mb-2 gap-2">
+                  <div className="flex justify-between text-xs font-semibold mb-2 gap-2">
                     <span>{modalidade.nome}</span>
                     <span>{valor}%</span>
                   </div>
@@ -574,7 +574,7 @@ function Progresso() {
                     />
                   </div>
 
-                  <p className="text-[9px] text-slate-600 mt-1">
+                  <p className="text-xs text-slate-600 mt-1">
                     {dados
                       ? `${dados.acertos} acertos de ${dados.total} questões · ${dados.simulados} simulado(s)`
                       : 'Nenhum simulado realizado ainda'}
@@ -638,7 +638,7 @@ function Progresso() {
             <div>
               <label
                 htmlFor="dataRegistro"
-                className="block text-[10px] font-semibold mb-1"
+                className="block text-xs font-semibold mb-1"
               >
                 Dia
               </label>
@@ -656,7 +656,7 @@ function Progresso() {
             <div>
               <label
                 htmlFor="horasRegistro"
-                className="block text-[10px] font-semibold mb-1"
+                className="block text-xs font-semibold mb-1"
               >
                 Horas
               </label>

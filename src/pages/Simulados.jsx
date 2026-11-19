@@ -4,8 +4,6 @@ import { Link } from 'react-router-dom';
 import Footer from '../components/Footer.jsx';
 import { obterResumoModalidade, obterResumoModalidadeAtual } from '../service/simulados.js';
 import { getToken } from '../service/auth.js';
-import { BANCOS_CONCURSO } from '../service/questoesConcurso.js';
-import { BANCOS_VESTIBULAR } from '../service/questoesVestibular.js';
 
 const MODALIDADES = [
   {
@@ -40,17 +38,17 @@ const MODALIDADES = [
     titulo: 'Concurso Público',
     descricao: 'Treine para concursos municipais, estaduais e federais com questões de nível médio.',
     icone: '🏛️',
-    questoes: BANCOS_CONCURSO.concurso.questoes.length,
-    areas: BANCOS_CONCURSO.concurso.areas,
+    questoes: 20,
+    areas: 'Português, Matemática e Raciocínio Lógico, Informática e Noções de Direito',
     instituicao: 'Concurso',
   },
   {
     id: 'vestibular',
     titulo: 'Vestibular',
-    descricao: 'Pratique com questões no estilo ENEM e dos vestibulares para o Ensino Superior.',
+    descricao: 'Pratique com questões de treinamento para vestibulares do Ensino Superior.',
     icone: '🧠',
-    questoes: BANCOS_VESTIBULAR.vestibular.questoes.length,
-    areas: BANCOS_VESTIBULAR.vestibular.areas,
+    questoes: 20,
+    areas: 'Linguagens, Matemática, Ciências Humanas e Ciências da Natureza',
     instituicao: 'Vestibular',
   },
 ];

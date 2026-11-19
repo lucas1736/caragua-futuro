@@ -50,7 +50,11 @@ function Home() {
               <img
                 alt="Plataforma de estudos"
                 className="w-full h-64 sm:h-80 lg:h-[420px] object-cover rounded-2xl shadow-xl"
-                src="/assets/foto principal.png"
+                src="/assets/foto-principal.webp"
+                width="1561"
+                height="1008"
+                loading="eager"
+                fetchPriority="high"
               />
             </div>
           </div>

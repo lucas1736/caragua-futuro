@@ -2,17 +2,20 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { getUsuario, logoutUsuario, ESTADO_AUTH_EVENTO } from '../service/auth.js';
-import { ESTADO_PERFIL_ATUALIZADO } from '../pages/Perfil.jsx';
+import { ESTADO_PERFIL_ATUALIZADO } from '../service/eventos.js';
 
 const links = [
   { nome: 'Início', to: '/' },
   { nome: 'Planejamento', to: '/planejamento' },
   { nome: 'Simulados', to: '/simulados' },
-  { nome: 'Progresso', to: '/progresso' },
   { nome: 'Cronograma', to: '/cronograma' },
+  { nome: 'Assistente (em breve)', to: '/assistente' },
+];
+
+const linksConta = [
+  { nome: 'Progresso', to: '/progresso' },
   { nome: 'Meus Planos', to: '/meus-planos' },
   { nome: 'Metas', to: '/metas' },
-  { nome: 'Assistente (em breve)', to: '/assistente' },
 ];
 
 function Header() {
@@ -76,14 +79,14 @@ function Header() {
 
           <div>
             <h1 className="font-bold text-sm leading-none">Caraguá Futuro</h1>
-            <p className="text-[8px] text-emerald-400 tracking-wide mt-1">
+            <p className="text-xs text-emerald-200 tracking-wide mt-1">
               PLATAFORMA DE ESTUDOS
             </p>
           </div>
         </Link>
 
         <div className="hidden lg:flex items-center gap-6 text-sm text-gray-300">
-          {links.map((link) => (
+          {[...links, ...(usuario ? linksConta : [])].map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
@@ -123,7 +126,7 @@ function Header() {
           ) : (
             <Link
               to="/login"
-              className="hidden sm:block bg-emerald-500 hover:bg-emerald-400 text-[#063b29] font-bold text-[11px] px-5 py-2 rounded-md transition"
+              className="hidden sm:block bg-emerald-500 hover:bg-emerald-400 text-[#063b29] font-bold text-sm px-5 py-2 rounded-md transition"
             >
               Entrar
             </Link>
@@ -132,7 +135,8 @@ function Header() {
           <button
             type="button"
             className="lg:hidden text-white text-2xl px-2"
-            aria-label="Abrir menu de navegação"
+            aria-label={menuAberto ? 'Fechar menu de navegação' : 'Abrir menu de navegação'}
+            aria-controls="menu-principal-mobile"
             aria-expanded={menuAberto}
             onClick={() => setMenuAberto((v) => !v)}
           >
@@ -142,12 +146,13 @@ function Header() {
       </nav>
 
       {menuAberto && (
-        <div className="lg:hidden px-4 sm:px-7 pb-5">
-          {links.map((link) => (
+        <div id="menu-principal-mobile" className="lg:hidden px-4 sm:px-7 pb-5">
+          {[...links, ...(usuario ? linksConta : [])].map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
               end={link.to === '/'}
+              onClick={() => setMenuAberto(false)}
               className={({ isActive }) =>
                 `block py-3 border-t border-[#174c3b] transition ${
                   isActive

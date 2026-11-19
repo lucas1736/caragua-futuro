@@ -256,13 +256,13 @@ function Metas() {
           <div className="bg-[#063b29] text-white rounded-xl p-5 mb-5 shadow-sm">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-[10px] text-emerald-300 font-bold uppercase tracking-wide">
+                <p className="text-xs text-emerald-300 font-bold uppercase tracking-wide">
                   Sua preparação
                 </p>
                 <h3 className="font-bold text-sm mt-1">
                   Metas sugeridas · {nomeModalidade(modalidade)}
                 </h3>
-                <p className="text-[11px] text-gray-300 mt-1">
+                <p className="text-xs text-gray-300 mt-1">
                   {sugestoesFaltantes.length === 0
                     ? 'Todas as metas sugeridas dessa modalidade já estão na sua lista.'
                     : `${sugestoesFaltantes.length} meta(s) com os conteúdos que essa prova cobra podem ser adicionadas automaticamente.`}
@@ -375,16 +375,16 @@ function Metas() {
                   )}
 
                   <div className="flex flex-wrap items-center gap-2 mt-3">
-                    <span className="text-[11px] px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+                    <span className="text-xs px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
                       {meta.materia}
                     </span>
                     <span
-                      className={`text-[11px] px-3 py-1 rounded-full border ${corPrioridade[meta.prioridade]}`}
+                      className={`text-xs px-3 py-1 rounded-full border ${corPrioridade[meta.prioridade]}`}
                     >
                       Prioridade {meta.prioridade.toLowerCase()}
                     </span>
                     <span
-                      className={`text-[11px] ${
+                      className={`text-xs ${
                         atrasada(meta) ? 'text-red-600 font-semibold' : 'text-slate-500'
                       }`}
                     >
@@ -417,12 +417,12 @@ function Metas() {
       </main>
 
       {formAberto && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <form
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onMouseDown={(evento) => { if (evento.target === evento.currentTarget) setFormAberto(false); }}>
+          <form role="dialog" aria-modal="true" aria-labelledby="titulo-form-meta"
             onSubmit={salvar}
             className="bg-white w-full max-w-lg rounded-2xl p-6 max-h-[90vh] overflow-y-auto space-y-5"
           >
-            <h3 className="text-xl font-bold text-slate-900">
+            <h3 id="titulo-form-meta" className="text-xl font-bold text-slate-900">
               {editandoId ? 'Editar meta' : 'Nova meta'}
             </h3>
 
