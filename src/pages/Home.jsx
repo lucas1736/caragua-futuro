@@ -1,5 +1,6 @@
 
 import { Link } from 'react-router-dom';
+import Footer from '../components/Footer.jsx';
 
 function Home() {
   return (
@@ -23,9 +24,9 @@ function Home() {
               </h2>
 
               <p className="text-base lg:text-lg text-gray-300 leading-relaxed max-w-xl mt-6">
-                Organize seus estudos de forma simples e realista.
-                A nossa Inteligência Artificial cria o cronograma ideal
-                baseado na sua rotina e objetivos de Caraguatatuba.
+                Organize seus estudos de forma simples e realista. Monte um
+                plano automático com base nas matérias, no tempo e nos dias
+                que você escolher.
               </p>
 
               <div className="flex flex-wrap gap-3 mt-8">
@@ -49,7 +50,11 @@ function Home() {
               <img
                 alt="Plataforma de estudos"
                 className="w-full h-64 sm:h-80 lg:h-[420px] object-cover rounded-2xl shadow-xl"
-                src="/assets/foto principal.png"
+                src="/assets/foto-principal.webp"
+                width="1561"
+                height="1008"
+                loading="eager"
+                fetchPriority="high"
               />
             </div>
           </div>
@@ -64,7 +69,7 @@ function Home() {
               Funcionalidades
             </p>
             <h2 className="text-3xl lg:text-4xl font-extrabold mt-3 text-slate-900">
-              Tudo o que você precisa para ser aprovado
+              Ferramentas para organizar sua preparação
             </h2>
           </div>
 
@@ -95,10 +100,10 @@ function Home() {
               <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-5 text-2xl text-emerald-600">
                 ♧
               </div>
-              <h3 className="font-bold text-xl mb-3">Plano Inteligente</h3>
+              <h3 className="font-bold text-xl mb-3">Plano automático</h3>
               <p className="text-base text-slate-600 leading-relaxed">
-                Nossa inteligência artificial cria o cronograma
-                focado nas suas necessidades e objetivos.
+                Gere uma sugestão de grade a partir das matérias, dos dias e
+                das horas que você informar. Você pode ajustar suas escolhas.
               </p>
             </div>
           </div>
@@ -202,40 +207,6 @@ function Home() {
         </div>
       </section>
 
-      {/* Indicadores */}
-      <section className="bg-[#063b29] border-b-2 border-emerald-400">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-14 lg:py-16">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 text-center">
-            <div>
-              <h2 className="text-4xl lg:text-5xl font-extrabold text-emerald-400">
-                2.500+
-              </h2>
-              <p className="text-base text-gray-200 mt-2">
-                Estudantes ativos de Caraguatatuba
-              </p>
-            </div>
-
-            <div>
-              <h2 className="text-4xl lg:text-5xl font-extrabold text-emerald-400">
-                95%
-              </h2>
-              <p className="text-base text-gray-200 mt-2">
-                Taxa de aprovação
-              </p>
-            </div>
-
-            <div>
-              <h2 className="text-4xl lg:text-5xl font-extrabold text-emerald-400">
-                10.000+
-              </h2>
-              <p className="text-base text-gray-200 mt-2">
-                Planos criados pela IA
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Metodologia */}
       <section className="bg-slate-50 py-16 lg:py-20">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12">
@@ -276,90 +247,41 @@ function Home() {
         </div>
       </section>
 
-      {/* Depoimentos */}
+      {/* Como a plataforma ajuda */}
       <section className="bg-slate-100 py-16 lg:py-20">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12">
           <div className="text-center mb-12">
             <p className="text-sm font-bold text-emerald-700 uppercase tracking-wide">
-              Depoimentos
+              Como funciona
             </p>
             <h2 className="text-3xl lg:text-4xl font-extrabold mt-3">
-              Histórias de quem alcançou a aprovação
+              Como o Caraguá Futuro ajuda
             </h2>
+            <p className="text-base text-slate-600 mt-4 max-w-2xl mx-auto">
+              A plataforma reúne ferramentas para você planejar sua rotina,
+              acompanhar seus registros de estudo e praticar com simulados.
+              Os resultados dependem da sua preparação e não são garantidos.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-2xl p-7 shadow-sm">
-              <p className="text-base text-slate-600 leading-relaxed">
-                "A plataforma me ajudou a passar na FATEC. Eu trabalhava o dia
-                todo e só tinha 2 horas por noite. A IA distribuiu meus estudos
-                perfeitamente."
-              </p>
-              <div className="mt-6">
-                <h3 className="text-base font-bold">Mariana Silva</h3>
-                <p className="text-sm text-emerald-700 font-semibold mt-1">
-                  Aprovada em Análise de Sistemas
-                </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              ['Planeje', 'Escolha seu objetivo, as matérias e os horários disponíveis para montar uma sugestão de estudos.'],
+              ['Organize', 'Consulte o cronograma e gerencie seus planos e metas de estudo.'],
+              ['Acompanhe', 'Registre seu progresso e pratique com os simulados disponíveis na plataforma.'],
+            ].map(([titulo, descricao]) => (
+              <div key={titulo} className="bg-white rounded-2xl p-7 shadow-sm">
+                <h3 className="font-bold text-xl mb-3">{titulo}</h3>
+                <p className="text-base text-slate-600 leading-relaxed">{descricao}</p>
               </div>
-            </div>
-
-            <div className="bg-white rounded-2xl p-7 shadow-sm">
-              <p className="text-base text-slate-600 leading-relaxed">
-                "O Assistente IA tirou todas as minhas dúvidas de Física e
-                Redação na semana da prova do ENEM. Melhor investimento que fiz."
-              </p>
-              <div className="mt-6">
-                <h3 className="text-base font-bold">Pedro Santos</h3>
-                <p className="text-sm text-emerald-700 font-semibold mt-1">
-                  Aprovado no ENEM
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       </main>
 
-      {/* Rodapé */}
-      <footer className="bg-[#063b29] text-white">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div>
-              <h2 className="text-xl font-extrabold">Caraguá Futuro</h2>
-              <p className="text-sm text-gray-300 leading-relaxed mt-4 max-w-sm">
-                Ajudando estudantes de Caraguatatuba e região a transformarem
-                rotinas em conquistas acadêmicas.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-base font-bold">Plataforma</h3>
-              <div className="flex flex-col gap-3 mt-4">
-                <Link className="text-sm text-gray-300 hover:text-emerald-400" to="/">Início</Link>
-                <Link className="text-sm text-gray-300 hover:text-emerald-400" to="/planejamento">Planejamento</Link>
-                <Link className="text-sm text-gray-300 hover:text-emerald-400" to="/simulados">Simulados</Link>
-                <Link className="text-sm text-gray-300 hover:text-emerald-400" to="/progresso">Progresso</Link>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-base font-bold">Contato</h3>
-              <div className="flex flex-col gap-3 mt-4">
-                <Link className="text-sm text-gray-300 hover:text-emerald-400" to="/assistente">Suporte</Link>
-                <span className="text-sm text-gray-300">Termos de Uso</span>
-                <span className="text-sm text-gray-300">Privacidade</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-[#174c3b] mt-10 pt-7">
-            <p className="text-sm text-gray-400">
-              © 2026 Caraguá Futuro. Todos os direitos reservados.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

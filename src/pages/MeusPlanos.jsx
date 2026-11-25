@@ -7,6 +7,7 @@ import {
   criarPlano,
   atualizarPlano,
   excluirPlano,
+  ativarPlano,
 } from '../service/planos.js';
 
 const OBJETIVOS = ['Vestibular', 'ENEM', 'FATEC', 'IFSP', 'Concurso'];
@@ -18,6 +19,9 @@ const DIAS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 
 const formVazio = {
   objetivo: 'ENEM',
+  modalidade: '',
+  vestibulares: [],
+  ativo: true,
   materias: ['Matemática', 'Português'],
   horas: 3,
   dias: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'],
@@ -73,6 +77,9 @@ function MeusPlanos() {
     setEditandoId(plano.id);
     setForm({
       objetivo: plano.objetivo,
+      modalidade: plano.modalidade,
+      vestibulares: plano.vestibulares,
+      ativo: plano.ativo,
       materias: plano.materias,
       horas: plano.horas,
       dias: plano.dias,
@@ -93,11 +100,14 @@ function MeusPlanos() {
     try {
       if (editandoId) {
         const atualizado = await atualizarPlano(editandoId, form);
-        setPlanos((lista) => lista.map((p) => (p.id === editandoId ? atualizado : p)));
+        setPlanos((lista) => lista.map((plano) => {
+          if (plano.id === editandoId) return atualizado;
+          return atualizado.ativo ? { ...plano, ativo: false } : plano;
+        }));
         setAviso('Plano atualizado!');
       } else {
         const novo = await criarPlano(form);
-        setPlanos((lista) => [novo, ...lista]);
+        setPlanos((lista) => [novo, ...lista.map((plano) => ({ ...plano, ativo: false }))]);
         setAviso('Plano criado!');
       }
       setFormAberto(false);
@@ -119,22 +129,19 @@ function MeusPlanos() {
     }
   }
 
-  function usarNoCronograma(plano) {
-    localStorage.setItem(
-      'planoCaraguaFuturo',
-      JSON.stringify({
-        objetivo: plano.objetivo,
-        materias: plano.materias,
-        horas: plano.horas,
-        dias: plano.dias,
-        data: plano.data,
-      })
-    );
-    navigate('/cronograma');
+  async function usarNoCronograma(plano) {
+    try {
+      const ativo = await ativarPlano(plano.id);
+      setPlanos((lista) => lista.map((item) => ({ ...item, ativo: item.id === ativo.id })));
+      window.dispatchEvent(new Event('planoAtualizado'));
+      navigate('/cronograma');
+    } catch (e) {
+      setErro(e.message);
+    }
   }
 
   const chip = (ativo) =>
-    `text-[11px] px-3 py-1.5 rounded-full border transition ${
+    `text-xs px-3 py-1.5 rounded-full border transition ${
       ativo
         ? 'bg-emerald-500 border-emerald-500 text-[#063b29] font-semibold'
         : 'bg-slate-50 border-slate-200 text-slate-600'
@@ -194,9 +201,9 @@ function MeusPlanos() {
           <div className="bg-white border border-dashed border-slate-300 rounded-xl p-8 text-center text-slate-500 text-sm">
             Você ainda não tem planos. Clique em <strong>+ Novo plano</strong> ou
             monte um na página de{' '}
-            <a href="/planejamento" className="text-emerald-600 font-semibold">
+            <Link to="/planejamento" className="text-emerald-800 font-semibold underline">
               Planejamento
-            </a>
+            </Link>
             .
           </div>
         )}
@@ -210,6 +217,7 @@ function MeusPlanos() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <h3 className="font-bold text-lg text-slate-900">{plano.objetivo}</h3>
+                  {plano.ativo && <span className="text-xs font-semibold text-emerald-700">Plano ativo no cronograma</span>}
                   <p className="text-xs text-slate-500 mt-1">
                     {plano.horas} {plano.horas === 1 ? 'hora' : 'horas'}/dia ·{' '}
                     {plano.dias.join(', ')} · Prova: {formatarData(plano.data)}
@@ -245,7 +253,7 @@ function MeusPlanos() {
                 {plano.materias.map((m) => (
                   <span
                     key={m}
-                    className="text-[11px] px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100"
+                    className="text-xs px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100"
                   >
                     {m}
                   </span>
@@ -257,12 +265,12 @@ function MeusPlanos() {
       </main>
 
       {formAberto && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <form
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onMouseDown={(evento) => { if (evento.target === evento.currentTarget) setFormAberto(false); }}>
+          <form role="dialog" aria-modal="true" aria-labelledby="titulo-form-plano"
             onSubmit={salvar}
             className="bg-white w-full max-w-lg rounded-2xl p-6 max-h-[90vh] overflow-y-auto space-y-5"
           >
-            <h3 className="text-xl font-bold text-slate-900">
+            <h3 id="titulo-form-plano" className="text-xl font-bold text-slate-900">
               {editandoId ? 'Editar plano' : 'Novo plano'}
             </h3>
 

@@ -2,12 +2,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer.jsx';
-import { getUsuario } from '../service/auth.js';
+import { getUsuario, getToken } from '../service/auth.js';
 import { listarMetas } from '../service/metas.js';
-import { obterResultados, limparResultados } from '../service/simulados.js';
-
-const CHAVE_PROGRESSO = 'progressoCaraguaFuturo';
-const CHAVE_PLANO = 'planoCaraguaFuturo';
+import { obterResultados, obterResultadosAtuais, limparResultados } from '../service/simulados.js';
+import { lerVisitante, salvarVisitante } from '../service/dadosVisitante.js';
+import { listarRegistrosEstudo, registrarEstudo, limparRegistrosEstudo } from '../service/progresso.js';
+import { obterPlanoAtivo } from '../service/planos.js';
 
 const modalidadesVestibulares = [
   {
@@ -57,17 +57,8 @@ function formatarHoras(valor) {
     : valor.toFixed(1).replace('.', ',');
 }
 
-function lerJSON(chave, padrao) {
-  try {
-    const bruto = localStorage.getItem(chave);
-    return bruto ? JSON.parse(bruto) : padrao;
-  } catch {
-    return padrao;
-  }
-}
-
 function lerProgresso() {
-  const dados = lerJSON(CHAVE_PROGRESSO, {});
+  const dados = lerVisitante('progresso', {});
 
   return {
     materias: dados?.materias || {},
@@ -76,11 +67,11 @@ function lerProgresso() {
 }
 
 function Progresso() {
-  const [progresso, setProgresso] = useState(lerProgresso);
-  const [resultados, setResultados] = useState(obterResultados);
-  const [plano, setPlano] = useState(() =>
-    lerJSON(CHAVE_PLANO, null)
-  );
+  const [progresso, setProgresso] = useState(() => getToken() ? { materias: {}, registros: {} } : lerProgresso());
+  const [resultados, setResultados] = useState(() => getToken() ? { materias: {}, modalidades: {}, historico: [] } : obterResultados());
+  const [plano, setPlano] = useState(() => getToken() ? null : lerVisitante('plano'));
+  const [carregandoDados, setCarregandoDados] = useState(false);
+  const [erroDados, setErroDados] = useState('');
   const [usuario, setUsuario] = useState(() => getUsuario());
   const [metas, setMetas] = useState(null);
   const [erroMetas, setErroMetas] = useState('');
@@ -91,21 +82,31 @@ function Progresso() {
   const [erroForm, setErroForm] = useState('');
 
   useEffect(() => {
-    try {
-      localStorage.setItem(
-        CHAVE_PROGRESSO,
-        JSON.stringify(progresso)
-      );
-    } catch {
-      // Ignora problemas de armazenamento.
-    }
+    if (!getToken()) salvarVisitante('progresso', progresso);
   }, [progresso]);
 
   useEffect(() => {
     function atualizar() {
-      setPlano(lerJSON(CHAVE_PLANO, null));
-      setUsuario(getUsuario());
-      setResultados(obterResultados());
+      const usuarioAtual = getUsuario();
+      setUsuario(usuarioAtual);
+      if (getToken()) {
+        setPlano(null);
+        setProgresso({ materias: {}, registros: {} });
+        setResultados({ materias: {}, modalidades: {}, historico: [] });
+      }
+      if (!getToken()) {
+        setPlano(lerVisitante('plano'));
+        setProgresso(lerProgresso());
+        setResultados(obterResultados());
+        return;
+      }
+      Promise.all([listarRegistrosEstudo(), obterResultadosAtuais(), obterPlanoAtivo()])
+        .then(([registros, resultadosAtuais, planoAtivo]) => {
+          setProgresso({ materias: {}, registros: Object.fromEntries(registros.map((item) => [String(item.data).slice(0, 10), Number(item.horas)])) });
+          setResultados(resultadosAtuais);
+          setPlano(planoAtivo);
+        })
+        .catch((erro) => setErroDados(erro.message));
     }
 
     window.addEventListener('planoAtualizado', atualizar);
@@ -120,6 +121,23 @@ function Progresso() {
       window.removeEventListener('focus', atualizar);
     };
   }, []);
+
+  useEffect(() => {
+    let ativo = true;
+    if (!usuario || !getToken()) return undefined;
+    setCarregandoDados(true);
+    setErroDados('');
+    Promise.all([listarRegistrosEstudo(), obterResultadosAtuais(), obterPlanoAtivo()])
+      .then(([registros, resultadosAtuais, planoAtivo]) => {
+        if (!ativo) return;
+        setProgresso({ materias: {}, registros: Object.fromEntries(registros.map((item) => [String(item.data).slice(0, 10), Number(item.horas)])) });
+        setResultados(resultadosAtuais);
+        setPlano(planoAtivo);
+      })
+      .catch((erro) => { if (ativo) setErroDados(erro.message); })
+      .finally(() => { if (ativo) setCarregandoDados(false); });
+    return () => { ativo = false; };
+  }, [usuario]);
 
   useEffect(() => {
     let ativo = true;
@@ -257,37 +275,41 @@ function Progresso() {
       return;
     }
 
-    setProgresso((atual) => ({
-      ...atual,
-      registros: {
-        ...atual.registros,
-        [dataRegistro]:
-          (Number(atual.registros[dataRegistro]) || 0) + horas,
-      },
-    }));
-
+    if (getToken()) {
+      setCarregandoDados(true);
+      setErroForm('');
+      registrarEstudo(dataRegistro, horas)
+        .then(() => listarRegistrosEstudo())
+        .then((registros) => setProgresso({ materias: {}, registros: Object.fromEntries(registros.map((item) => [String(item.data).slice(0, 10), Number(item.horas)])) }))
+        .catch((erro) => setErroForm(erro.message))
+        .finally(() => setCarregandoDados(false));
+    } else {
+      setProgresso((atual) => ({
+        ...atual,
+        registros: {
+          ...atual.registros,
+          [dataRegistro]: Math.min(24, (Number(atual.registros[dataRegistro]) || 0) + horas),
+        },
+      }));
+    }
     setHorasRegistro('1');
   }
 
   function limparRegistros() {
-    if (
-      window.confirm(
-        'Apagar o histórico de horas e todos os resultados dos simulados?'
-      )
-    ) {
-      setProgresso({
-        materias: {},
-        registros: {},
-      });
-
-      limparResultados();
-
-      setResultados({
-        materias: {},
-        modalidades: {},
-        historico: [],
-      });
-    }
+    if (!window.confirm('Apagar o histórico de horas e todos os resultados dos simulados?')) return;
+    setCarregandoDados(true);
+    setErroDados('');
+    const apagar = getToken()
+      ? Promise.all([limparRegistrosEstudo(), limparResultados()])
+      : limparResultados();
+    apagar
+      .then(() => {
+        setProgresso({ materias: {}, registros: {} });
+        setResultados({ materias: {}, modalidades: {}, historico: [] });
+        setErroDados('');
+      })
+      .catch((erro) => setErroDados(erro.message))
+      .finally(() => setCarregandoDados(false));
   }
 
   const circ = 2 * Math.PI * 16;
@@ -313,18 +335,21 @@ function Progresso() {
           <button
             type="button"
             onClick={limparRegistros}
-            className="text-[11px] text-slate-500 hover:text-red-600 border border-slate-200 bg-white px-3 py-2 rounded-md"
+            className="text-xs text-slate-500 hover:text-red-600 border border-slate-200 bg-white px-3 py-2 rounded-md"
           >
             Zerar progresso
           </button>
         </section>
+
+        {erroDados && <p className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">{erroDados}</p>}
+        {carregandoDados && <p className="mb-4 text-sm text-slate-600" role="status">Sincronizando seus dados...</p>}
 
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
 
           <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-[10px] text-slate-600">
+                <p className="text-xs text-slate-600">
                   Conclusão Geral
                 </p>
 
@@ -332,7 +357,7 @@ function Progresso() {
                   {conclusao}%
                 </h3>
 
-                <p className="text-[8px] text-slate-500">
+                <p className="text-xs text-slate-500">
                   Média dos resultados dos simulados realizados
                 </p>
               </div>
@@ -368,7 +393,7 @@ function Progresso() {
           </div>
 
           <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-            <p className="text-[10px] text-slate-600">
+            <p className="text-xs text-slate-600">
               Horas Estudadas (semana)
             </p>
 
@@ -376,7 +401,7 @@ function Progresso() {
               {formatarHoras(horasSemana)}h
             </h3>
 
-            <p className="text-[8px] text-slate-500">
+            <p className="text-xs text-slate-500">
               {metaHoras > 0
                 ? `Meta: ${metaHoras} horas semanais`
                 : 'Crie um plano para definir sua meta'}
@@ -398,7 +423,7 @@ function Progresso() {
           </div>
 
           <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-            <p className="text-[10px] text-slate-600">
+            <p className="text-xs text-slate-600">
               Metas Cumpridas
             </p>
 
@@ -410,7 +435,7 @@ function Progresso() {
                     : '—'}
                 </h3>
 
-                <p className="text-[8px] text-slate-500">
+                <p className="text-xs text-slate-500">
                   {erroMetas ||
                     (metas
                       ? 'Suas metas de estudo'
@@ -430,7 +455,7 @@ function Progresso() {
                   —
                 </h3>
 
-                <p className="text-[9px] text-slate-500 mt-1">
+                <p className="text-xs text-slate-500 mt-1">
                   <Link
                     to="/login"
                     className="text-emerald-600 font-semibold"
@@ -446,7 +471,7 @@ function Progresso() {
           <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
             <div className="flex justify-between">
               <div>
-                <p className="text-[10px] text-slate-600">
+                <p className="text-xs text-slate-600">
                   Sequência de Estudos
                 </p>
 
@@ -454,7 +479,7 @@ function Progresso() {
                   {sequencia} {sequencia === 1 ? 'Dia' : 'Dias'}
                 </h3>
 
-                <p className="text-[8px] text-slate-500">
+                <p className="text-xs text-slate-500">
                   {sequencia > 0
                     ? 'Continue assim!'
                     : 'Registre horas hoje para começar'}
@@ -481,7 +506,7 @@ function Progresso() {
                   key={i}
                   className="flex-1 h-full flex flex-col justify-end items-center gap-2 min-w-0"
                 >
-                  <span className="text-[8px] text-slate-500">
+                  <span className="text-xs text-slate-500">
                     {horas > 0
                       ? formatarHoras(
                           Math.round(horas * 10) / 10
@@ -506,14 +531,14 @@ function Progresso() {
                     )} horas estudadas`}
                   />
 
-                  <span className="text-[7px] sm:text-[8px] text-slate-500 whitespace-nowrap">
+                  <span className="text-xs sm:text-xs text-slate-500 whitespace-nowrap">
                     {i === 7 ? 'Atual' : `S-${7 - i}`}
                   </span>
                 </div>
               ))}
             </div>
 
-            <p className="text-[9px] text-slate-600 mt-3">
+            <p className="text-xs text-slate-600 mt-3">
               Horas por semana nas últimas 8 semanas (S-1 = semana passada).
             </p>
           </div>
@@ -523,7 +548,7 @@ function Progresso() {
               Progresso por Vestibular
             </h3>
 
-            <p className="text-[9px] text-slate-600 mb-4">
+            <p className="text-xs text-slate-600 mb-4">
               Desempenho calculado automaticamente pelos simulados realizados.
             </p>
 
@@ -537,7 +562,7 @@ function Progresso() {
                   key={modalidade.id}
                   className="mb-5 last:mb-0"
                 >
-                  <div className="flex justify-between text-[10px] font-semibold mb-2 gap-2">
+                  <div className="flex justify-between text-xs font-semibold mb-2 gap-2">
                     <span>{modalidade.nome}</span>
                     <span>{valor}%</span>
                   </div>
@@ -549,7 +574,7 @@ function Progresso() {
                     />
                   </div>
 
-                  <p className="text-[9px] text-slate-600 mt-1">
+                  <p className="text-xs text-slate-600 mt-1">
                     {dados
                       ? `${dados.acertos} acertos de ${dados.total} questões · ${dados.simulados} simulado(s)`
                       : 'Nenhum simulado realizado ainda'}
@@ -567,6 +592,40 @@ function Progresso() {
           </div>
         </section>
 
+        {resultados.historico?.length > 0 && (
+          <section className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-sm mb-5">
+            <h3 className="font-bold text-sm mb-1">Histórico de simulados</h3>
+            <p className="text-xs text-slate-600 mb-4">Tentativas registradas nesta conta ou neste navegador.</p>
+            <ol className="space-y-3">
+              {[...resultados.historico].reverse().slice(0, 10).map((item, indice) => (
+                <li key={`${item.data || indice}-${indice}`} className="flex flex-wrap justify-between gap-2 border-b border-slate-100 pb-3 last:border-0">
+                  <div><p className="text-sm font-semibold text-slate-800">{item.modalidade || item.materia || 'Simulado'}</p><p className="text-xs text-slate-600">{item.acertos} acertos de {item.total} questões{item.data ? ` · ${new Date(item.data).toLocaleString('pt-BR')}` : ''}</p></div>
+                  <span className="text-sm font-bold text-emerald-700">{item.total ? Math.round((item.acertos / item.total) * 100) : 0}%</span>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
+
+        {Object.keys(resultados.materias || {}).length > 0 && (
+          <section className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-sm mb-5">
+            <h3 className="font-bold text-sm mb-1">Desempenho por matéria</h3>
+            <p className="text-xs text-slate-600 mb-4">Resultados agregados das questões dos simulados realizados.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {Object.entries(resultados.materias).sort(([a], [b]) => a.localeCompare(b, 'pt-BR')).map(([materia, dados]) => {
+                const porcentagem = dados.total ? Math.round((dados.acertos / dados.total) * 100) : 0;
+                return (
+                  <div key={materia} className="rounded-lg border border-slate-200 p-3">
+                    <div className="flex justify-between gap-2 text-sm font-semibold"><span>{materia}</span><span>{porcentagem}%</span></div>
+                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-emerald-500" style={{ width: `${porcentagem}%` }} /></div>
+                    <p className="mt-2 text-xs text-slate-600">{dados.acertos} acertos de {dados.total} questões · {dados.simulados} tentativa(s)</p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         <section className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-sm">
           <h3 className="font-bold text-sm mb-4">
             Registrar horas estudadas
@@ -579,7 +638,7 @@ function Progresso() {
             <div>
               <label
                 htmlFor="dataRegistro"
-                className="block text-[10px] font-semibold mb-1"
+                className="block text-xs font-semibold mb-1"
               >
                 Dia
               </label>
@@ -597,7 +656,7 @@ function Progresso() {
             <div>
               <label
                 htmlFor="horasRegistro"
-                className="block text-[10px] font-semibold mb-1"
+                className="block text-xs font-semibold mb-1"
               >
                 Horas
               </label>

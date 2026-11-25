@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer.jsx';
 import { getUsuario, atualizarPerfil } from '../service/auth.js';
+import { ESTADO_PERFIL_ATUALIZADO } from '../service/eventos.js';
 
 const FOTO_MAX_LARGURA = 512;
 
@@ -166,9 +167,10 @@ function Perfil() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm px-4 py-2.5 rounded-lg cursor-pointer text-center transition">
+                <label htmlFor="perfil-foto" className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm px-4 py-2.5 rounded-lg cursor-pointer text-center transition">
                   Escolher foto
                   <input
+                    id="perfil-foto"
                     type="file"
                     accept="image/*"
                     onChange={escolherFoto}
@@ -274,7 +276,7 @@ function Perfil() {
                   id="perfil-nova-senha"
                   type="password"
                   autoComplete="new-password"
-                  minLength={novaSenha ? 6 : undefined}
+                  minLength={novaSenha ? 8 : undefined}
                   value={novaSenha}
                   onChange={(e) => setNovaSenha(e.target.value)}
                   className={inputClasse}
@@ -323,7 +325,5 @@ function Perfil() {
     </div>
   );
 }
-
-export const ESTADO_PERFIL_ATUALIZADO = 'caragua-perfil-atualizado';
 
 export default Perfil;

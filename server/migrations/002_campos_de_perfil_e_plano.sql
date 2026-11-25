@@ -1,0 +1,3 @@
+ALTER TABLE usuarios ADD COLUMN telefone VARCHAR(20) NULL AFTER senha_hash;
+ALTER TABLE usuarios ADD COLUMN foto MEDIUMTEXT NULL AFTER telefone;
+ALTER TABLE planos ADD COLUMN modalidade VARCHAR(60) NULL AFTER objetivo;

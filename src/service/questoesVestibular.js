@@ -63,7 +63,7 @@ const questoesVestibular = [
 export const BANCOS_VESTIBULAR = {
   vestibular: {
     titulo: 'Vestibular',
-    descricao: 'Simulado de treino com 20 questões de Linguagens, Matemática, Ciências Humanas e Ciências da Natureza.',
+    descricao: 'Simulado com 20 questões autorais de treino de Linguagens, Matemática, Ciências Humanas e Ciências da Natureza; não são questões oficiais.',
     instituicao: 'Vestibular',
     areas: 'Linguagens, Matemática, Ciências Humanas e Ciências da Natureza',
     tempoMinutos: 40,

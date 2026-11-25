@@ -34,3 +34,44 @@ button {
 img {
   max-width: 100%;
 }
+
+/* Textos compactos mantêm o mínimo de 12 px em toda a interface. */
+.text-xs {
+  font-size: 0.75rem !important;
+  line-height: 1rem;
+}
+
+/* Ajustes de contraste para textos usados sobre fundos claros. */
+.text-slate-400 {
+  color: #475569 !important;
+}
+
+.text-emerald-500,
+.text-emerald-600 {
+  color: #047857 !important;
+}
+
+.bg-\[\#063b29\] .text-emerald-500,
+.bg-\[\#063b29\] .text-emerald-600 {
+  color: #6ee7b7 !important;
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid #047857;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

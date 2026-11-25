@@ -361,6 +361,6 @@ const questoesETEC = [
 
 export const BANCO_ETEC = {
   titulo: 'Vestibulinho ETEC',
-  descricao: 'Simulado de treino com 50 questões de Português, Matemática, Ciências Humanas e Ciências da Natureza.',
+  descricao: 'Simulado com 50 questões autorais de treino de Português, Matemática, Ciências Humanas e Ciências da Natureza; não são questões oficiais.',
   questoes: questoesETEC,
 };

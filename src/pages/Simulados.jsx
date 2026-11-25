@@ -2,9 +2,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer.jsx';
-import { obterResumoModalidade } from '../service/simulados.js';
-import { BANCOS_CONCURSO } from '../service/questoesConcurso.js';
-import { BANCOS_VESTIBULAR } from '../service/questoesVestibular.js';
+import { obterResumoModalidade, obterResumoModalidadeAtual } from '../service/simulados.js';
+import { getToken } from '../service/auth.js';
 
 const MODALIDADES = [
   {
@@ -39,42 +38,46 @@ const MODALIDADES = [
     titulo: 'Concurso Público',
     descricao: 'Treine para concursos municipais, estaduais e federais com questões de nível médio.',
     icone: '🏛️',
-    questoes: BANCOS_CONCURSO.concurso.questoes.length,
-    areas: BANCOS_CONCURSO.concurso.areas,
+    questoes: 20,
+    areas: 'Português, Matemática e Raciocínio Lógico, Informática e Noções de Direito',
     instituicao: 'Concurso',
   },
   {
     id: 'vestibular',
     titulo: 'Vestibular',
-    descricao: 'Pratique com questões no estilo ENEM e dos vestibulares para o Ensino Superior.',
+    descricao: 'Pratique com questões de treinamento para vestibulares do Ensino Superior.',
     icone: '🧠',
-    questoes: BANCOS_VESTIBULAR.vestibular.questoes.length,
-    areas: BANCOS_VESTIBULAR.vestibular.areas,
+    questoes: 20,
+    areas: 'Linguagens, Matemática, Ciências Humanas e Ciências da Natureza',
     instituicao: 'Vestibular',
   },
 ];
 
 function Simulados() {
   const [resultados, setResultados] = useState({});
+  const [erroResultados, setErroResultados] = useState('');
 
-  function atualizarResultados() {
-    setResultados({
-      integrado: obterResumoModalidade('integrado'),
-      concomitante: obterResumoModalidade('concomitante'),
-      etec: obterResumoModalidade('etec'),
-      concurso: obterResumoModalidade('concurso'),
-      vestibular: obterResumoModalidade('vestibular'),
-    });
+  async function atualizarResultados() {
+    try {
+      const obterResumo = getToken() ? obterResumoModalidadeAtual : async (id) => obterResumoModalidade(id);
+      const entradas = await Promise.all(MODALIDADES.map(async ({ id }) => [id, await obterResumo(id)]));
+      setResultados(Object.fromEntries(entradas));
+      setErroResultados('');
+    } catch (erro) {
+      setErroResultados(erro.message);
+    }
   }
 
   useEffect(() => {
     atualizarResultados();
 
     window.addEventListener('simuladosAtualizados', atualizarResultados);
+    window.addEventListener('caragua-auth-mudou', atualizarResultados);
     window.addEventListener('focus', atualizarResultados);
 
     return () => {
       window.removeEventListener('simuladosAtualizados', atualizarResultados);
+      window.removeEventListener('caragua-auth-mudou', atualizarResultados);
       window.removeEventListener('focus', atualizarResultados);
     };
   }, []);
@@ -127,6 +130,7 @@ function Simulados() {
           </div>
         </div>
 
+        {erroResultados && <p className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">{erroResultados}</p>}
         <h2 className="font-bold text-slate-800 mb-4">
           Escolha seu simulado
         </h2>

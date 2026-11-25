@@ -19,7 +19,7 @@ Projeto convertido para React + Vite + Tailwind CSS, mantendo as páginas e func
 - `public/assets/`: imagens servidas em `/assets/...`.
 - `src/App.jsx`: rotas e importações das páginas.
 - `src/main.jsx`: ponto de entrada do React.
-- `server/`: API Express, conexão com o MySQL e criação automática das tabelas.
+- `server/`: API Express, conexão com o MySQL e migrations SQL versionadas (`server/migrations/`).
 
 `node_modules` não está incluído; ele será criado ao executar `npm install`.
 
@@ -42,11 +42,11 @@ Projeto convertido para React + Vite + Tailwind CSS, mantendo as páginas e func
 4. `npm run dev` — liga a API (porta 3001) e o site (porta 5173) juntos.
 5. Abra http://localhost:5173/login e use **Criar conta**.
 
-O banco `caragua_futuro` e as tabelas são criados automaticamente.
+O banco `caragua_futuro` e as migrations pendentes são aplicados automaticamente na inicialização.
 
 ## CRUD de Planos de Estudo
 
-Tabela `planos` (veja `server/schema.sql`), sempre ligada ao usuário logado.
+Tabela `planos` (veja `server/migrations/`), sempre ligada ao usuário logado.
 
 | Operação | Rota da API | Onde usar no site |
 | --- | --- | --- |
@@ -55,11 +55,11 @@ Tabela `planos` (veja `server/schema.sql`), sempre ligada ao usuário logado.
 | Update | `PUT /api/planos/:id` | Meus Planos → "Editar" |
 | Delete | `DELETE /api/planos/:id` | Meus Planos → "Excluir" |
 
-As tabelas são criadas automaticamente ao iniciar a API (`server/schema.sql` fica como referência).
+As migrations pendentes são aplicadas automaticamente ao iniciar a API.
 
 ## CRUD de Metas de Estudo (2º CRUD)
 
-Tabela `metas` (veja `server/schema.sql`), sempre ligada ao usuário logado.
+Tabela `metas` (veja `server/migrations/`), sempre ligada ao usuário logado.
 Campos: título, matéria, descrição, prioridade (Baixa/Média/Alta), prazo e se está concluída.
 
 | Operação | Rota da API | Onde usar no site |
@@ -102,14 +102,17 @@ DB_PASSWORD=sua_senha_do_mysql
 DB_NAME=caragua_futuro
 
 PORT=3001
+NODE_ENV=development
 JWT_SECRET=coloque-uma-frase-longa-e-aleatoria-aqui
+CORS_ORIGIN=http://localhost:5173,http://127.0.0.1:5173
+JSON_BODY_LIMIT=2mb
 ```
 
 3. **Nunca envie o `.env` para o GitHub.** Ele já está no `.gitignore`.
 
 ### 4. Banco de dados
 
-Basta ter o MySQL rodando. O servidor cria o banco `caragua_futuro` e as tabelas automaticamente na primeira execução. Só garanta que o usuário e a senha no `.env` estão corretos.
+Basta ter o MySQL rodando. O servidor cria o banco `caragua_futuro` e aplica as migrations pendentes na primeira execução. Em produção, configure `NODE_ENV=production`, `JWT_SECRET` aleatório com pelo menos 32 caracteres e `CORS_ORIGIN` com a origem do frontend. Só garanta que o usuário e a senha no `.env` estão corretos.
 
 ### 5. Rodar o projeto
 
