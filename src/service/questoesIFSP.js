@@ -2,10 +2,12 @@ const questoesIntegrado = [
   // PORTUGUÊS
   {
     materia: 'Português',
-    pergunta: 'Leia: "Apesar da chuva, os estudantes chegaram no horário." A expressão "apesar da" indica:',
+    pergunta:
+      'Leia: "Apesar da chuva, os estudantes chegaram no horário." A expressão "apesar da" indica:',
     alternativas: ['Causa', 'Concessão', 'Conclusão', 'Finalidade', 'Comparação'],
     correta: 1,
-    explicacao: 'A expressão indica uma situação contrária à expectativa: mesmo com chuva, os estudantes chegaram no horário.',
+    explicacao:
+      'A expressão indica uma situação contrária à expectativa: mesmo com chuva, os estudantes chegaram no horário.',
   },
   {
     materia: 'Português',
@@ -242,7 +244,8 @@ const questoesConcomitante = [
   // PORTUGUÊS
   {
     materia: 'Português',
-    pergunta: 'Leia: "A tecnologia facilita o acesso à informação, mas exige atenção à confiabilidade das fontes." A ideia principal é:',
+    pergunta:
+      'Leia: "A tecnologia facilita o acesso à informação, mas exige atenção à confiabilidade das fontes." A ideia principal é:',
     alternativas: [
       'A tecnologia deve ser abandonada.',
       'Toda informação na internet é confiável.',
@@ -356,7 +359,13 @@ const questoesConcomitante = [
   {
     materia: 'Português',
     pergunta: 'A palavra "iminente" significa:',
-    alternativas: ['Que já aconteceu', 'Que está prestes a acontecer', 'Que é impossível', 'Que está distante', 'Que é antigo'],
+    alternativas: [
+      'Que já aconteceu',
+      'Que está prestes a acontecer',
+      'Que é impossível',
+      'Que está distante',
+      'Que é antigo',
+    ],
     correta: 1,
     explicacao: 'Iminente é aquilo que está próximo de ocorrer.',
   },
@@ -397,7 +406,8 @@ const questoesConcomitante = [
   // MATEMÁTICA
   {
     materia: 'Matemática',
-    pergunta: 'Uma loja oferece 20% de desconto em um produto de R$ 250. Qual é o preço com desconto?',
+    pergunta:
+      'Uma loja oferece 20% de desconto em um produto de R$ 250. Qual é o preço com desconto?',
     alternativas: ['R$ 180', 'R$ 190', 'R$ 200', 'R$ 210', 'R$ 220'],
     correta: 2,
     explicacao: '20% de 250 é 50. O preço final é 250 - 50 = 200 reais.',
@@ -411,7 +421,8 @@ const questoesConcomitante = [
   },
   {
     materia: 'Matemática',
-    pergunta: 'Uma receita usa 3 xícaras de farinha para 12 porções. Para 20 porções, mantendo a proporção, serão necessárias:',
+    pergunta:
+      'Uma receita usa 3 xícaras de farinha para 12 porções. Para 20 porções, mantendo a proporção, serão necessárias:',
     alternativas: ['4', '4,5', '5', '5,5', '6'],
     correta: 2,
     explicacao: '3 ÷ 12 = 0,25 xícara por porção. Para 20: 20 × 0,25 = 5.',
@@ -428,11 +439,13 @@ const questoesConcomitante = [
     pergunta: 'Qual é o valor de 2(3 + 5) - 4?',
     alternativas: ['8', '10', '12', '14', '16'],
     correta: 2,
-    explicacao: 'Primeiro os parênteses: 3 + 5 = 8. Depois 2 × 8 - 4 = 12. A resposta correta é 12, alternativa C.',
+    explicacao:
+      'Primeiro os parênteses: 3 + 5 = 8. Depois 2 × 8 - 4 = 12. A resposta correta é 12, alternativa C.',
   },
   {
     materia: 'Matemática',
-    pergunta: 'Em uma caixa há 3 bolas vermelhas e 7 azuis. A probabilidade de retirar uma vermelha é:',
+    pergunta:
+      'Em uma caixa há 3 bolas vermelhas e 7 azuis. A probabilidade de retirar uma vermelha é:',
     alternativas: ['10%', '20%', '30%', '40%', '70%'],
     correta: 2,
     explicacao: 'São 3 bolas vermelhas em 10 bolas: 3/10 = 30%.',
@@ -453,7 +466,8 @@ const questoesConcomitante = [
   },
   {
     materia: 'Matemática',
-    pergunta: 'Se 3 máquinas produzem 90 peças em uma hora, quantas peças 5 máquinas iguais produzem no mesmo tempo?',
+    pergunta:
+      'Se 3 máquinas produzem 90 peças em uma hora, quantas peças 5 máquinas iguais produzem no mesmo tempo?',
     alternativas: ['120', '135', '150', '165', '180'],
     correta: 2,
     explicacao: 'Cada máquina produz 30 peças por hora. Cinco produzem 150.',
@@ -505,12 +519,14 @@ const questoesConcomitante = [
 export const BANCOS_IFSP = {
   integrado: {
     titulo: 'IFSP Integrado ao Ensino Médio',
-    descricao: 'Questões autorais de treino no nível do Ensino Fundamental, inspiradas no formato do processo seletivo; não são questões oficiais.',
+    descricao:
+      'Questões autorais de treino no nível do Ensino Fundamental, inspiradas no formato do processo seletivo; não são questões oficiais.',
     questoes: questoesIntegrado,
   },
   concomitante: {
     titulo: 'IFSP Concomitante e Subsequente',
-    descricao: 'Questões autorais de treino no estilo do processo seletivo para cursos concomitantes e subsequentes; não são questões oficiais.',
+    descricao:
+      'Questões autorais de treino no estilo do processo seletivo para cursos concomitantes e subsequentes; não são questões oficiais.',
     questoes: questoesConcomitante,
   },
 };

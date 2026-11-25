@@ -13,17 +13,21 @@ export async function ativarPlano(id) {
 }
 
 export async function criarPlano(plano) {
-  return (await requisicaoApi('/api/planos', {
-    method: 'POST',
-    body: JSON.stringify(plano),
-  })).plano;
+  return (
+    await requisicaoApi('/api/planos', {
+      method: 'POST',
+      body: JSON.stringify(plano),
+    })
+  ).plano;
 }
 
 export async function atualizarPlano(id, plano) {
-  return (await requisicaoApi(`/api/planos/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(plano),
-  })).plano;
+  return (
+    await requisicaoApi(`/api/planos/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(plano),
+    })
+  ).plano;
 }
 
 export async function excluirPlano(id) {

@@ -20,7 +20,9 @@ function MainLayout() {
     '/privacidade': 'Privacidade',
     '/suporte': 'Suporte',
   };
-  const tituloPagina = pathname.startsWith('/simulados/') ? 'Realizar Simulado' : titulos[pathname] || 'Página não encontrada';
+  const tituloPagina = pathname.startsWith('/simulados/')
+    ? 'Realizar Simulado'
+    : titulos[pathname] || 'Página não encontrada';
 
   useEffect(() => {
     document.title = `${tituloPagina} | Caraguá Futuro`;

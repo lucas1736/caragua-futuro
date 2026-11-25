@@ -66,6 +66,14 @@ function Perfil() {
     const arquivo = evento.target.files?.[0];
     evento.target.value = '';
     if (!arquivo) return;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(arquivo.type)) {
+      setErro('Selecione uma imagem JPG, PNG ou WebP.');
+      return;
+    }
+    if (arquivo.size > 10 * 1024 * 1024) {
+      setErro('A imagem deve ter no máximo 10 MB antes da redução.');
+      return;
+    }
 
     setErro('');
     setSucesso('');
@@ -114,9 +122,7 @@ function Perfil() {
       setSenhaAtual('');
       setNovaSenha('');
       setConfirmarSenha('');
-      setSucesso(
-        'Perfil atualizado com sucesso! Use seu novo e-mail e senha no próximo login.'
-      );
+      setSucesso('Perfil atualizado com sucesso! Use seu novo e-mail e senha no próximo login.');
 
       window.dispatchEvent(new Event(ESTADO_PERFIL_ATUALIZADO));
     } catch (e) {
@@ -137,13 +143,11 @@ function Perfil() {
             Sua conta
           </span>
 
-          <h1 className="text-3xl font-extrabold text-slate-800 mt-2">
-            Meu perfil
-          </h1>
+          <h1 className="text-3xl font-extrabold text-slate-800 mt-2">Meu perfil</h1>
 
           <p className="text-sm text-slate-500 mt-2">
-            Escolha sua foto de perfil e mantenha seus dados atualizados. As
-            alterações são salvas no banco de dados.
+            Escolha sua foto de perfil e mantenha seus dados atualizados. As alterações são salvas
+            no banco de dados.
           </p>
         </div>
 
@@ -154,11 +158,7 @@ function Perfil() {
             <div className="flex items-center gap-5">
               <div className="w-24 h-24 rounded-full overflow-hidden bg-emerald-100 flex items-center justify-center shrink-0">
                 {foto ? (
-                  <img
-                    src={foto}
-                    alt="Foto de perfil"
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={foto} alt="Foto de perfil" className="w-full h-full object-cover" />
                 ) : (
                   <span className="text-3xl font-extrabold text-emerald-700">
                     {nome.charAt(0).toUpperCase() || '?'}
@@ -167,12 +167,15 @@ function Perfil() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label htmlFor="perfil-foto" className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm px-4 py-2.5 rounded-lg cursor-pointer text-center transition">
+                <label
+                  htmlFor="perfil-foto"
+                  className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm px-4 py-2.5 rounded-lg cursor-pointer text-center transition"
+                >
                   Escolher foto
                   <input
                     id="perfil-foto"
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp"
                     onChange={escolherFoto}
                     className="hidden"
                   />
@@ -189,7 +192,7 @@ function Perfil() {
                 )}
 
                 <p className="text-xs text-slate-400">
-                  JPG ou PNG. A imagem é reduzida automaticamente.
+                  JPG, PNG ou WebP. A imagem é reduzida automaticamente.
                 </p>
               </div>
             </div>

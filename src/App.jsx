@@ -32,13 +32,34 @@ function App() {
             <Route element={<MainLayout />}>
               <Route path="/" element={<Home />} />
               <Route path="/planejamento" element={<Planejamento />} />
-              <Route path="/progresso" element={<RotaProtegida><Progresso /></RotaProtegida>} />
+              <Route
+                path="/progresso"
+                element={
+                  <RotaProtegida>
+                    <Progresso />
+                  </RotaProtegida>
+                }
+              />
               <Route path="/cronograma" element={<Cronograma />} />
               <Route path="/simulados" element={<Simulados />} />
               <Route path="/simulados/:materia" element={<RealizarSimulado />} />
               <Route path="/assistente" element={<Assistente />} />
-              <Route path="/meus-planos" element={<RotaProtegida><MeusPlanos /></RotaProtegida>} />
-              <Route path="/metas" element={<RotaProtegida><Metas /></RotaProtegida>} />
+              <Route
+                path="/meus-planos"
+                element={
+                  <RotaProtegida>
+                    <MeusPlanos />
+                  </RotaProtegida>
+                }
+              />
+              <Route
+                path="/metas"
+                element={
+                  <RotaProtegida>
+                    <Metas />
+                  </RotaProtegida>
+                }
+              />
               <Route path="/login" element={<Login />} />
               <Route path="/perfil" element={<Perfil />} />
               <Route path="/termos" element={<Termos />} />

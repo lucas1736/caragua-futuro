@@ -81,11 +81,7 @@ function Pomodoro({ compacto = false }) {
           </div>
         </div>
 
-        {aviso && (
-          <p className="text-xs text-emerald-200 mt-2 leading-snug">
-            {aviso}
-          </p>
-        )}
+        {aviso && <p className="text-xs text-emerald-200 mt-2 leading-snug">{aviso}</p>}
       </div>
     );
   }
@@ -94,9 +90,7 @@ function Pomodoro({ compacto = false }) {
     <div className="bg-[#063b29] text-white rounded-xl p-6 shadow-sm">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-emerald-300 text-sm font-bold uppercase tracking-wide">
-            Temporizador
-          </p>
+          <p className="text-emerald-300 text-sm font-bold uppercase tracking-wide">Temporizador</p>
           <h3 className="font-bold text-xl mt-1">Pomodoro</h3>
         </div>
         <span className="text-3xl">⏱️</span>
@@ -133,9 +127,7 @@ function Pomodoro({ compacto = false }) {
       </div>
 
       {aviso && (
-        <p className="text-sm text-emerald-200 text-center mt-4 leading-relaxed">
-          {aviso}
-        </p>
+        <p className="text-sm text-emerald-200 text-center mt-4 leading-relaxed">{aviso}</p>
       )}
     </div>
   );

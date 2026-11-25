@@ -3,20 +3,26 @@ import { Link } from 'react-router-dom';
 import Footer from '../components/Footer.jsx';
 import { getUsuario } from '../service/auth.js';
 import { listarPlanos } from '../service/planos.js';
-import {
-  sugestoesDaModalidade,
-  nomeModalidade,
-} from '../service/metasSugeridas.js';
+import { NOMES_MODALIDADES, nomeModalidade } from '../../shared/metasSugeridas.js';
 import {
   listarMetas,
+  obterModalidadePreferida,
+  sincronizarMetasSugeridas,
   criarMeta,
   atualizarMeta,
   excluirMeta,
 } from '../service/metas.js';
 
 const MATERIAS = [
-  'Matemática', 'Português', 'Física', 'Química',
-  'Biologia', 'História', 'Geografia', 'Redação', 'Geral',
+  'Matemática',
+  'Português',
+  'Física',
+  'Química',
+  'Biologia',
+  'História',
+  'Geografia',
+  'Redação',
+  'Geral',
 ];
 const PRIORIDADES = ['Baixa', 'Média', 'Alta'];
 const FILTROS = ['Todas', 'Pendentes', 'Concluídas'];
@@ -50,10 +56,11 @@ function atrasada(meta) {
 
 function Metas() {
   const usuario = getUsuario();
+  const usuarioId = usuario?.id ?? null;
 
   const [metas, setMetas] = useState([]);
   const [modalidade, setModalidade] = useState('');
-  const [adicionandoSugestoes, setAdicionandoSugestoes] = useState(false);
+  const [sincronizandoSugestoes, setSincronizandoSugestoes] = useState(false);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
   const [aviso, setAviso] = useState('');
@@ -67,27 +74,62 @@ function Metas() {
   const [erroForm, setErroForm] = useState('');
 
   useEffect(() => {
-    if (!usuario) {
+    let ativo = true;
+    if (!usuarioId) {
       setCarregando(false);
-      return;
+      return () => {
+        ativo = false;
+      };
     }
-    listarMetas()
-      .then(setMetas)
-      .catch((e) => setErro(e.message))
-      .finally(() => setCarregando(false));
 
-    // Modalidade vem do plano salvo na conta (banco de dados);
-    // se ainda não há plano salvo, usa o plano local do navegador.
-    listarPlanos()
-      .then((planos) => {
+    Promise.all([listarMetas(), listarPlanos(), obterModalidadePreferida()])
+      .then(async ([lista, planos, modalidadePreferida]) => {
+        if (!ativo) return;
+        setMetas(lista);
         const plano = planos.find((item) => item.ativo) || planos[0];
-        if (plano?.modalidade) setModalidade(plano.modalidade);
+        const modalidadeInicial = modalidadePreferida || plano?.modalidade || '';
+        setModalidade(modalidadeInicial);
+        if (modalidadeInicial) {
+          setSincronizandoSugestoes(true);
+          const sugeridas = await sincronizarMetasSugeridas(modalidadeInicial);
+          if (ativo) {
+            const porId = new Map([...lista, ...sugeridas].map((meta) => [meta.id, meta]));
+            setMetas([...porId.values()]);
+          }
+        }
       })
-      .catch(() => {
-        // A modalidade continua opcional se a conta não tiver planos.
+      .catch((e) => {
+        if (ativo) setErro(e.message);
+      })
+      .finally(() => {
+        if (ativo) {
+          setCarregando(false);
+          setSincronizandoSugestoes(false);
+        }
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
+    return () => {
+      ativo = false;
+    };
+  }, [usuarioId]);
+
+  async function selecionarModalidade(valor) {
+    setModalidade(valor);
+    setErro('');
+    if (!valor || !usuario) return;
+    setSincronizandoSugestoes(true);
+    try {
+      const sugeridas = await sincronizarMetasSugeridas(valor);
+      setMetas((atuais) => {
+        const porId = new Map([...atuais, ...sugeridas].map((meta) => [meta.id, meta]));
+        return [...porId.values()];
+      });
+    } catch (e) {
+      setErro(e.message);
+    } finally {
+      setSincronizandoSugestoes(false);
+    }
+  }
 
   function abrirCriar() {
     setEditandoId(null);
@@ -159,56 +201,19 @@ function Metas() {
     }
   }
 
-  async function adicionarSugestoes() {
-    if (adicionandoSugestoes) return;
-    setAdicionandoSugestoes(true);
-    setErro('');
+  const metasDaModalidade = metas.filter((meta) => meta.modalidade === modalidade);
+  const metasConcluidasDaModalidade = metasDaModalidade.filter((meta) => meta.concluida).length;
 
-    try {
-      const sugestoes = sugestoesDaModalidade(modalidade);
-      const titulos = new Set(metas.map((m) => m.titulo));
-      const novas = sugestoes.filter((s) => !titulos.has(s.titulo));
-
-      const criadas = [];
-      for (const sugestao of novas) {
-        criadas.push(
-          await criarMeta({
-            titulo: sugestao.titulo,
-            materia: sugestao.materia,
-            descricao: sugestao.descricao,
-            prioridade: sugestao.prioridade,
-            prazo: '',
-            concluida: false,
-          })
-        );
-      }
-
-      setMetas((lista) => [...criadas.reverse(), ...lista]);
-      setAviso(
-        criadas.length === 0
-          ? 'As metas sugeridas já estão na sua lista.'
-          : `${criadas.length} meta(s) sugerida(s) adicionada(s)!`
-      );
-    } catch (e) {
-      setErro(e.message);
-    } finally {
-      setAdicionandoSugestoes(false);
-    }
-  }
-
-  const sugestoesModalidade = sugestoesDaModalidade(modalidade);
-  const titulosAtuais = new Set(metas.map((m) => m.titulo));
-  const sugestoesFaltantes = sugestoesModalidade.filter(
-    (s) => !titulosAtuais.has(s.titulo)
-  );
-
-  const total = metas.length;
-  const feitas = metas.filter((m) => m.concluida).length;
+  const metasDaPreparacao = modalidade
+    ? metas.filter((meta) => !meta.modalidade || meta.modalidade === modalidade)
+    : metas;
+  const total = metasDaPreparacao.length;
+  const feitas = metasDaPreparacao.filter((meta) => meta.concluida).length;
   const percentual = total === 0 ? 0 : Math.round((feitas / total) * 100);
 
-  const visiveis = metas.filter((m) => {
-    if (filtro === 'Pendentes') return !m.concluida;
-    if (filtro === 'Concluídas') return m.concluida;
+  const visiveis = metasDaPreparacao.filter((meta) => {
+    if (filtro === 'Pendentes') return !meta.concluida;
+    if (filtro === 'Concluídas') return meta.concluida;
     return true;
   });
 
@@ -217,7 +222,6 @@ function Metas() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-
       <main className="flex-1 max-w-4xl w-full mx-auto px-5 md:px-7 py-9">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <div>
@@ -252,37 +256,38 @@ function Metas() {
           </div>
         )}
 
-        {usuario && modalidade && sugestoesModalidade.length > 0 && (
-          <div className="bg-[#063b29] text-white rounded-xl p-5 mb-5 shadow-sm">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-xs text-emerald-300 font-bold uppercase tracking-wide">
-                  Sua preparação
-                </p>
-                <h3 className="font-bold text-sm mt-1">
-                  Metas sugeridas · {nomeModalidade(modalidade)}
-                </h3>
+        {usuario && (
+          <section className="bg-[#063b29] text-white rounded-xl p-5 mb-5 shadow-sm">
+            <label
+              htmlFor="modalidade-metas"
+              className="block text-xs text-emerald-300 font-bold uppercase tracking-wide"
+            >
+              Sua preparação
+            </label>
+            <select
+              id="modalidade-metas"
+              value={modalidade}
+              onChange={(evento) => selecionarModalidade(evento.target.value)}
+              className="mt-2 w-full sm:max-w-lg rounded-lg bg-white text-slate-900 p-3 text-sm"
+            >
+              <option value="">Escolha sua modalidade para gerar metas</option>
+              {Object.entries(NOMES_MODALIDADES).map(([id, nome]) => (
+                <option key={id} value={id}>
+                  {nome}
+                </option>
+              ))}
+            </select>
+            {modalidade && (
+              <div className="mt-3" aria-live="polite">
+                <h3 className="font-bold text-sm">Metas de {nomeModalidade(modalidade)}</h3>
                 <p className="text-xs text-gray-300 mt-1">
-                  {sugestoesFaltantes.length === 0
-                    ? 'Todas as metas sugeridas dessa modalidade já estão na sua lista.'
-                    : `${sugestoesFaltantes.length} meta(s) com os conteúdos que essa prova cobra podem ser adicionadas automaticamente.`}
+                  {sincronizandoSugestoes
+                    ? 'Sincronizando metas da modalidade...'
+                    : `${metasConcluidasDaModalidade} de ${metasDaModalidade.length} metas concluídas. As metas geradas ficam salvas na sua conta.`}
                 </p>
               </div>
-
-              {sugestoesFaltantes.length > 0 && (
-                <button
-                  type="button"
-                  onClick={adicionarSugestoes}
-                  disabled={adicionandoSugestoes}
-                  className="bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 text-[#063b29] text-xs font-bold px-4 py-2.5 rounded-lg transition"
-                >
-                  {adicionandoSugestoes
-                    ? 'Adicionando...'
-                    : `+ Adicionar ${sugestoesFaltantes.length} meta(s)`}
-                </button>
-              )}
-            </div>
-          </div>
+            )}
+          </section>
         )}
 
         {usuario && total > 0 && (
@@ -336,8 +341,7 @@ function Metas() {
 
         {usuario && !carregando && total === 0 && !erro && (
           <div className="bg-white border border-dashed border-slate-300 rounded-xl p-8 text-center text-slate-500 text-sm">
-            Você ainda não tem metas. Clique em <strong>+ Nova meta</strong> para
-            criar a primeira.
+            Você ainda não tem metas. Clique em <strong>+ Nova meta</strong> para criar a primeira.
           </div>
         )}
 
@@ -351,50 +355,50 @@ function Metas() {
               key={meta.id}
               className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm"
             >
-              <div className="flex items-start gap-4">
-                <input
-                  type="checkbox"
-                  checked={meta.concluida}
-                  onChange={() => alternarConclusao(meta)}
-                  aria-label={`Marcar "${meta.titulo}" como concluída`}
-                  className="mt-1 w-5 h-5 accent-emerald-500 cursor-pointer shrink-0"
-                />
+              <div className="flex flex-col sm:flex-row items-start gap-4">
+                <div className="flex items-start gap-4 w-full min-w-0">
+                  <input
+                    type="checkbox"
+                    checked={meta.concluida}
+                    onChange={() => alternarConclusao(meta)}
+                    aria-label={`Marcar "${meta.titulo}" como concluída`}
+                    className="mt-1 w-5 h-5 accent-emerald-500 cursor-pointer shrink-0"
+                  />
 
-                <div className="flex-1 min-w-0">
-                  <h3
-                    className={`font-bold text-base break-words ${
-                      meta.concluida ? 'line-through text-slate-400' : 'text-slate-900'
-                    }`}
-                  >
-                    {meta.titulo}
-                  </h3>
-                  {meta.descricao && (
-                    <p className="text-xs text-slate-500 mt-1 break-words">
-                      {meta.descricao}
-                    </p>
-                  )}
-
-                  <div className="flex flex-wrap items-center gap-2 mt-3">
-                    <span className="text-xs px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
-                      {meta.materia}
-                    </span>
-                    <span
-                      className={`text-xs px-3 py-1 rounded-full border ${corPrioridade[meta.prioridade]}`}
-                    >
-                      Prioridade {meta.prioridade.toLowerCase()}
-                    </span>
-                    <span
-                      className={`text-xs ${
-                        atrasada(meta) ? 'text-red-600 font-semibold' : 'text-slate-500'
+                  <div className="flex-1 min-w-0">
+                    <h3
+                      className={`font-bold text-base break-words ${
+                        meta.concluida ? 'line-through text-slate-400' : 'text-slate-900'
                       }`}
                     >
-                      {atrasada(meta) ? 'Atrasada · ' : 'Prazo: '}
-                      {formatarData(meta.prazo)}
-                    </span>
+                      {meta.titulo}
+                    </h3>
+                    {meta.descricao && (
+                      <p className="text-xs text-slate-500 mt-1 break-words">{meta.descricao}</p>
+                    )}
+
+                    <div className="flex flex-wrap items-center gap-2 mt-3">
+                      <span className="text-xs px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+                        {meta.materia}
+                      </span>
+                      <span
+                        className={`text-xs px-3 py-1 rounded-full border ${corPrioridade[meta.prioridade]}`}
+                      >
+                        Prioridade {meta.prioridade.toLowerCase()}
+                      </span>
+                      <span
+                        className={`text-xs ${
+                          atrasada(meta) ? 'text-red-600 font-semibold' : 'text-slate-500'
+                        }`}
+                      >
+                        {atrasada(meta) ? 'Atrasada · ' : 'Prazo: '}
+                        {formatarData(meta.prazo)}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-2 text-xs font-semibold">
+                <div className="flex flex-row sm:flex-col gap-2 text-xs font-semibold pl-9 sm:pl-0">
                   <button
                     type="button"
                     onClick={() => abrirEditar(meta)}
@@ -417,8 +421,17 @@ function Metas() {
       </main>
 
       {formAberto && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onMouseDown={(evento) => { if (evento.target === evento.currentTarget) setFormAberto(false); }}>
-          <form role="dialog" aria-modal="true" aria-labelledby="titulo-form-meta"
+        <div
+          role="presentation"
+          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+          onMouseDown={(evento) => {
+            if (evento.target === evento.currentTarget) setFormAberto(false);
+          }}
+        >
+          <form
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="titulo-form-meta"
             onSubmit={salvar}
             className="bg-white w-full max-w-lg rounded-2xl p-6 max-h-[90vh] overflow-y-auto space-y-5"
           >

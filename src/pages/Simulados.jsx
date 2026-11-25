@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer.jsx';
@@ -36,7 +35,8 @@ const MODALIDADES = [
   {
     id: 'concurso',
     titulo: 'Concurso Público',
-    descricao: 'Treine para concursos municipais, estaduais e federais com questões de nível médio.',
+    descricao:
+      'Treine para concursos municipais, estaduais e federais com questões de nível médio.',
     icone: '🏛️',
     questoes: 20,
     areas: 'Português, Matemática e Raciocínio Lógico, Informática e Noções de Direito',
@@ -59,8 +59,12 @@ function Simulados() {
 
   async function atualizarResultados() {
     try {
-      const obterResumo = getToken() ? obterResumoModalidadeAtual : async (id) => obterResumoModalidade(id);
-      const entradas = await Promise.all(MODALIDADES.map(async ({ id }) => [id, await obterResumo(id)]));
+      const obterResumo = getToken()
+        ? obterResumoModalidadeAtual
+        : async (id) => obterResumoModalidade(id);
+      const entradas = await Promise.all(
+        MODALIDADES.map(async ({ id }) => [id, await obterResumo(id)]),
+      );
       setResultados(Object.fromEntries(entradas));
       setErroResultados('');
     } catch (erro) {
@@ -85,27 +89,21 @@ function Simulados() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-7 py-8">
-
         <div className="mb-8">
           <span className="text-emerald-600 font-bold text-xs uppercase tracking-wider">
             Prepare-se para sua aprovação
           </span>
 
-          <h1 className="text-3xl font-extrabold text-slate-800 mt-2">
-            Simulados
-          </h1>
+          <h1 className="text-3xl font-extrabold text-slate-800 mt-2">Simulados</h1>
 
           <p className="text-sm text-slate-500 mt-2 max-w-2xl">
-            Escolha o processo seletivo que deseja realizar e pratique com
-            questões de treinamento. Seus resultados serão enviados
-            automaticamente para a página de progresso.
+            Escolha o processo seletivo que deseja realizar e pratique com questões de treinamento.
+            Seus resultados serão enviados automaticamente para a página de progresso.
           </p>
         </div>
 
         <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-5 mb-7">
-          <h2 className="font-bold text-emerald-900">
-            Conheça os simulados
-          </h2>
+          <h2 className="font-bold text-emerald-900">Conheça os simulados</h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
             <div>
@@ -130,10 +128,15 @@ function Simulados() {
           </div>
         </div>
 
-        {erroResultados && <p className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">{erroResultados}</p>}
-        <h2 className="font-bold text-slate-800 mb-4">
-          Escolha seu simulado
-        </h2>
+        {erroResultados && (
+          <p
+            className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+            role="alert"
+          >
+            {erroResultados}
+          </p>
+        )}
+        <h2 className="font-bold text-slate-800 mb-4">Escolha seu simulado</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {MODALIDADES.map((modalidade) => {
@@ -157,33 +160,23 @@ function Simulados() {
                   {modalidade.instituicao}
                 </span>
 
-                <h3 className="text-xl font-bold text-slate-800 mt-1">
-                  {modalidade.titulo}
-                </h3>
+                <h3 className="text-xl font-bold text-slate-800 mt-1">{modalidade.titulo}</h3>
 
-                <p className="text-sm text-slate-500 mt-2 min-h-10">
-                  {modalidade.descricao}
-                </p>
+                <p className="text-sm text-slate-500 mt-2 min-h-10">{modalidade.descricao}</p>
 
                 <div className="bg-slate-50 rounded-lg p-3 mt-4">
                   <p className="text-sm font-semibold text-slate-700">
                     {modalidade.questoes} questões
                   </p>
 
-                  <p className="text-xs text-slate-500 mt-1">
-                    {modalidade.areas}
-                  </p>
+                  <p className="text-xs text-slate-500 mt-1">{modalidade.areas}</p>
                 </div>
 
                 <div className="mt-5 mb-3">
                   <div className="flex justify-between text-xs mb-2">
-                    <span className="text-slate-500">
-                      Aproveitamento acumulado
-                    </span>
+                    <span className="text-slate-500">Aproveitamento acumulado</span>
 
-                    <strong className="text-emerald-700">
-                      {resultado.porcentagem}%
-                    </strong>
+                    <strong className="text-emerald-700">{resultado.porcentagem}%</strong>
                   </div>
 
                   <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -212,9 +205,8 @@ function Simulados() {
         </div>
 
         <p className="text-xs text-slate-400 mt-6">
-          Os simulados são compostos por questões de treinamento elaboradas
-          no estilo dos processos seletivos. Não são cadernos oficiais nem
-          substituem a consulta aos editais vigentes.
+          Os simulados são compostos por questões de treinamento elaboradas no estilo dos processos
+          seletivos. Não são cadernos oficiais nem substituem a consulta aos editais vigentes.
         </p>
       </main>
 

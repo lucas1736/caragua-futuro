@@ -49,7 +49,7 @@ export function existemDadosVisitante(dados = coletarDadosVisitante()) {
   return Boolean(
     dados.plano ||
     Object.keys(dados.progresso?.registros || {}).length ||
-    (dados.simulados?.historico || []).length
+    (dados.simulados?.historico || []).length,
   );
 }
 

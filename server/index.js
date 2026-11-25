@@ -13,7 +13,7 @@ import { validarSegredoJwt } from './validators/segredoJwt.js';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
-const JWT_SECRET = validarSegredoJwt(process.env.JWT_SECRET);
+validarSegredoJwt(process.env.JWT_SECRET);
 
 const origensPermitidas = (process.env.CORS_ORIGIN || 'http://localhost:5173,http://127.0.0.1:5173')
   .split(',')
@@ -22,12 +22,14 @@ const origensPermitidas = (process.env.CORS_ORIGIN || 'http://localhost:5173,htt
 
 app.disable('x-powered-by');
 app.use(helmet());
-app.use(cors({
-  origin(origem, callback) {
-    if (!origem || origensPermitidas.includes(origem)) return callback(null, true);
-    return callback(new Error('Origem não autorizada pelo CORS.'));
-  },
-}));
+app.use(
+  cors({
+    origin(origem, callback) {
+      if (!origem || origensPermitidas.includes(origem)) return callback(null, true);
+      return callback(new Error('Origem não autorizada pelo CORS.'));
+    },
+  }),
+);
 app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || '2mb' }));
 
 app.get('/api/health', async (req, res, next) => {
@@ -68,9 +70,29 @@ if (!process.env.DB_PASSWORD) {
 
 prepararBanco()
   .then(() => {
-    app.listen(PORT, () => {
+    const servidor = app.listen(PORT);
+
+    servidor.on('listening', () => {
       console.log('Banco de dados OK (migrations aplicadas).');
       console.log(`API rodando na porta ${PORT}`);
+    });
+
+    servidor.on('error', (erro) => {
+      if (erro.code === 'EADDRINUSE') {
+        console.error(`\nNão foi possível iniciar a API: a porta ${PORT} já está em uso.`);
+        console.error(`Identifique o processo com: netstat -ano | findstr :${PORT}`);
+        console.error('No PowerShell, consulte o PID com:');
+        console.error(
+          `Get-NetTCPConnection -LocalPort ${PORT} -State Listen | Select-Object -ExpandProperty OwningProcess`,
+        );
+        console.error(
+          'Encerre somente o processo identificado, se tiver certeza de que não está sendo usado.',
+        );
+        console.error('Para encerrar no PowerShell: Stop-Process -Id <PID>');
+      } else {
+        console.error('Erro ao iniciar o servidor da API:', erro.message || erro);
+      }
+      process.exit(1);
     });
   })
   .catch((erro) => {

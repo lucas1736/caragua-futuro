@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { getUsuario, logoutUsuario, ESTADO_AUTH_EVENTO } from '../service/auth.js';
@@ -51,19 +50,13 @@ function Header() {
   }
 
   const classeLink = ({ isActive }) =>
-    isActive
-      ? 'relative text-emerald-400 font-medium'
-      : 'hover:text-emerald-400 transition';
+    isActive ? 'relative text-emerald-400 font-medium' : 'hover:text-emerald-400 transition';
 
   const inicial = usuario?.nome?.charAt(0).toUpperCase() || '?';
 
   function avatar(usuario) {
     return usuario?.foto ? (
-      <img
-        src={usuario.foto}
-        alt="Foto de perfil"
-        className="w-full h-full object-cover"
-      />
+      <img src={usuario.foto} alt="Foto de perfil" className="w-full h-full object-cover" />
     ) : (
       <span className="font-bold">{inicial}</span>
     );
@@ -79,20 +72,13 @@ function Header() {
 
           <div>
             <h1 className="font-bold text-sm leading-none">Caraguá Futuro</h1>
-            <p className="text-xs text-emerald-200 tracking-wide mt-1">
-              PLATAFORMA DE ESTUDOS
-            </p>
+            <p className="text-xs text-emerald-200 tracking-wide mt-1">PLATAFORMA DE ESTUDOS</p>
           </div>
         </Link>
 
         <div className="hidden lg:flex items-center gap-6 text-sm text-gray-300">
           {[...links, ...(usuario ? linksConta : [])].map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              end={link.to === '/'}
-              className={classeLink}
-            >
+            <NavLink key={link.to} to={link.to} end={link.to === '/'} className={classeLink}>
               {link.nome}
             </NavLink>
           ))}
@@ -155,9 +141,7 @@ function Header() {
               onClick={() => setMenuAberto(false)}
               className={({ isActive }) =>
                 `block py-3 border-t border-[#174c3b] transition ${
-                  isActive
-                    ? 'text-emerald-400'
-                    : 'text-white hover:text-emerald-400'
+                  isActive ? 'text-emerald-400' : 'text-white hover:text-emerald-400'
                 }`
               }
             >
@@ -174,11 +158,7 @@ function Header() {
                 {usuario.nome}
               </Link>
 
-              <button
-                type="button"
-                onClick={sair}
-                className="text-emerald-300 text-sm"
-              >
+              <button type="button" onClick={sair} className="text-emerald-300 text-sm">
                 Sair
               </button>
             </div>

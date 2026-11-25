@@ -23,9 +23,14 @@ function agregarResultados(resultados) {
       data: item.criadoEm,
       desempenhoMaterias: (() => {
         if (Array.isArray(item.desempenhoMaterias)) return item.desempenhoMaterias;
-        if (item.desempenhoMaterias && typeof item.desempenhoMaterias === 'object') return item.desempenhoMaterias;
+        if (item.desempenhoMaterias && typeof item.desempenhoMaterias === 'object')
+          return item.desempenhoMaterias;
         if (typeof item.desempenhoMaterias === 'string') {
-          try { return JSON.parse(item.desempenhoMaterias || '[]'); } catch { return []; }
+          try {
+            return JSON.parse(item.desempenhoMaterias || '[]');
+          } catch {
+            return [];
+          }
         }
         return [];
       })(),
@@ -52,24 +57,49 @@ export function obterResultados() {
 
 export async function obterResultadosAtuais() {
   if (!getToken()) return obterResultados();
-  return agregarResultados(await requisicaoApi('/api/progresso/resultados-simulado').then((d) => d.resultados));
+  return agregarResultados(
+    await requisicaoApi('/api/progresso/resultados-simulado').then((d) => d.resultados),
+  );
 }
 
 export function obterResumoModalidade(modalidade) {
   const resultado = obterResultados().modalidades?.[modalidade];
-  if (!resultado || !resultado.total) return { acertos: 0, erros: 0, total: 0, simulados: 0, porcentagem: 0 };
-  return { ...resultado, erros: resultado.total - resultado.acertos, porcentagem: Math.round((resultado.acertos / resultado.total) * 100) };
+  if (!resultado || !resultado.total)
+    return { acertos: 0, erros: 0, total: 0, simulados: 0, porcentagem: 0 };
+  return {
+    ...resultado,
+    erros: resultado.total - resultado.acertos,
+    porcentagem: Math.round((resultado.acertos / resultado.total) * 100),
+  };
 }
 
 export async function obterResumoModalidadeAtual(modalidade) {
   const dados = await obterResultadosAtuais();
   const resultado = dados.modalidades?.[modalidade];
-  if (!resultado || !resultado.total) return { acertos: 0, erros: 0, total: 0, simulados: 0, porcentagem: 0 };
-  return { ...resultado, erros: resultado.total - resultado.acertos, porcentagem: Math.round((resultado.acertos / resultado.total) * 100) };
+  if (!resultado || !resultado.total)
+    return { acertos: 0, erros: 0, total: 0, simulados: 0, porcentagem: 0 };
+  return {
+    ...resultado,
+    erros: resultado.total - resultado.acertos,
+    porcentagem: Math.round((resultado.acertos / resultado.total) * 100),
+  };
 }
 
-export async function registrarResultadoModalidade(modalidade, acertos, total, duracaoSegundos = 0, desempenhoMaterias = []) {
-  if (!modalidade || !Number.isInteger(acertos) || !Number.isInteger(total) || total <= 0 || acertos < 0 || acertos > total) {
+export async function registrarResultadoModalidade(
+  modalidade,
+  acertos,
+  total,
+  duracaoSegundos = 0,
+  desempenhoMaterias = [],
+) {
+  if (
+    !modalidade ||
+    !Number.isInteger(acertos) ||
+    !Number.isInteger(total) ||
+    total <= 0 ||
+    acertos < 0 ||
+    acertos > total
+  ) {
     throw new Error('Resultado de simulado inválido.');
   }
   if (getToken()) {
@@ -83,9 +113,19 @@ export async function registrarResultadoModalidade(modalidade, acertos, total, d
 
   const dados = obterResultados();
   const anterior = dados.modalidades[modalidade] || { acertos: 0, total: 0, simulados: 0 };
-  const novoResultado = { acertos: anterior.acertos + acertos, total: anterior.total + total, simulados: anterior.simulados + 1 };
+  const novoResultado = {
+    acertos: anterior.acertos + acertos,
+    total: anterior.total + total,
+    simulados: anterior.simulados + 1,
+  };
   dados.modalidades[modalidade] = novoResultado;
-  dados.historico.push({ modalidade, acertos, total, data: new Date().toISOString(), desempenhoMaterias });
+  dados.historico.push({
+    modalidade,
+    acertos,
+    total,
+    data: new Date().toISOString(),
+    desempenhoMaterias,
+  });
   salvarVisitante('simulados', dados);
   window.dispatchEvent(new Event('simuladosAtualizados'));
   return novoResultado;
@@ -98,10 +138,15 @@ export function obterResumoMateria(nome) {
 }
 
 export function registrarResultado(nome, acertos, total) {
-  if (!nome || total <= 0 || acertos < 0 || acertos > total) throw new Error('Resultado de simulado inválido.');
+  if (!nome || total <= 0 || acertos < 0 || acertos > total)
+    throw new Error('Resultado de simulado inválido.');
   const dados = obterResultados();
   const anterior = dados.materias[nome] || { acertos: 0, total: 0, simulados: 0 };
-  dados.materias[nome] = { acertos: anterior.acertos + acertos, total: anterior.total + total, simulados: anterior.simulados + 1 };
+  dados.materias[nome] = {
+    acertos: anterior.acertos + acertos,
+    total: anterior.total + total,
+    simulados: anterior.simulados + 1,
+  };
   dados.historico.push({ materia: nome, acertos, total, data: new Date().toISOString() });
   salvarVisitante('simulados', dados);
   window.dispatchEvent(new Event('simuladosAtualizados'));

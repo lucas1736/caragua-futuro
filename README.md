@@ -1,164 +1,70 @@
 # Caraguá Futuro
 
-Projeto convertido para React + Vite + Tailwind CSS, mantendo as páginas e funcionalidades existentes do protótipo.
+Aplicação de estudos para o litoral norte, com frontend React/Vite e API Express/MySQL. Inclui planejamento, cronograma, metas, registros de estudo, simulados de treinamento e autenticação por conta.
 
-## Como executar
+## Requisitos
 
-1. Instale Node.js.
-2. Abra esta pasta no VS Code.
-3. No terminal, execute `npm install`.
-4. Depois execute `npm run dev`.
-5. Abra o endereço local mostrado pelo Vite.
+- Node.js 24 LTS ou superior e npm.
+- MySQL 8 ou MariaDB compatível para executar a API.
 
-## Organização
+## Configuração local
 
-- `src/pages/`: telas do site — Início, Planejamento, Progresso, Cronograma, Simulados, Assistente, Meus Planos, Metas e Login.
-- `src/components/`: cabeçalho e rodapé compartilhados.
-- `src/layouts/`: layout principal do React Router.
-- `src/service/`: acesso à API (autenticação, planos, metas) e dados locais (cronograma, simulados).
-- `public/assets/`: imagens servidas em `/assets/...`.
-- `src/App.jsx`: rotas e importações das páginas.
-- `src/main.jsx`: ponto de entrada do React.
-- `server/`: API Express, conexão com o MySQL e migrations SQL versionadas (`server/migrations/`).
+1. Instale as dependências: `npm ci` (ou `npm install`).
+2. Copie `.env.example` para `.env` e configure o banco e um `JWT_SECRET` aleatório. Em produção, o segredo precisa ter pelo menos 32 caracteres; nunca o inclua no Git nem em variáveis `VITE_*`.
+3. Inicie o MySQL.
+4. Execute `npm run dev` e acesse <http://localhost:5173>.
 
-`node_modules` não está incluído; ele será criado ao executar `npm install`.
+A API inicia na porta 3001 e o Vite encaminha `/api` para ela. Na primeira inicialização, a API cria o banco e aplica as migrations de `server/migrations/`; a conta MySQL precisa ter permissões para criar o banco e as tabelas.
 
 ## Scripts
 
-| Comando | O que faz |
-| --- | --- |
-| `npm run dev` | Liga a API (porta 3001) e o site (porta 5173) juntos |
-| `npm run web` | Liga apenas o site (Vite) |
-| `npm run server` | Liga apenas a API |
-| `npm run build` | Gera a versão de produção em `dist/` |
-| `npm run preview` | Serve localmente a versão de produção |
+| Comando                | Descrição                                   |
+| ---------------------- | ------------------------------------------- |
+| `npm run dev`          | Inicia API e frontend para desenvolvimento  |
+| `npm run web`          | Inicia apenas o Vite                        |
+| `npm run server`       | Inicia apenas a API (requer MySQL e `.env`) |
+| `npm run build`        | Gera o frontend de produção em `dist/`      |
+| `npm run preview`      | Pré-visualiza o build do frontend           |
+| `npm run lint`         | Executa ESLint                              |
+| `npm run format:check` | Verifica formatação com Prettier            |
+| `npm run format`       | Formata arquivos suportados pelo Prettier   |
+| `npm test`             | Executa os testes Vitest                    |
 
+## Testes e integração contínua
 
-## Como rodar (rápido)
+Os testes cobrem utilitários de simulados e isolamento de planos entre contas. O teste de API usa pool em memória, sem precisar de MySQL ou dados pessoais. GitHub Actions executa `npm ci`, lint, verificação de formatação, testes e build em pushes e pull requests.
 
-1. Ligue o MySQL.
-2. Abra o arquivo `.env` e preencha `DB_PASSWORD=` com a senha do seu MySQL.
-3. `npm install` (só na primeira vez).
-4. `npm run dev` — liga a API (porta 3001) e o site (porta 5173) juntos.
-5. Abra http://localhost:5173/login e use **Criar conta**.
-
-O banco `caragua_futuro` e as migrations pendentes são aplicados automaticamente na inicialização.
-
-## CRUD de Planos de Estudo
-
-Tabela `planos` (veja `server/migrations/`), sempre ligada ao usuário logado.
-
-| Operação | Rota da API | Onde usar no site |
-| --- | --- | --- |
-| Create | `POST /api/planos` | Planejamento → "Confirmar plano" e Meus Planos → "+ Novo plano" |
-| Read | `GET /api/planos` e `GET /api/planos/:id` | Meus Planos |
-| Update | `PUT /api/planos/:id` | Meus Planos → "Editar" |
-| Delete | `DELETE /api/planos/:id` | Meus Planos → "Excluir" |
-
-As migrations pendentes são aplicadas automaticamente ao iniciar a API.
-
-## CRUD de Metas de Estudo (2º CRUD)
-
-Tabela `metas` (veja `server/migrations/`), sempre ligada ao usuário logado.
-Campos: título, matéria, descrição, prioridade (Baixa/Média/Alta), prazo e se está concluída.
-
-| Operação | Rota da API | Onde usar no site |
-| --- | --- | --- |
-| Create | `POST /api/metas` | Metas → "+ Nova meta" |
-| Read | `GET /api/metas` e `GET /api/metas/:id` | Metas (lista, barra de progresso e filtros) |
-| Update | `PUT /api/metas/:id` | Metas → "Editar" ou o checkbox de concluir |
-| Delete | `DELETE /api/metas/:id` | Metas → "Excluir" |
-
-## Como trabalhar neste projeto (passo a passo)
-
-### 1. O que instalar antes
-
-- [Git](https://git-scm.com/downloads)
-- [Node.js](https://nodejs.org/) (versão LTS)
-- [VS Code](https://code.visualstudio.com/)
-- [MySQL](https://dev.mysql.com/downloads/mysql/) (precisa estar instalado e rodando)
-
-### 2. Baixar o projeto
-
-Abra o terminal do VS Code (Terminal → New Terminal), vá até a pasta onde quer guardar o projeto e rode:
-
-```
-git clone https://github.com/lucas1736/caragua-futuro.git
-cd caragua-futuro
-code .
-npm install
+```bash
+npm run lint
+npm run format:check
+npm test
+npm run build
 ```
 
-### 3. Configurar o ambiente (.env)
+## Implantação
 
-1. Na raiz do projeto, crie um arquivo chamado `.env`.
-2. Cole o modelo abaixo e preencha com os seus dados:
+A implantação requer frontend estático, API Node.js e MySQL/MariaDB. Publique os arquivos de `dist/` e configure o host (ou proxy reverso) para encaminhar `/api` ao backend na mesma origem do site. O proxy do Vite funciona somente em desenvolvimento e não acompanha o build. Se frontend e API ficarem em origens separadas, será necessário configurar uma URL de API no frontend e `CORS_ORIGIN` no backend.
 
-```
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=sua_senha_do_mysql
-DB_NAME=caragua_futuro
+Configure no ambiente do backend, nunca no frontend:
 
-PORT=3001
-NODE_ENV=development
-JWT_SECRET=coloque-uma-frase-longa-e-aleatoria-aqui
-CORS_ORIGIN=http://localhost:5173,http://127.0.0.1:5173
-JSON_BODY_LIMIT=2mb
-```
+- `NODE_ENV=production`
+- `JWT_SECRET`: segredo aleatório com pelo menos 32 caracteres
+- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` e `DB_NAME`
+- `PORT`, se exigido pelo host
+- `CORS_ORIGIN`: origem(s) exata(s) do frontend
+- `JSON_BODY_LIMIT`, opcional (padrão `2mb`)
 
-3. **Nunca envie o `.env` para o GitHub.** Ele já está no `.gitignore`.
+O servidor recusa iniciar com `JWT_SECRET` ausente, padrão ou menor que 32 caracteres em produção. A conta do banco também precisa poder aplicar migrations. Use HTTPS, mantenha backups e planeje migrations de acordo com a política de deploy. Após publicar, verifique `GET /api/health` e as telas principais; a rota de saúde não substitui monitoramento nem backup.
 
-### 4. Banco de dados
+## Organização
 
-Basta ter o MySQL rodando. O servidor cria o banco `caragua_futuro` e aplica as migrations pendentes na primeira execução. Em produção, configure `NODE_ENV=production`, `JWT_SECRET` aleatório com pelo menos 32 caracteres e `CORS_ORIGIN` com a origem do frontend. Só garanta que o usuário e a senha no `.env` estão corretos.
+- `src/pages/`: páginas da aplicação.
+- `src/components/`: componentes React compartilhados e de tela.
+- `src/layouts/`: layout do React Router.
+- `src/service/`: integração com API e dados locais.
+- `src/utils/`: regras e utilitários puros.
+- `server/routes/`: rotas Express.
+- `server/migrations/`: alterações versionadas do banco.
+- `.github/workflows/ci.yml`: verificações automatizadas.
 
-### 5. Rodar o projeto
-
-Um único comando sobe o servidor (API) e o site juntos:
-
-```
-npm run dev
-```
-
-Se precisar rodar separado: `npm run server` (API) e `npm run web` (site).
-
-### 6. Fluxo de trabalho (sempre em branch)
-
-**Nunca trabalhe direto na `main`.**
-
-```
-git checkout main
-git pull
-git checkout -b nome-da-tarefa
-```
-
-Faça suas alterações e depois:
-
-```
-git add .
-git commit -m "Descreva o que você fez"
-git push -u origin nome-da-tarefa
-```
-
-### 7. Abrir um Pull Request
-
-1. No GitHub, abra o repositório e clique em **Compare & pull request**.
-2. Descreva rapidamente o que foi feito.
-3. Aguarde a revisão. O responsável clica em **Merge** quando estiver tudo certo.
-
-Depois do merge, volte para a `main` e atualize:
-
-```
-git checkout main
-git pull
-```
-
-### 8. Regras do grupo
-
-- Combine quem faz cada página/arquivo para evitar conflitos.
-- Rode `git pull` antes de começar a mexer.
-- Faça commits pequenos, com mensagens claras.
-- Nunca envie senhas, tokens ou arquivos `.env`.
-- Em caso de conflito, avise o grupo antes de resolver.
+Planos, metas, registros de estudo e resultados de simulados de usuários autenticados são associados à conta. Dados de visitante ficam no navegador até importação explícita. Os simulados usam questões de treinamento, não cadernos oficiais. Termos de Uso e Privacidade são preliminares e devem ser revisados pelo responsável antes da publicação definitiva.

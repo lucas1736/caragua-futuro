@@ -26,7 +26,11 @@ function Login() {
       } else {
         await loginUsuario(email, senha);
       }
-      const destino = location.state?.returnTo || '/';
+      const returnTo = location.state?.returnTo;
+      const destino =
+        typeof returnTo === 'string' && returnTo.startsWith('/') && !returnTo.startsWith('//')
+          ? returnTo
+          : '/';
       navigate(destino, { replace: true });
     } catch (e) {
       setErro(e.message);
@@ -47,9 +51,7 @@ function Login() {
     <div className="min-h-screen flex flex-col">
       <main className="flex-1 bg-slate-100 flex items-center justify-center p-4">
         <div className="bg-white w-full max-w-md rounded-2xl shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-emerald-600 text-center mb-2">
-            Caraguá Futuro
-          </h1>
+          <h1 className="text-3xl font-bold text-emerald-600 text-center mb-2">Caraguá Futuro</h1>
 
           <p className="text-slate-500 text-center mb-8">
             {modoCadastro
@@ -121,11 +123,7 @@ function Login() {
 
           <p className="text-center text-sm text-slate-500 mt-6">
             {modoCadastro ? 'Já tem conta?' : 'Ainda não tem conta?'}{' '}
-            <button
-              type="button"
-              onClick={alternarModo}
-              className="text-emerald-700 font-semibold"
-            >
+            <button type="button" onClick={alternarModo} className="text-emerald-700 font-semibold">
               {modoCadastro ? 'Entrar' : 'Criar conta'}
             </button>
           </p>

@@ -13,11 +13,22 @@ export const materiasPorModalidade = {
   concomitante: ['Português', 'Matemática'],
   etec: ['Português', 'Matemática', 'História', 'Geografia', 'Biologia', 'Física', 'Química'],
   concurso: ['Português', 'Matemática', 'História', 'Geografia'],
-  outros: ['Português', 'Matemática', 'Física', 'Química', 'Biologia', 'História', 'Geografia', 'Redação'],
+  outros: [
+    'Português',
+    'Matemática',
+    'Física',
+    'Química',
+    'Biologia',
+    'História',
+    'Geografia',
+    'Redação',
+  ],
 };
 
 export const nomesModalidades = Object.fromEntries(
-  Object.entries(opcoesPorObjetivo).flatMap(([, opcoes]) => opcoes.map(({ id, nome }) => [id, nome]))
+  Object.entries(opcoesPorObjetivo).flatMap(([, opcoes]) =>
+    opcoes.map(({ id, nome }) => [id, nome]),
+  ),
 );
 
 export function obterOpcoesModalidade(objetivo) {
@@ -28,7 +39,7 @@ export function obterMateriasModalidade(modalidade) {
   return materiasPorModalidade[modalidade] || [];
 }
 
-export function obterSugestaoPlanejamento(horas, diasSelecionados) {
+export function obterSugestaoPlanejamento(horas) {
   if (horas <= 2) {
     return {
       distribuicao: 'Priorizar teoria e exercícios essenciais.',
@@ -72,13 +83,19 @@ export function validarPlanoEstudo(plano) {
   return '';
 }
 
-export function gerarGradeSemanal(plano, materiasSemana = plano?.materias || [], dias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']) {
+export function gerarGradeSemanal(
+  plano,
+  materiasSemana = plano?.materias || [],
+  dias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+) {
   const diasAtivos = dias.filter((dia) => plano?.dias?.includes(dia));
   if (!diasAtivos.length) return [];
   return dias.map((dia, indiceDia) => ({
     dia,
     materias: diasAtivos.includes(dia)
-      ? materiasSemana.filter((_, indiceMateria) => indiceMateria % diasAtivos.length === diasAtivos.indexOf(dia))
+      ? materiasSemana.filter(
+          (_, indiceMateria) => indiceMateria % diasAtivos.length === diasAtivos.indexOf(dia),
+        )
       : [],
     indice: indiceDia,
   }));

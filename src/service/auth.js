@@ -45,7 +45,10 @@ export function concluirImportacao() {
 }
 
 export async function loginUsuario(email, senha) {
-  const resposta = await requisicaoApi('/api/login', { method: 'POST', body: JSON.stringify({ email, senha }) });
+  const resposta = await requisicaoApi('/api/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, senha }),
+  });
   localStorage.setItem(CHAVE_USUARIO, JSON.stringify(resposta.usuario));
   localStorage.setItem(CHAVE_TOKEN, resposta.token);
   marcarImportacaoPendente();
@@ -53,7 +56,10 @@ export async function loginUsuario(email, senha) {
 }
 
 export async function cadastrarUsuario(nome, email, senha) {
-  const resposta = await requisicaoApi('/api/cadastro', { method: 'POST', body: JSON.stringify({ nome, email, senha }) });
+  const resposta = await requisicaoApi('/api/cadastro', {
+    method: 'POST',
+    body: JSON.stringify({ nome, email, senha }),
+  });
   localStorage.setItem(CHAVE_USUARIO, JSON.stringify(resposta.usuario));
   localStorage.setItem(CHAVE_TOKEN, resposta.token);
   marcarImportacaoPendente();
@@ -62,7 +68,9 @@ export async function cadastrarUsuario(nome, email, senha) {
 
 // Atualiza os dados do perfil no banco e renova a sessão local
 export async function atualizarPerfil(dados) {
-  return salvarSessao(await requisicaoApi('/api/perfil', { method: 'PUT', body: JSON.stringify(dados) }));
+  return salvarSessao(
+    await requisicaoApi('/api/perfil', { method: 'PUT', body: JSON.stringify(dados) }),
+  );
 }
 
 export function logoutUsuario() {
@@ -75,7 +83,8 @@ export function logoutUsuario() {
     'resultadosSimuladosCaraguaFuturo',
     'cronogramaCaraguaFuturo',
     'atividadesCaraguaFuturo',
-  ]) localStorage.removeItem(chave);
+  ])
+    localStorage.removeItem(chave);
   limparDadosVisitante();
   avisarMudanca();
 }

@@ -21,15 +21,14 @@ function Suporte() {
             </a>
           ) : (
             <p className="text-slate-600 mt-3">
-              O canal de suporte ainda não foi configurado. O responsável pelo site
-              deve definir a variável <code>VITE_SUPORTE_EMAIL</code> no ambiente de
-              publicação.
+              O canal de suporte ainda não foi configurado. O responsável pelo site deve definir a
+              variável <code>VITE_SUPORTE_EMAIL</code> no ambiente de publicação.
             </p>
           )}
         </section>
         <p className="text-sm text-slate-500 mt-6">
-          Os textos de Termos de Uso e Privacidade são rascunhos e precisam de revisão
-          pelo responsável e por orientação jurídica antes da publicação.
+          Os textos de Termos de Uso e Privacidade são rascunhos e precisam de revisão pelo
+          responsável e por orientação jurídica antes da publicação.
         </p>
       </main>
       <Footer />

@@ -1,9 +1,9 @@
-
 const questoesETEC = [
   // PORTUGUÊS — 13 QUESTÕES
   {
     materia: 'Português',
-    pergunta: 'Leia: "Mesmo com as dificuldades, os estudantes continuaram seus estudos." A expressão "mesmo com" indica:',
+    pergunta:
+      'Leia: "Mesmo com as dificuldades, os estudantes continuaram seus estudos." A expressão "mesmo com" indica:',
     alternativas: ['Causa', 'Concessão', 'Finalidade', 'Conclusão', 'Comparação'],
     correta: 1,
     explicacao: 'A expressão indica uma dificuldade que não impediu a continuidade dos estudos.',
@@ -11,7 +11,13 @@ const questoesETEC = [
   {
     materia: 'Português',
     pergunta: 'Em "Os moradores organizaram uma campanha", o sujeito é:',
-    alternativas: ['Uma campanha', 'Organizaram', 'Os moradores', 'Moradores organizaram', 'Sujeito oculto'],
+    alternativas: [
+      'Uma campanha',
+      'Organizaram',
+      'Os moradores',
+      'Moradores organizaram',
+      'Sujeito oculto',
+    ],
     correta: 2,
     explicacao: 'Os moradores são aqueles que praticam a ação.',
   },
@@ -25,14 +31,26 @@ const questoesETEC = [
   {
     materia: 'Português',
     pergunta: 'A principal finalidade de uma notícia é:',
-    alternativas: ['Defender uma opinião pessoal', 'Informar sobre acontecimentos', 'Ensinar uma receita', 'Contar uma história fantástica', 'Vender um produto'],
+    alternativas: [
+      'Defender uma opinião pessoal',
+      'Informar sobre acontecimentos',
+      'Ensinar uma receita',
+      'Contar uma história fantástica',
+      'Vender um produto',
+    ],
     correta: 1,
     explicacao: 'A notícia apresenta informações sobre acontecimentos.',
   },
   {
     materia: 'Português',
     pergunta: 'Qual alternativa apresenta uma opinião?',
-    alternativas: ['A Terra gira ao redor do Sol.', 'Caraguatatuba fica no litoral paulista.', 'A leitura é a melhor forma de aprender.', 'A água é formada por hidrogênio e oxigênio.', 'O Brasil possui 26 estados e o Distrito Federal.'],
+    alternativas: [
+      'A Terra gira ao redor do Sol.',
+      'Caraguatatuba fica no litoral paulista.',
+      'A leitura é a melhor forma de aprender.',
+      'A água é formada por hidrogênio e oxigênio.',
+      'O Brasil possui 26 estados e o Distrito Federal.',
+    ],
     correta: 2,
     explicacao: 'A afirmação apresenta uma avaliação pessoal.',
   },
@@ -60,21 +78,39 @@ const questoesETEC = [
   {
     materia: 'Português',
     pergunta: 'Qual frase apresenta concordância verbal correta?',
-    alternativas: ['Os alunos estuda bastante.', 'As meninas chegou cedo.', 'Existem muitas oportunidades.', 'A gente fomos ao parque.', 'Fazem três anos que estudo.'],
+    alternativas: [
+      'Os alunos estuda bastante.',
+      'As meninas chegou cedo.',
+      'Existem muitas oportunidades.',
+      'A gente fomos ao parque.',
+      'Fazem três anos que estudo.',
+    ],
     correta: 2,
     explicacao: 'O verbo existir concorda com o sujeito plural: oportunidades.',
   },
   {
     materia: 'Português',
     pergunta: 'Em um texto argumentativo, a tese é:',
-    alternativas: ['A ideia defendida pelo autor', 'A lista de personagens', 'O título obrigatório', 'A referência bibliográfica', 'Uma informação sem relação com o tema'],
+    alternativas: [
+      'A ideia defendida pelo autor',
+      'A lista de personagens',
+      'O título obrigatório',
+      'A referência bibliográfica',
+      'Uma informação sem relação com o tema',
+    ],
     correta: 0,
     explicacao: 'A tese representa o posicionamento que o autor pretende defender.',
   },
   {
     materia: 'Português',
     pergunta: 'Qual alternativa apresenta discurso indireto?',
-    alternativas: ['Maria disse: "Estou estudando".', '"Estou estudando", afirmou Maria.', 'Maria afirmou que estava estudando.', '"Vou estudar amanhã!", disse ela.', 'Maria: "Estou estudando".'],
+    alternativas: [
+      'Maria disse: "Estou estudando".',
+      '"Estou estudando", afirmou Maria.',
+      'Maria afirmou que estava estudando.',
+      '"Vou estudar amanhã!", disse ela.',
+      'Maria: "Estou estudando".',
+    ],
     correta: 2,
     explicacao: 'No discurso indireto, a fala é apresentada pelo narrador.',
   },
@@ -88,7 +124,13 @@ const questoesETEC = [
   {
     materia: 'Português',
     pergunta: 'Em uma charge, o humor geralmente é construído por meio de:',
-    alternativas: ['Apenas informações científicas', 'Crítica, ironia ou situações inesperadas', 'Somente dados numéricos', 'Uma sequência de instruções', 'Uma lista de acontecimentos históricos'],
+    alternativas: [
+      'Apenas informações científicas',
+      'Crítica, ironia ou situações inesperadas',
+      'Somente dados numéricos',
+      'Uma sequência de instruções',
+      'Uma lista de acontecimentos históricos',
+    ],
     correta: 1,
     explicacao: 'Charges frequentemente utilizam humor e ironia para apresentar críticas.',
   },
@@ -117,7 +159,8 @@ const questoesETEC = [
   },
   {
     materia: 'Matemática',
-    pergunta: 'Um terreno retangular possui 12 metros de comprimento e 7 metros de largura. Qual é sua área?',
+    pergunta:
+      'Um terreno retangular possui 12 metros de comprimento e 7 metros de largura. Qual é sua área?',
     alternativas: ['19 m²', '38 m²', '72 m²', '84 m²', '96 m²'],
     correta: 3,
     explicacao: 'Área do retângulo = comprimento × largura = 12 × 7 = 84 m².',
@@ -190,14 +233,26 @@ const questoesETEC = [
   {
     materia: 'Ciências Humanas',
     pergunta: 'Qual acontecimento marcou oficialmente o início da Independência do Brasil?',
-    alternativas: ['A Proclamação da República, em 1889', 'O Grito do Ipiranga, em 1822', 'A chegada da família real, em 1808', 'A Abolição da Escravidão, em 1888', 'A Revolução de 1930'],
+    alternativas: [
+      'A Proclamação da República, em 1889',
+      'O Grito do Ipiranga, em 1822',
+      'A chegada da família real, em 1808',
+      'A Abolição da Escravidão, em 1888',
+      'A Revolução de 1930',
+    ],
     correta: 1,
     explicacao: 'O processo de independência foi proclamado em 7 de setembro de 1822.',
   },
   {
     materia: 'Ciências Humanas',
     pergunta: 'A Lei Áurea, assinada em 1888, determinou:',
-    alternativas: ['A independência do Brasil', 'O fim legal da escravidão no Brasil', 'A criação da República', 'O início da colonização', 'A divisão dos estados brasileiros'],
+    alternativas: [
+      'A independência do Brasil',
+      'O fim legal da escravidão no Brasil',
+      'A criação da República',
+      'O início da colonização',
+      'A divisão dos estados brasileiros',
+    ],
     correta: 1,
     explicacao: 'A Lei Áurea aboliu legalmente a escravidão no Brasil.',
   },
@@ -211,9 +266,16 @@ const questoesETEC = [
   {
     materia: 'Ciências Humanas',
     pergunta: 'Qual é uma consequência do crescimento urbano desordenado?',
-    alternativas: ['Redução automática da poluição', 'Desaparecimento do trânsito', 'Aumento de problemas habitacionais e de infraestrutura', 'Fim das desigualdades sociais', 'Diminuição da necessidade de transporte'],
+    alternativas: [
+      'Redução automática da poluição',
+      'Desaparecimento do trânsito',
+      'Aumento de problemas habitacionais e de infraestrutura',
+      'Fim das desigualdades sociais',
+      'Diminuição da necessidade de transporte',
+    ],
     correta: 2,
-    explicacao: 'O crescimento sem planejamento pode ampliar problemas de moradia, saneamento e mobilidade.',
+    explicacao:
+      'O crescimento sem planejamento pode ampliar problemas de moradia, saneamento e mobilidade.',
   },
   {
     materia: 'Ciências Humanas',
@@ -225,7 +287,13 @@ const questoesETEC = [
   {
     materia: 'Ciências Humanas',
     pergunta: 'A escala de um mapa serve para:',
-    alternativas: ['Indicar a temperatura de um lugar', 'Relacionar as distâncias do mapa com as distâncias reais', 'Mostrar apenas as fronteiras políticas', 'Indicar a população de uma cidade', 'Determinar a altitude de todos os lugares'],
+    alternativas: [
+      'Indicar a temperatura de um lugar',
+      'Relacionar as distâncias do mapa com as distâncias reais',
+      'Mostrar apenas as fronteiras políticas',
+      'Indicar a população de uma cidade',
+      'Determinar a altitude de todos os lugares',
+    ],
     correta: 1,
     explicacao: 'A escala representa a proporção entre a medida no mapa e a medida real.',
   },
@@ -239,43 +307,77 @@ const questoesETEC = [
   {
     materia: 'Ciências Humanas',
     pergunta: 'A principal função dos poderes Executivo, Legislativo e Judiciário é:',
-    alternativas: ['Concentrar todas as decisões em uma pessoa', 'Organizar e dividir as funções do Estado', 'Substituir as eleições', 'Eliminar as leis', 'Controlar somente a economia'],
+    alternativas: [
+      'Concentrar todas as decisões em uma pessoa',
+      'Organizar e dividir as funções do Estado',
+      'Substituir as eleições',
+      'Eliminar as leis',
+      'Controlar somente a economia',
+    ],
     correta: 1,
-    explicacao: 'A divisão dos poderes organiza as funções do Estado e estabelece controles entre eles.',
+    explicacao:
+      'A divisão dos poderes organiza as funções do Estado e estabelece controles entre eles.',
   },
   {
     materia: 'Ciências Humanas',
     pergunta: 'O movimento de rotação da Terra é responsável principalmente:',
-    alternativas: ['Pelas estações do ano', 'Pela sucessão de dias e noites', 'Pela formação dos oceanos', 'Pela ocorrência das marés', 'Pela mudança dos continentes'],
+    alternativas: [
+      'Pelas estações do ano',
+      'Pela sucessão de dias e noites',
+      'Pela formação dos oceanos',
+      'Pela ocorrência das marés',
+      'Pela mudança dos continentes',
+    ],
     correta: 1,
     explicacao: 'A rotação é o movimento da Terra em torno do próprio eixo.',
   },
   {
     materia: 'Ciências Humanas',
     pergunta: 'O êxodo rural corresponde:',
-    alternativas: ['À migração da cidade para o campo', 'À saída de pessoas do campo para as cidades', 'Ao deslocamento entre países', 'Ao aumento da população rural', 'À construção de áreas agrícolas'],
+    alternativas: [
+      'À migração da cidade para o campo',
+      'À saída de pessoas do campo para as cidades',
+      'Ao deslocamento entre países',
+      'Ao aumento da população rural',
+      'À construção de áreas agrícolas',
+    ],
     correta: 1,
     explicacao: 'Êxodo rural é a migração de pessoas do campo para áreas urbanas.',
   },
   {
     materia: 'Ciências Humanas',
     pergunta: 'A escravidão no Brasil colonial esteve diretamente relacionada:',
-    alternativas: ['À produção agrícola e à exploração do trabalho', 'À industrialização automobilística', 'À produção de computadores', 'À expansão do turismo', 'À criação de universidades públicas'],
+    alternativas: [
+      'À produção agrícola e à exploração do trabalho',
+      'À industrialização automobilística',
+      'À produção de computadores',
+      'À expansão do turismo',
+      'À criação de universidades públicas',
+    ],
     correta: 0,
-    explicacao: 'O trabalho escravizado foi utilizado amplamente em atividades econômicas coloniais.',
+    explicacao:
+      'O trabalho escravizado foi utilizado amplamente em atividades econômicas coloniais.',
   },
   {
     materia: 'Ciências Humanas',
     pergunta: 'O efeito estufa é um fenômeno natural importante porque:',
-    alternativas: ['Impede toda a entrada de luz solar', 'Mantém parte do calor na atmosfera e ajuda a regular a temperatura da Terra', 'Elimina a necessidade de água', 'Impede a formação de nuvens', 'Produz diretamente terremotos'],
+    alternativas: [
+      'Impede toda a entrada de luz solar',
+      'Mantém parte do calor na atmosfera e ajuda a regular a temperatura da Terra',
+      'Elimina a necessidade de água',
+      'Impede a formação de nuvens',
+      'Produz diretamente terremotos',
+    ],
     correta: 1,
-    explicacao: 'O efeito estufa natural mantém a temperatura adequada à vida; sua intensificação contribui para o aquecimento global.',
+    explicacao:
+      'O efeito estufa natural mantém a temperatura adequada à vida; sua intensificação contribui para o aquecimento global.',
   },
 
   // CIÊNCIAS DA NATUREZA — 12 QUESTÕES
   {
     materia: 'Ciências da Natureza',
-    pergunta: 'Qual organela celular é responsável principalmente pela produção de energia na respiração celular?',
+    pergunta:
+      'Qual organela celular é responsável principalmente pela produção de energia na respiração celular?',
     alternativas: ['Núcleo', 'Mitocôndria', 'Ribossomo', 'Lisossomo', 'Membrana plasmática'],
     correta: 1,
     explicacao: 'As mitocôndrias participam da respiração celular e da produção de ATP.',
@@ -283,9 +385,16 @@ const questoesETEC = [
   {
     materia: 'Ciências da Natureza',
     pergunta: 'Na fotossíntese, as plantas utilizam principalmente:',
-    alternativas: ['Oxigênio e açúcar', 'Água, gás carbônico e luz', 'Nitrogênio e sal', 'Somente água', 'Somente oxigênio'],
+    alternativas: [
+      'Oxigênio e açúcar',
+      'Água, gás carbônico e luz',
+      'Nitrogênio e sal',
+      'Somente água',
+      'Somente oxigênio',
+    ],
     correta: 1,
-    explicacao: 'A fotossíntese utiliza água, gás carbônico e energia luminosa para produzir matéria orgânica.',
+    explicacao:
+      'A fotossíntese utiliza água, gás carbônico e energia luminosa para produzir matéria orgânica.',
   },
   {
     materia: 'Ciências da Natureza',
@@ -304,16 +413,29 @@ const questoesETEC = [
   {
     materia: 'Ciências da Natureza',
     pergunta: 'Qual é a principal função dos decompositores em um ecossistema?',
-    alternativas: ['Produzir luz solar', 'Reciclar matéria orgânica e nutrientes', 'Impedir a fotossíntese', 'Consumir apenas animais vivos', 'Produzir rochas'],
+    alternativas: [
+      'Produzir luz solar',
+      'Reciclar matéria orgânica e nutrientes',
+      'Impedir a fotossíntese',
+      'Consumir apenas animais vivos',
+      'Produzir rochas',
+    ],
     correta: 1,
     explicacao: 'Fungos e bactérias decompositores devolvem nutrientes ao ambiente.',
   },
   {
     materia: 'Ciências da Natureza',
     pergunta: 'Uma força pode provocar em um corpo:',
-    alternativas: ['Somente mudança de cor', 'Mudança de movimento ou deformação', 'Apenas aumento de massa', 'Desaparecimento da matéria', 'Transformação automática em energia elétrica'],
+    alternativas: [
+      'Somente mudança de cor',
+      'Mudança de movimento ou deformação',
+      'Apenas aumento de massa',
+      'Desaparecimento da matéria',
+      'Transformação automática em energia elétrica',
+    ],
     correta: 1,
-    explicacao: 'Uma força pode alterar a velocidade, a direção do movimento ou a forma de um corpo.',
+    explicacao:
+      'Uma força pode alterar a velocidade, a direção do movimento ou a forma de um corpo.',
   },
   {
     materia: 'Ciências da Natureza',
@@ -325,7 +447,13 @@ const questoesETEC = [
   {
     materia: 'Ciências da Natureza',
     pergunta: 'As vacinas têm como principal objetivo:',
-    alternativas: ['Substituir todos os medicamentos', 'Estimular o sistema imunológico a desenvolver proteção', 'Eliminar a necessidade de higiene', 'Tratar qualquer doença instantaneamente', 'Impedir o funcionamento do sistema imunológico'],
+    alternativas: [
+      'Substituir todos os medicamentos',
+      'Estimular o sistema imunológico a desenvolver proteção',
+      'Eliminar a necessidade de higiene',
+      'Tratar qualquer doença instantaneamente',
+      'Impedir o funcionamento do sistema imunológico',
+    ],
     correta: 1,
     explicacao: 'As vacinas estimulam uma resposta imunológica e ajudam a prevenir doenças.',
   },
@@ -339,21 +467,39 @@ const questoesETEC = [
   {
     materia: 'Ciências da Natureza',
     pergunta: 'A mistura de água e óleo é classificada como:',
-    alternativas: ['Homogênea, pois forma uma única fase', 'Heterogênea, pois apresenta duas fases', 'Uma substância pura', 'Uma solução gasosa', 'Um elemento químico'],
+    alternativas: [
+      'Homogênea, pois forma uma única fase',
+      'Heterogênea, pois apresenta duas fases',
+      'Uma substância pura',
+      'Uma solução gasosa',
+      'Um elemento químico',
+    ],
     correta: 1,
     explicacao: 'Água e óleo não se misturam completamente e formam duas fases.',
   },
   {
     materia: 'Ciências da Natureza',
     pergunta: 'Qual atitude contribui para reduzir a produção de lixo?',
-    alternativas: ['Descartar pilhas no lixo comum', 'Queimar plásticos', 'Reutilizar materiais e separar recicláveis', 'Desperdiçar alimentos', 'Utilizar produtos descartáveis sempre que possível'],
+    alternativas: [
+      'Descartar pilhas no lixo comum',
+      'Queimar plásticos',
+      'Reutilizar materiais e separar recicláveis',
+      'Desperdiçar alimentos',
+      'Utilizar produtos descartáveis sempre que possível',
+    ],
     correta: 2,
     explicacao: 'Reutilização e reciclagem ajudam a diminuir a quantidade de resíduos.',
   },
   {
     materia: 'Ciências da Natureza',
     pergunta: 'Em uma cadeia alimentar, os produtores são geralmente:',
-    alternativas: ['Animais carnívoros', 'Fungos decompositores', 'Plantas e algas', 'Animais herbívoros', 'Bactérias causadoras de doenças'],
+    alternativas: [
+      'Animais carnívoros',
+      'Fungos decompositores',
+      'Plantas e algas',
+      'Animais herbívoros',
+      'Bactérias causadoras de doenças',
+    ],
     correta: 2,
     explicacao: 'Plantas e algas produzem matéria orgânica, geralmente por meio da fotossíntese.',
   },
@@ -361,6 +507,7 @@ const questoesETEC = [
 
 export const BANCO_ETEC = {
   titulo: 'Vestibulinho ETEC',
-  descricao: 'Simulado com 50 questões autorais de treino de Português, Matemática, Ciências Humanas e Ciências da Natureza; não são questões oficiais.',
+  descricao:
+    'Simulado com 50 questões autorais de treino de Português, Matemática, Ciências Humanas e Ciências da Natureza; não são questões oficiais.',
   questoes: questoesETEC,
 };

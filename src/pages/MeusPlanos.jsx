@@ -12,8 +12,14 @@ import {
 
 const OBJETIVOS = ['Vestibular', 'ENEM', 'FATEC', 'IFSP', 'Concurso'];
 const MATERIAS = [
-  'Matemática', 'Português', 'Física', 'Química',
-  'Biologia', 'História', 'Geografia', 'Redação',
+  'Matemática',
+  'Português',
+  'Física',
+  'Química',
+  'Biologia',
+  'História',
+  'Geografia',
+  'Redação',
 ];
 const DIAS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 
@@ -100,10 +106,12 @@ function MeusPlanos() {
     try {
       if (editandoId) {
         const atualizado = await atualizarPlano(editandoId, form);
-        setPlanos((lista) => lista.map((plano) => {
-          if (plano.id === editandoId) return atualizado;
-          return atualizado.ativo ? { ...plano, ativo: false } : plano;
-        }));
+        setPlanos((lista) =>
+          lista.map((plano) => {
+            if (plano.id === editandoId) return atualizado;
+            return atualizado.ativo ? { ...plano, ativo: false } : plano;
+          }),
+        );
         setAviso('Plano atualizado!');
       } else {
         const novo = await criarPlano(form);
@@ -149,14 +157,11 @@ function MeusPlanos() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-
       <main className="flex-1 max-w-4xl w-full mx-auto px-5 md:px-7 py-9">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <div>
             <h2 className="text-2xl font-extrabold text-slate-900">Meus Planos</h2>
-            <p className="text-xs text-slate-500 mt-1">
-              Planos de estudo salvos na sua conta.
-            </p>
+            <p className="text-xs text-slate-500 mt-1">Planos de estudo salvos na sua conta.</p>
           </div>
 
           {usuario && (
@@ -199,8 +204,8 @@ function MeusPlanos() {
 
         {usuario && !carregando && planos.length === 0 && !erro && (
           <div className="bg-white border border-dashed border-slate-300 rounded-xl p-8 text-center text-slate-500 text-sm">
-            Você ainda não tem planos. Clique em <strong>+ Novo plano</strong> ou
-            monte um na página de{' '}
+            Você ainda não tem planos. Clique em <strong>+ Novo plano</strong> ou monte um na página
+            de{' '}
             <Link to="/planejamento" className="text-emerald-800 font-semibold underline">
               Planejamento
             </Link>
@@ -217,7 +222,11 @@ function MeusPlanos() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <h3 className="font-bold text-lg text-slate-900">{plano.objetivo}</h3>
-                  {plano.ativo && <span className="text-xs font-semibold text-emerald-700">Plano ativo no cronograma</span>}
+                  {plano.ativo && (
+                    <span className="text-xs font-semibold text-emerald-700">
+                      Plano ativo no cronograma
+                    </span>
+                  )}
                   <p className="text-xs text-slate-500 mt-1">
                     {plano.horas} {plano.horas === 1 ? 'hora' : 'horas'}/dia ·{' '}
                     {plano.dias.join(', ')} · Prova: {formatarData(plano.data)}
@@ -265,8 +274,17 @@ function MeusPlanos() {
       </main>
 
       {formAberto && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onMouseDown={(evento) => { if (evento.target === evento.currentTarget) setFormAberto(false); }}>
-          <form role="dialog" aria-modal="true" aria-labelledby="titulo-form-plano"
+        <div
+          role="presentation"
+          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+          onMouseDown={(evento) => {
+            if (evento.target === evento.currentTarget) setFormAberto(false);
+          }}
+        >
+          <form
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="titulo-form-plano"
             onSubmit={salvar}
             className="bg-white w-full max-w-lg rounded-2xl p-6 max-h-[90vh] overflow-y-auto space-y-5"
           >

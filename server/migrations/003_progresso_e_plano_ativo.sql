@@ -2,7 +2,7 @@ ALTER TABLE planos
   ADD COLUMN vestibulares JSON NULL AFTER modalidade,
   ADD COLUMN ativo TINYINT(1) NOT NULL DEFAULT 0 AFTER data_exame,
   ADD COLUMN usuario_ativo_id INT UNSIGNED
-    GENERATED ALWAYS AS (CASE WHEN ativo = 1 THEN usuario_id ELSE NULL END) STORED,
+    GENERATED ALWAYS AS (CASE WHEN ativo = 1 THEN usuario_id ELSE NULL END) VIRTUAL,
   ADD UNIQUE KEY uq_planos_usuario_ativo (usuario_ativo_id);
 
 UPDATE planos p

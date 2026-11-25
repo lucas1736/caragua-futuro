@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Footer from '../components/Footer.jsx';
 import { BANCOS_IFSP } from '../service/questoesIFSP.js';
@@ -16,14 +15,15 @@ function RealizarSimulado() {
 
   const modalidade = materia || '';
 
-  const banco =
-    modalidade === 'etec'
-      ? BANCO_ETEC
-      : BANCOS_CONCURSO[modalidade] ||
-        BANCOS_VESTIBULAR[modalidade] ||
-        BANCOS_IFSP[modalidade];
+  const banco = useMemo(
+    () =>
+      modalidade === 'etec'
+        ? BANCO_ETEC
+        : BANCOS_CONCURSO[modalidade] || BANCOS_VESTIBULAR[modalidade] || BANCOS_IFSP[modalidade],
+    [modalidade],
+  );
 
-  const questoesOriginais = banco?.questoes || [];
+  const questoesOriginais = useMemo(() => banco?.questoes || [], [banco]);
   const [questoes, setQuestoes] = useState(() => embaralharQuestoes(questoesOriginais));
   const [respostas, setRespostas] = useState({});
   const [resultado, setResultado] = useState(null);
@@ -37,13 +37,21 @@ function RealizarSimulado() {
 
   useEffect(() => {
     finalizacaoIniciada.current = false;
+    if (!banco) {
+      setQuestoes([]);
+      setErroResultado('Modalidade de simulado não encontrada.');
+      setResultado(null);
+      setSalvandoResultado(false);
+      setTempoRestante(tempoTotalMinutos * 60);
+      return;
+    }
+    setErroResultado('');
     setQuestoes(embaralharQuestoes(questoesOriginais));
     setRespostas({});
     setResultado(null);
-    setErroResultado('');
     setSalvandoResultado(false);
     setTempoRestante(tempoTotalMinutos * 60);
-  }, [modalidade]);
+  }, [banco, modalidade, questoesOriginais, tempoTotalMinutos]);
 
   function refazerSimulado() {
     finalizacaoIniciada.current = false;
@@ -63,41 +71,49 @@ function RealizarSimulado() {
     }));
   }
 
-  const finalizarSimulado = useCallback(async (automatico = false) => {
-    if (resultado !== null || salvandoResultado || finalizacaoIniciada.current) return;
+  const finalizarSimulado = useCallback(
+    async (automatico = false) => {
+      if (resultado !== null || salvandoResultado || finalizacaoIniciada.current) return;
 
-    if (
-      !automatico &&
-      Object.keys(respostas).length !== questoes.length
-    ) {
-      return;
-    }
+      if (!automatico && Object.keys(respostas).length !== questoes.length) {
+        return;
+      }
 
-    finalizacaoIniciada.current = true;
-    const calculado = calcularResultado(questoes, respostas);
-    const { acertos, total, desempenhoMaterias } = calculado;
-    const porcentagem = total ? Math.round((acertos / total) * 100) : 0;
+      finalizacaoIniciada.current = true;
+      const calculado = calcularResultado(questoes, respostas);
+      const { acertos, total, desempenhoMaterias } = calculado;
+      const porcentagem = total ? Math.round((acertos / total) * 100) : 0;
 
-    setSalvandoResultado(true);
-    setErroResultado('');
-    try {
-      await registrarResultadoModalidade(
-        modalidade,
-        acertos,
-        total,
-        tempoTotalMinutos * 60 - tempoRestante,
-        desempenhoMaterias
-      );
-      setResultado({ acertos, total, porcentagem, automatico, desempenhoMaterias });
-    } catch (erro) {
-      finalizacaoIniciada.current = false;
-      setErroResultado(erro.message);
-    } finally {
-      setSalvandoResultado(false);
-    }
+      setSalvandoResultado(true);
+      setErroResultado('');
+      try {
+        await registrarResultadoModalidade(
+          modalidade,
+          acertos,
+          total,
+          tempoTotalMinutos * 60 - tempoRestante,
+          desempenhoMaterias,
+        );
+        setResultado({ acertos, total, porcentagem, automatico, desempenhoMaterias });
+      } catch (erro) {
+        finalizacaoIniciada.current = false;
+        setErroResultado(erro.message);
+      } finally {
+        setSalvandoResultado(false);
+      }
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [respostas, questoes, modalidade, resultado, salvandoResultado, tempoRestante, tempoTotalMinutos]);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    [
+      respostas,
+      questoes,
+      modalidade,
+      resultado,
+      salvandoResultado,
+      tempoRestante,
+      tempoTotalMinutos,
+    ],
+  );
 
   // Inicia a contagem regressiva de 25 minutos.
   useEffect(() => {
@@ -112,11 +128,7 @@ function RealizarSimulado() {
 
   // Finaliza automaticamente quando o tempo acaba.
   useEffect(() => {
-    if (
-      tempoRestante === 0 &&
-      resultado === null &&
-      questoes.length > 0
-    ) {
+    if (tempoRestante === 0 && resultado === null && questoes.length > 0) {
       finalizarSimulado(true);
     }
   }, [tempoRestante, resultado, questoes.length, finalizarSimulado]);
@@ -132,18 +144,13 @@ function RealizarSimulado() {
       <div className="min-h-screen bg-slate-50 flex flex-col">
         <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-12">
           <div className="bg-white rounded-xl border p-7 text-center">
-            <h1 className="text-xl font-bold text-slate-800">
-              Simulado não encontrado
-            </h1>
+            <h1 className="text-xl font-bold text-slate-800">Simulado não encontrado</h1>
 
             <p className="text-sm text-slate-500 mt-2">
               Escolha um dos simulados disponíveis para continuar.
             </p>
 
-            <Link
-              to="/simulados"
-              className="text-emerald-700 font-bold text-sm inline-block mt-5"
-            >
+            <Link to="/simulados" className="text-emerald-700 font-bold text-sm inline-block mt-5">
               Voltar aos simulados
             </Link>
           </div>
@@ -154,16 +161,31 @@ function RealizarSimulado() {
     );
   }
 
+  if (!banco) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col">
+        <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-7 py-8">
+          <Link to="/simulados" className="text-sm text-emerald-700 font-semibold hover:underline">
+            ← Voltar aos simulados
+          </Link>
+          <div className="mt-6 bg-white border border-slate-200 rounded-xl p-6">
+            <p className="text-sm text-red-700 font-semibold" role="alert">
+              {erroResultado || 'Modalidade de simulado não encontrada.'}
+            </p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   const respondidas = Object.keys(respostas).length;
-  const porcentagemRespondida = (respondidas / questoes.length) * 100;
+  const porcentagemRespondida = questoes.length > 0 ? (respondidas / questoes.length) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-7 py-8">
-        <Link
-          to="/simulados"
-          className="text-sm text-emerald-700 font-semibold hover:underline"
-        >
+        <Link to="/simulados" className="text-sm text-emerald-700 font-semibold hover:underline">
           ← Voltar aos simulados
         </Link>
 
@@ -176,9 +198,7 @@ function RealizarSimulado() {
             {banco.titulo}
           </h1>
 
-          <p className="text-sm text-slate-500 mt-2">
-            {banco.descricao}
-          </p>
+          <p className="text-sm text-slate-500 mt-2">{banco.descricao}</p>
 
           <div className="flex flex-wrap gap-3 mt-4">
             <span className="bg-emerald-50 text-emerald-800 text-xs font-semibold px-3 py-2 rounded-lg">
@@ -231,9 +251,7 @@ function RealizarSimulado() {
                         : 'bg-emerald-50 text-emerald-800'
                   }`}
                 >
-                  <p className="text-xs font-semibold">
-                    Tempo restante
-                  </p>
+                  <p className="text-xs font-semibold">Tempo restante</p>
 
                   <p className="text-2xl font-extrabold tabular-nums">
                     {minutos}:{segundos}
@@ -259,13 +277,9 @@ function RealizarSimulado() {
                   className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6"
                 >
                   <div className="flex flex-wrap justify-between items-center gap-2 mb-3">
-                    <p className="text-xs text-emerald-700 font-bold">
-                      QUESTÃO {indice + 1}
-                    </p>
+                    <p className="text-xs text-emerald-700 font-bold">QUESTÃO {indice + 1}</p>
 
-                    <span className="text-xs text-slate-400">
-                      {questao.materia}
-                    </span>
+                    <span className="text-xs text-slate-400">{questao.materia}</span>
                   </div>
 
                   <h2 className="font-bold text-slate-800 mb-5 leading-relaxed">
@@ -286,9 +300,7 @@ function RealizarSimulado() {
                           type="radio"
                           name={`questao-${indice}`}
                           checked={respostas[indice] === indiceAlternativa}
-                          onChange={() =>
-                            selecionarResposta(indice, indiceAlternativa)
-                          }
+                          onChange={() => selecionarResposta(indice, indiceAlternativa)}
                           className="accent-emerald-600 mt-1"
                         />
 
@@ -305,7 +317,14 @@ function RealizarSimulado() {
               ))}
             </div>
 
-            {erroResultado && <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3" role="alert">{erroResultado} O resultado não foi salvo. Tente finalizar novamente.</p>}
+            {erroResultado && (
+              <p
+                className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3"
+                role="alert"
+              >
+                {erroResultado} O resultado não foi salvo. Tente finalizar novamente.
+              </p>
+            )}
             <button
               type="button"
               onClick={() => finalizarSimulado(false)}
@@ -317,22 +336,18 @@ function RealizarSimulado() {
 
             {respondidas !== questoes.length && (
               <p className="text-center text-xs text-slate-500 mt-3">
-                Ainda faltam {questoes.length - respondidas} questão(ões).
-                Responda todas para finalizar manualmente. Quando o tempo acabar,
-                o simulado será encerrado automaticamente.
+                Ainda faltam {questoes.length - respondidas} questão(ões). Responda todas para
+                finalizar manualmente. Quando o tempo acabar, o simulado será encerrado
+                automaticamente.
               </p>
             )}
           </>
         ) : (
           <>
             <section className="bg-white border border-slate-200 rounded-xl p-7 text-center shadow-sm mb-6">
-              <div className="text-5xl mb-4">
-                {resultado.porcentagem >= 70 ? '🎉' : '📚'}
-              </div>
+              <div className="text-5xl mb-4">{resultado.porcentagem >= 70 ? '🎉' : '📚'}</div>
 
-              <h2 className="text-2xl font-extrabold text-slate-800">
-                Simulado finalizado!
-              </h2>
+              <h2 className="text-2xl font-extrabold text-slate-800">Simulado finalizado!</h2>
 
               <p className="text-sm text-slate-500 mt-2">
                 {resultado.automatico
@@ -340,14 +355,10 @@ function RealizarSimulado() {
                   : 'Você concluiu o simulado antes do tempo acabar.'}
               </p>
 
-              <p className="text-sm text-slate-500 mt-2">
-                Seu resultado em {banco.titulo}.
-              </p>
+              <p className="text-sm text-slate-500 mt-2">Seu resultado em {banco.titulo}.</p>
 
               <div className="my-7">
-                <p className="text-5xl font-extrabold text-emerald-600">
-                  {resultado.porcentagem}%
-                </p>
+                <p className="text-5xl font-extrabold text-emerald-600">{resultado.porcentagem}%</p>
 
                 <p className="text-sm text-slate-500 mt-2">
                   {resultado.acertos} acertos de {resultado.total} questões
@@ -357,9 +368,7 @@ function RealizarSimulado() {
               <div className="grid grid-cols-2 gap-3 text-left">
                 <div className="bg-emerald-50 rounded-lg p-3">
                   <p className="text-xs text-emerald-700">Acertos</p>
-                  <p className="text-xl font-bold text-emerald-800">
-                    {resultado.acertos}
-                  </p>
+                  <p className="text-xl font-bold text-emerald-800">{resultado.acertos}</p>
                 </div>
 
                 <div className="bg-red-50 rounded-lg p-3">
@@ -377,9 +386,7 @@ function RealizarSimulado() {
               </p>
             </section>
 
-            <h2 className="text-xl font-extrabold text-slate-800 mb-4">
-              Correção das questões
-            </h2>
+            <h2 className="text-xl font-extrabold text-slate-800 mb-4">Correção das questões</h2>
 
             <div className="space-y-4">
               {questoes.map((questao, indice) => {
@@ -387,10 +394,7 @@ function RealizarSimulado() {
                 const acertou = respostaAluno === questao.correta;
 
                 return (
-                  <section
-                    key={indice}
-                    className="bg-white border border-slate-200 rounded-xl p-5"
-                  >
+                  <section key={indice} className="bg-white border border-slate-200 rounded-xl p-5">
                     <div className="flex justify-between items-center gap-3 mb-3">
                       <span className="text-xs font-bold text-slate-500">
                         QUESTÃO {indice + 1} · {questao.materia}
@@ -405,9 +409,7 @@ function RealizarSimulado() {
                       </span>
                     </div>
 
-                    <h3 className="font-bold text-slate-800 mb-4">
-                      {questao.pergunta}
-                    </h3>
+                    <h3 className="font-bold text-slate-800 mb-4">{questao.pergunta}</h3>
 
                     <p className="text-sm text-slate-600">
                       Sua resposta:{' '}
@@ -427,13 +429,9 @@ function RealizarSimulado() {
                     </p>
 
                     <div className="bg-slate-50 rounded-lg p-3 mt-3">
-                      <p className="text-xs font-bold text-slate-700 mb-1">
-                        Entenda a resposta
-                      </p>
+                      <p className="text-xs font-bold text-slate-700 mb-1">Entenda a resposta</p>
 
-                      <p className="text-sm text-slate-600">
-                        {questao.explicacao}
-                      </p>
+                      <p className="text-sm text-slate-600">{questao.explicacao}</p>
                     </div>
                   </section>
                 );

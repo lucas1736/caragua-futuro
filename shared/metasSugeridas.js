@@ -1,16 +1,13 @@
 // Metas sugeridas para cada modalidade de estudo.
-// Os conteúdos seguem o que realmente é cobrado em cada processo
-// seletivo (mesmas matérias/áreas usadas nos simulados do site).
+// Sugestões gerais de estudo por modalidade; não substituem edital ou guia oficial.
 // Ao serem adicionadas, viram metas comuns do usuário (CRUD /api/metas).
 
 export const NOMES_MODALIDADES = {
   integrado: 'IFSP Integrado ao Ensino Médio',
   concomitante: 'IFSP Concomitante e Subsequente',
   etec: 'Vestibulinho ETEC',
-  fatec: 'Vestibular FATEC',
   concurso: 'Concurso público',
-  enem: 'ENEM',
-  outros: 'Outros vestibulares',
+  outros: 'Vestibular',
 };
 
 export const SUGESTOES_POR_MODALIDADE = {
@@ -18,25 +15,26 @@ export const SUGESTOES_POR_MODALIDADE = {
     {
       titulo: 'Revisar interpretação de texto (causa, conclusão e concessão)',
       materia: 'Português',
-      descricao: 'Conteúdo central do IFSP Integrado: identificar causa, conclusão, finalidade e comparação nos enunciados.',
+      descricao:
+        'Conteúdo central do IFSP Integrado: identificar causa, conclusão, finalidade e comparação nos enunciados.',
       prioridade: 'Alta',
     },
     {
       titulo: 'Dominar as quatro operações, frações e decimais',
       materia: 'Matemática',
-      descricao: 'Base do nível do Ensino Fundamental cobrado na prova do integrado.',
+      descricao: 'Revise esses fundamentos e ajuste o foco ao edital ou guia oficial vigente.',
       prioridade: 'Alta',
     },
     {
       titulo: 'Resolver problemas de porcentagem e regra de três',
       materia: 'Matemática',
-      descricao: 'Tipo de questão que mais aparece no processo seletivo do IFSP.',
+      descricao: 'Pratique problemas de porcentagem e regra de três.',
       prioridade: 'Alta',
     },
     {
       titulo: 'Praticar concordância, pontuação e ortografia',
       materia: 'Português',
-      descricao: 'Questões de gramática básica aparecem em toda prova do integrado.',
+      descricao: 'Revise esses tópicos de gramática e consulte o material oficial da seleção.',
       prioridade: 'Média',
     },
     {
@@ -57,19 +55,19 @@ export const SUGESTOES_POR_MODALIDADE = {
     {
       titulo: 'Revisar crase, regência e concordância',
       materia: 'Português',
-      descricao: 'Gramática exigida no processo seletivo para cursos concomitantes e subsequentes.',
+      descricao: 'Revise esses tópicos e confira sua pertinência no edital ou guia oficial.',
       prioridade: 'Alta',
     },
     {
       titulo: 'Treinar equações do 2º grau e funções',
       materia: 'Matemática',
-      descricao: 'Conteúdo de Matemática do Ensino Médio cobrado na prova.',
+      descricao: 'Pratique os conceitos e ajuste o foco ao edital ou guia oficial vigente.',
       prioridade: 'Alta',
     },
     {
       titulo: 'Resolver problemas de porcentagem, escalas e proporcionalidade',
       materia: 'Matemática',
-      descricao: 'Questões aplicadas ao cotidiano, comum no estilo IFSP.',
+      descricao: 'Resolva problemas de proporcionalidade em contextos variados.',
       prioridade: 'Alta',
     },
     {
@@ -96,25 +94,26 @@ export const SUGESTOES_POR_MODALIDADE = {
     {
       titulo: 'Revisar acentuação, concordância e figuras de linguagem',
       materia: 'Português',
-      descricao: 'Língua Portuguesa tem peso grande no Vestibulinho ETEC.',
+      descricao: 'Revise língua portuguesa e confira os conteúdos no manual oficial vigente.',
       prioridade: 'Alta',
     },
     {
       titulo: 'Dominar frações, porcentagem e regra de três',
       materia: 'Matemática',
-      descricao: 'Matemática básica e aplicada é o núcleo da prova de exatas.',
+      descricao: 'Pratique matemática básica e aplicada conforme sua preparação.',
       prioridade: 'Alta',
     },
     {
       titulo: 'Estudar História e Geografia do Brasil',
       materia: 'História',
-      descricao: 'Ciências Humanas entram no Vestibulinho: período colonial, República e urbanização.',
+      descricao:
+        'Ciências Humanas entram no Vestibulinho: período colonial, República e urbanização.',
       prioridade: 'Média',
     },
     {
       titulo: 'Revisar ecologia, cadeias alimentares e meio ambiente',
       materia: 'Biologia',
-      descricao: 'Ciências da Natureza cobradas no estilo do vestibulinho.',
+      descricao: 'Revise temas de ecologia e meio ambiente com materiais de estudo.',
       prioridade: 'Média',
     },
     {
@@ -141,7 +140,7 @@ export const SUGESTOES_POR_MODALIDADE = {
     {
       titulo: 'Treinar funções, logaritmos e geometria espacial',
       materia: 'Matemática',
-      descricao: 'Conteúdos de nível médio/técnico cobrados no Vestibular FATEC.',
+      descricao: 'Estude esses tópicos e confira o programa oficial da seleção vigente.',
       prioridade: 'Alta',
     },
     {
@@ -153,7 +152,7 @@ export const SUGESTOES_POR_MODALIDADE = {
     {
       titulo: 'Revisar tabela periódica e funções inorgânicas',
       materia: 'Química',
-      descricao: 'Química básica exigida no vestibular das FATECs.',
+      descricao: 'Revise conceitos de química e ajuste o foco ao programa oficial vigente.',
       prioridade: 'Média',
     },
     {
@@ -174,31 +173,32 @@ export const SUGESTOES_POR_MODALIDADE = {
     {
       titulo: 'Dominar crase, concordância e regência',
       materia: 'Português',
-      descricao: 'Língua Portuguesa é a matéria com mais questões em concursos de nível médio.',
+      descricao: 'Revise língua portuguesa de acordo com o edital do concurso escolhido.',
       prioridade: 'Alta',
     },
     {
       titulo: 'Treinar porcentagem, regra de três e razão',
       materia: 'Matemática',
-      descricao: 'Matemática básica aplicada, cobrada em concursos municipais e estaduais.',
+      descricao: 'Pratique matemática básica e consulte o conteúdo previsto no edital.',
       prioridade: 'Alta',
     },
     {
       titulo: 'Resolver questões de raciocínio lógico semanalmente',
       materia: 'Matemática',
-      descricao: 'Proposições, negações e sequências lógicas são recorrentes.',
+      descricao: 'Pratique proposições, negações e sequências lógicas.',
       prioridade: 'Alta',
     },
     {
       titulo: 'Estudar os princípios da Administração Pública (LIMPE)',
       materia: 'Geral',
-      descricao: 'Legalidade, Impessoalidade, Moralidade, Publicidade e Eficiência (art. 37 da CF).',
+      descricao:
+        'Legalidade, Impessoalidade, Moralidade, Publicidade e Eficiência (art. 37 da CF).',
       prioridade: 'Média',
     },
     {
       titulo: 'Revisar informática: atalhos, formatos e segurança da informação',
       materia: 'Geral',
-      descricao: 'Noções de informática aparecem em quase todo concurso.',
+      descricao: 'Pratique noções de informática conforme o conteúdo previsto no edital.',
       prioridade: 'Média',
     },
     {
@@ -225,7 +225,7 @@ export const SUGESTOES_POR_MODALIDADE = {
     {
       titulo: 'Estudar ecologia, citologia e genética',
       materia: 'Biologia',
-      descricao: 'Ciências da Natureza: os temas de Biologia mais cobrados no ENEM.',
+      descricao: 'Revise temas de Biologia e compare com a matriz de referência oficial.',
       prioridade: 'Média',
     },
     {
@@ -252,13 +252,13 @@ export const SUGESTOES_POR_MODALIDADE = {
     {
       titulo: 'Revisar interpretação de texto e gramática essencial',
       materia: 'Português',
-      descricao: 'Interpretação e gramática são a base de qualquer vestibular.',
+      descricao: 'Revise interpretação e gramática conforme o processo seletivo escolhido.',
       prioridade: 'Alta',
     },
     {
       titulo: 'Treinar álgebra, geometria e probabilidade',
       materia: 'Matemática',
-      descricao: 'Conteúdos de Matemática mais cobrados nos vestibulares.',
+      descricao: 'Pratique álgebra, geometria e probabilidade conforme o programa da seleção.',
       prioridade: 'Alta',
     },
     {

@@ -1,11 +1,18 @@
 const CHAVE_TOKEN = 'caragua_token';
 const CHAVE_USUARIO = 'caragua_usuario';
 
+const BASE_API = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+
+function resolverUrl(url) {
+  if (/^https?:\/\//i.test(url)) return url;
+  return `${BASE_API}${url}`;
+}
+
 export async function requisicaoApi(url, opcoes = {}) {
   let resposta;
   try {
     const token = localStorage.getItem(CHAVE_TOKEN);
-    resposta = await fetch(url, {
+    resposta = await fetch(resolverUrl(url), {
       ...opcoes,
       headers: {
         'Content-Type': 'application/json',

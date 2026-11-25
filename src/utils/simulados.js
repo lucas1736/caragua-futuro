@@ -36,7 +36,10 @@ export function calcularResultado(questoes, respostas) {
   return {
     acertos,
     total: questoes.length,
-    desempenhoMaterias: Object.entries(desempenhoMaterias).map(([materia, dados]) => ({ materia, ...dados })),
+    desempenhoMaterias: Object.entries(desempenhoMaterias).map(([materia, dados]) => ({
+      materia,
+      ...dados,
+    })),
   };
 }
 

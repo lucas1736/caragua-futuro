@@ -11,10 +11,7 @@ const conexaoConfig = {
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
 };
-const DIRETORIO_MIGRACOES = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  'migrations'
-);
+const DIRETORIO_MIGRACOES = path.join(path.dirname(fileURLToPath(import.meta.url)), 'migrations');
 
 const pool = mysql.createPool({
   ...conexaoConfig,
@@ -33,7 +30,7 @@ export async function prepararBanco() {
   try {
     await conexao.query(
       `CREATE DATABASE IF NOT EXISTS \`${NOME_BANCO}\`
-       CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+       CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`,
     );
     await conexao.query(`USE \`${NOME_BANCO}\``);
     await conexao.query(`
@@ -50,12 +47,15 @@ export async function prepararBanco() {
     for (const arquivo of arquivos) {
       const [aplicadas] = await conexao.query(
         'SELECT versao FROM schema_migrations WHERE versao = ?',
-        [arquivo]
+        [arquivo],
       );
       if (aplicadas.length > 0) continue;
 
       const sql = await readFile(path.join(DIRETORIO_MIGRACOES, arquivo), 'utf8');
-      for (const instrucao of sql.split(';').map((item) => item.trim()).filter(Boolean)) {
+      for (const instrucao of sql
+        .split(';')
+        .map((item) => item.trim())
+        .filter(Boolean)) {
         try {
           await conexao.query(instrucao);
         } catch (erro) {
